@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Talk Challenge - ESL Speaking Activity</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --gray-light: #f8fafc;
+            --gray-border: #e2e8f0;
+            --accent: #0d9488;
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Typography & Common Elements */
+        h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px -1px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-bg);
+            box-shadow: none;
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3);
+        }
+        .btn-accent:hover {
+            background-color: #14b8a6;
+            box-shadow: 0 6px 12px -1px rgba(13, 148, 136, 0.4);
+        }
+
+        /* Screens Layout */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Screen */
+        #home-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .icon-banner {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Main Game Screen Dashboard */
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dynamic Prompt Cards */
+        .card {
+            background: var(--gray-light);
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--primary-light);
+            background: var(--white);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .card-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-content {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        /* Highlight special challenge status */
+        .card.bonus {
+            background: #f0fdfa;
+            border-color: #ccfbf1;
+        }
+        .card.bonus .card-label {
+            color: var(--accent);
+        }
+
+        /* Interactive Question Bar */
+        .question-box {
+            grid-column: 1 / -1;
+            background: var(--primary-bg);
+            border: 2px dashed var(--primary-light);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            min-height: 45px;
+        }
+
+        /* Sidebar: Timer & Toolbox */
+        .sidebar-tools {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-tools {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Speaking Timer Styling */
+        .timer-card {
+            background: var(--white);
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-variant-numeric: tabular-nums;
+            margin: 10px 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+        }
+
+        /* Collapsible Toolbox Accordion */
+        .toolbox-card {
+            background: var(--white);
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .toolbox-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        .accordion-item {
+            margin-bottom: 8px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--gray-border);
+        }
+
+        .accordion-header {
+            background: var(--gray-light);
+            padding: 12px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+
+        .accordion-header:hover {
+            background: var(--primary-bg);
+            color: var(--primary);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            background: var(--white);
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content ul {
+            list-style: none;
+            padding: 12px 16px;
+        }
+
+        .accordion-content li {
+            padding: 4px 0;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .accordion-content li:last-child {
+            border-bottom: none;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 200px;
+        }
+
+        .accordion-item.open .accordion-header::after {
+            content: "▲";
+            font-size: 0.7rem;
+        }
+
+        .accordion-header::after {
+            content: "▼";
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* Teacher Engine Room Controls */
+        .teacher-panel {
+            background: #f1f5f9;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .control-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* End Screen / Reflection Layer */
+        .reflection-list {
+            list-style: none;
+            margin: 24px 0;
+        }
+
+        .reflection-list li {
+            background: var(--primary-bg);
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--gray-border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HOME SCREEN -->
+    <div id="home-screen" class="screen active">
+        <div class="icon-banner">💬</div>
+        <h1>Small Talk Challenge</h1>
+        <p class="subtitle">Can you keep the conversation going?</p>
+        <button class="btn" onclick="startActivity()">Start Challenge</button>
+    </div>
+
+    <!-- MAIN ACTIVITY SCREEN -->
+    <div id="game-screen" class="screen">
+        <h1 style="font-size: 2rem; margin-bottom: 5px; text-align: left;">Challenge Panel</h1>
+        <p class="subtitle" style="text-align: left; margin-bottom: 24px; font-size: 1rem;">Present your screen and challenge your students.</p>
+        
+        <div class="game-grid">
+            <!-- Situation Card -->
+            <div class="card">
+                <div class="card-label">📍 Situation</div>
+                <div id="display-situation" class="card-content">...</div>
+            </div>
+
+            <!-- Role Card -->
+            <div class="card">
+                <div class="card-label">👤 Your Role</div>
+                <div id="display-role" class="card-content">...</div>
+            </div>
+
+            <!-- Goal Card -->
+            <div class="card">
+                <div class="card-label">🎯 Conversation Goal</div>
+                <div id="display-goal" class="card-content">...</div>
+            </div>
+
+            <!-- Bonus Card -->
+            <div class="card bonus">
+                <div class="card-label">⚡ Bonus Challenge</div>
+                <div id="display-bonus" class="card-content">...</div>
+            </div>
+
+            <!-- Random Prompt Generator Bar -->
+            <div class="question-box">
+                <div class="card-label" style="justify-content: center;">💡 Random Conversation Starter</div>
+                <div id="display-question" class="question-text">Click the button below to generate a backup question...</div>
+                <button class="btn btn-secondary btn-sm" style="margin-top: 12px;" onclick="generateQuestion()">Random Question</button>
+            </div>
+        </div>
+
+        <!-- Utilities Row: Timer & Accordion Phrases -->
+        <div class="sidebar-tools">
+            <!-- Timer Module -->
+            <div class="timer-card">
+                <div class="card-label">⏱️ Speaking Timer</div>
+                <div id="timer-display" class="timer-display">02:00</div>
+                <div class="timer-controls">
+                    <button id="timer-start" class="btn btn-sm" onclick="toggleTimer()">Start</button>
+                    <button class="btn btn-secondary btn-sm" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+
+            <!-- Phrases Functional Reference Dropdowns -->
+            <div class="toolbox-card">
+                <div class="toolbox-title">🧰 Conversation Toolbox</div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">Start a Conversation</div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>Hi! Is this seat taken?</li>
+                            <li>How's your day going?</li>
+                            <li>Have you been here before?</li>
+                            <li>That's interesting.</li>
+                            <li>Nice to meet you.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">Keep It Going</div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>Really? Tell me more.</li>
+                            <li>What happened next?</li>
+                            <li>Why do you think that?</li>
+                            <li>What do you usually do?</li>
+                            <li>How about you?</li>
+                            <li>That's a good point.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">End Politely</div>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>It was nice talking to you.</li>
+                            <li>I hope we talk again.</li>
+                            <li>Have a great day!</li>
+                            <li>See you around.</li>
+                            <li>Take care!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Dashboard Operational Core -->
+        <div class="teacher-panel">
+            <div class="panel-title">🛠️ Teacher Control Board</div>
+            <div class="control-btns">
+                <button class="btn btn-accent btn-sm" onclick="generateAll()">New Full Challenge</button>
+                <button class="btn btn-secondary btn-sm" onclick="generateElement('situation')">New Situation</button>
+                <button class="btn btn-secondary btn-sm" onclick="generateElement('role')">New Role</button>
+                <button class="btn btn-secondary btn-sm" onclick="generateElement('goal')">New Goal</button>
+                <button class="btn btn-secondary btn-sm" onclick="generateElement('bonus')">New Bonus</button>
+            </div>
+        </div>
+
+        <!-- Nav Footer -->
+        <div class="nav-footer">
+            <button class="btn btn-secondary btn-sm" onclick="showScreen('home-screen')">↩ Home</button>
+            <button class="btn btn-sm" onclick="showScreen('end-screen')">Finish & Reflect 🏁</button>
+        </div>
+    </div>
+
+    <!-- REFLECTION / END SCREEN -->
+    <div id="end-screen" class="screen">
+        <h1>Review & Reflect</h1>
+        <p class="subtitle">Great job! Let's wrap up your practice performance.</p>
+        
+        <ul class="reflection-list">
+            <li>🤔 What was the easiest part of this challenge?</li>
+            <li>💬 What expression did you find yourself using the most?</li>
+            <li>💡 What new vocabulary words or phrases did you use or learn?</li>
+            <li>📈 How confident did you feel navigating unexpected twists?</li>
+        </ul>
+
+        <div class="nav-footer" style="justify-content: center; gap: 15px;">
+            <button class="btn" onclick="startActivity()">Try Another Challenge</button>
+            <button class="btn btn-secondary" onclick="showScreen('home-screen')">Exit Game</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- DATA REPOSITORIES ---
+    const data = {
+        situations: [
+            "Waiting at the airport", "Coffee shop", "First day at work", 
+            "Before an online meeting", "At the gym", "Waiting for class", 
+            "Bookstore", "Dog park", "Bus stop", "Birthday party", 
+            "Networking event", "Hotel lobby", "University campus", 
+            "Grocery store", "Tourist attraction"
+        ],
+        roles: [
+            "Tourist", "Student", "Teacher", "Engineer", "Customer", 
+            "Traveler", "Photographer", "Designer", "Freelancer", 
+            "Coffee lover", "Dog owner", "Movie fan"
+        ],
+        goals: [
+            "Find something you have in common.",
+            "Keep the conversation going for two minutes.",
+            "Ask at least five follow-up questions.",
+            "Learn about the other person's hobbies.",
+            "Recommend something.",
+            "Make a new friend.",
+            "Give advice.",
+            "Invite the person somewhere.",
+            "Exchange travel tips.",
+            "Talk about weekend plans."
+        ],
+        bonuses: [
+            "Use three follow-up questions.",
+            "Use one phrasal verb.",
+            "Don't answer with yes or no.",
+            "Tell a short story.",
+            "Give a compliment.",
+            "Make the other person laugh.",
+            "Use the word 'Actually...'",
+            "Use the phrase 'By the way...'",
+            "Ask about future plans.",
+            "Agree politely."
+        ],
+        questions: [
+            "What's your favorite place you've ever visited?",
+            "What's a hobby you'd like to learn?",
+            "What's the best meal you've ever had?",
+            "Do you enjoy working from home?",
+            "What's your dream vacation?",
+            "What kind of music do you listen to when you want to relax?",
+            "Are you a morning person or a night owl?",
+            "What is the best movie you have watched this year?",
+            "Do you prefer cooking at home or eating out?",
+            "What's your favorite season of the year and why?",
+            "What's the most interesting book you've read recently?",
+            "Do you prefer city vacations or nature trips?",
+            "What's your favorite thing to do on the weekends?",
+            "If you could have dinner with any famous person, who would it be?",
+            "What's the most useful app on your phone?",
+            "How do you usually pass the time when you're commuting or waiting?",
+            "What's your favorite childhood memory?",
+            "Do you collect anything?",
+            "What's your favorite holiday?",
+            "What is something you are looking forward to next month?",
+            "What's the best piece of advice you've ever received?",
+            "Do you have any pets, or what animal would you want?",
+            "What's your favorite cold-weather drink?",
+            "What's a skill you think everyone should have?",
+            "What's the most beautiful park you've been to?",
+            "Do you prefer watching movies at home or in the theater?",
+            "What's a local food from your city that everyone must try?",
+            "What was your favorite subject in school?",
+            "What is your absolute dream job?",
+            "Do you prefer physical books or e-books?",
+            "What's the first thing you do when you get home from work or school?",
+            "What's an item you bought recently that you absolutely love?",
+            "What's your favorite way to exercise?",
+            "If you could live in any country for one year, where would it be?",
+            "What's something that always makes you laugh?",
+            "What's your favorite TV show to binge-watch?",
+            "Do you prefer sweet or savory snacks?",
+            "What's the most adventurous thing you've ever done?",
+            "How do you like to celebrate your birthday?",
+            "What's a language you'd love to learn besides English?",
+            "What's your favorite board game or card game?",
+            "Do you like going to museums, or do you find them boring?",
+            "What is the longest road trip you have ever taken?",
+            "What's your favorite type of weather?",
+            "What is one goal you hope to achieve this year?",
+            "What's the most interesting museum you've ever visited?",
+            "Do you like shopping online or in physical stores?",
+            "What's something you could talk about for hours?",
+            "What's your favorite family tradition?",
+            "What's the most important quality in a friend?"
+        ]
+    };
+
+    // --- APPLICATION RUNTIME STATE ---
+    let timerInterval = null;
+    let timeRemaining = 120; // 2 minutes standard
+    let isTimerRunning = false;
+
+    // --- SCREEN NAVIGATION CONTROLLER ---
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        
+        // Pause timer if shifting away from game screen
+        if (screenId !== 'game-screen' && isTimerRunning) {
+            toggleTimer();
+        }
+    }
+
+    function startActivity() {
+        showScreen('game-screen');
+        generateAll();
+        resetTimer();
+    }
+
+    // --- RANDOMIZATION CORE ENGINES ---
+    function getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function generateElement(type) {
+        if (type === 'situation') {
+            document.getElementById('display-situation').innerText = getRandomItem(data.situations);
+        } else if (type === 'role') {
+            document.getElementById('display-role').innerText = getRandomItem(data.roles);
+        } else if (type === 'goal') {
+            document.getElementById('display-goal').innerText = getRandomItem(data.goals);
+        } else if (type === 'bonus') {
+            document.getElementById('display-bonus').innerText = getRandomItem(data.bonuses);
+        }
+    }
+
+    function generateAll() {
+        generateElement('situation');
+        generateElement('role');
+        generateElement('goal');
+        generateElement('bonus');
+        document.getElementById('display-question').innerText = "Click below if your conversation stalls!";
+    }
+
+    function generateQuestion() {
+        document.getElementById('display-question').innerText = getRandomItem(data.questions);
+    }
+
+    // --- TIMER IMPLEMENTATION MECHANICS ---
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        document.getElementById('timer-display').innerText = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function toggleTimer() {
+        const startBtn = document.getElementById('timer-start');
+        if (isTimerRunning) {
+            // Pause behavior
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            startBtn.innerText = "Start";
+            startBtn.style.backgroundColor = "var(--primary)";
+        } else {
+            // Start execution
+            isTimerRunning = true;
+            startBtn.innerText = "Pause";
+            startBtn.style.backgroundColor = "#e11d48"; // Red alert color accents
+            
+            timerInterval = setInterval(() => {
+                if (timeRemaining > 0) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    startBtn.innerText = "Start";
+                    startBtn.style.backgroundColor = "var(--primary)";
+                    alert("Time's up! Wrap up your final thoughts.");
+                }
+            }, 1000);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        timeRemaining = 120;
+        updateTimerDisplay();
+        const startBtn = document.getElementById('timer-start');
+        startBtn.innerText = "Start";
+        startBtn.style.backgroundColor = "var(--primary)";
+    }
+
+    // --- UI/UX ACCORDION INTERACTION CONTROL ---
+    function toggleAccordion(element) {
+        const parent = element.parentElement;
+        const isOpen = parent.classList.contains('open');
+        
+        // Close other panels cleanly
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            item.classList.remove('open');
+        });
+
+        if (!isOpen) {
+            parent.classList.add('open');
+        }
+    }
+</script>
+
+</body>
+</html>
