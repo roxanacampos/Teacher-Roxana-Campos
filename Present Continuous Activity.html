@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's Happening Now? - Present Continuous Game</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --bg-gradient: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --white: #ffffff;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Screens Management */
+        .screen {
+            display: none;
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1 {
+            color: var(--primary);
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        /* Dashboard & Progress Components */
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .meta-pill {
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .meta-pill span {
+            color: var(--primary);
+        }
+
+        .round-banner {
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+        }
+
+        /* Interactive UI Elements */
+        .prompt-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 30px;
+            border-radius: var(--radius);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-option {
+            background: var(--white);
+            color: var(--text-main);
+            border: 2px solid #cbd5e1;
+            border-radius: var(--radius);
+            padding: 18px 25px;
+            font-size: 1.3rem;
+            text-align: left;
+            box-shadow: none;
+        }
+
+        .btn-option:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            transform: none;
+        }
+
+        /* Feedback States */
+        .btn-option.correct {
+            background: #ecfdf5 !important;
+            border-color: var(--success) !important;
+            color: var(--success) !important;
+        }
+
+        .btn-option.wrong {
+            background: #fef2f2 !important;
+            border-color: var(--error) !important;
+            color: var(--error) !important;
+        }
+
+        .feedback-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: var(--radius);
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .feedback-box.wrong {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .explanation {
+            font-weight: 400;
+            margin-top: 5px;
+            font-size: 1.1rem;
+            display: block;
+        }
+
+        /* Speaking Challenge Visuals */
+        .speaking-graphic {
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+
+        /* End Screen Displays */
+        .score-display {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .message-box {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 35px;
+            color: var(--text-muted);
+            padding: 0 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+
+        <!-- WELCOME SCREEN -->
+        <div id="welcome-screen" class="screen active">
+            <div style="font-size: 5rem; margin-bottom: 15px;">🎬</div>
+            <h1>What's Happening Now?</h1>
+            <p class="instructions">
+                Master the Present Continuous tense! <br>
+                Choose the correct answers, fix grammar mistakes, and describe real-time situations aloud.
+            </p>
+            <button class="btn" onclick="startGame()">Start Challenge</button>
+        </div>
+
+        <!-- PLAYING INTERFACE SCREEN -->
+        <div id="game-screen" class="screen">
+            <div class="game-meta">
+                <div class="meta-pill">Progress: <span id="current-step">1</span>/<span id="total-steps">10</span></div>
+                <div class="meta-pill">Score: <span id="score-counter">0</span></div>
+            </div>
+
+            <div id="round-indicator" class="round-banner">Round 1: Multiple Choice</div>
+            
+            <div id="question-text" class="prompt-box">Loading challenge content...</div>
+            
+            <div id="options-container" class="options-grid">
+                <!-- Actionable items populating dynamic items locally -->
+            </div>
+
+            <div id="feedback-panel" class="feedback-box"></div>
+
+            <div style="margin-top: 25px; text-align: right;">
+                <button id="next-btn" class="btn" style="display: none;" onclick="advanceGame()">Next Question →</button>
+            </div>
+        </div>
+
+        <!-- SCORE REPORT SCREEN -->
+        <div id="end-screen" class="screen">
+            <div style="font-size: 5rem;">🏆</div>
+            <h2>Challenge Complete!</h2>
+            <div class="score-display"><span id="final-score">0</span>%</div>
+            <div id="final-message" class="message-box">Excellent performance practicing English!</div>
+            <button class="btn" onclick="resetGameObj()">Play Again</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA OBJECT SCHEMATICS ---
+        const gameData = {
+            round1: [
+                { q: "She ___ watching TV right now.", a: ["is", "are", "am"], c: 0 },
+                { q: "They ___ playing soccer at the moment.", a: ["is", "are", "am"], c: 1 },
+                { q: "What ___ you doing right now?", a: ["is", "are", "am"], c: 1 },
+                { q: "Listen! The birds ___ singing beautifully.", a: ["is", "are", "am"], c: 1 },
+                { q: "I ___ studying for my English exam today.", a: ["is", "are", "am"], c: 2 },
+                { q: "He isn't working today. He ___ relaxing at home.", a: ["is", "are", "am"], c: 0 },
+                { q: "Look! It ___ snowing outside!", a: ["is", "are", "am"], c: 0 },
+                { q: "Why ___ everyone laughing?", a: ["is", "are", "am"], c: 0 },
+                { q: "We ___ planning a big party this week.", a: ["is", "are", "am"], c: 1 },
+                { q: "The kids ___ running around in the garden.", a: ["is", "are", "am"], c: 1 }
+            ],
+            round2: [
+                { 
+                    wrong: "He are cooking dinner.", 
+                    options: ["He is cooking dinner.", "He cooking dinner.", "He am cooking dinner."], 
+                    correct: 0, 
+                    exp: "Always use 'is' with third-person singular pronouns (He, She, It)." 
+                },
+                { 
+                    wrong: "They sitting in the living room right now.", 
+                    options: ["They is sitting in the living room.", "They are sitting in the living room right now.", "They are siting in the living room."], 
+                    correct: 1, 
+                    exp: "Don't forget the helping verb 'are' and double the 't' in 'sitting'." 
+                },
+                { 
+                    wrong: "I am writeing an email at the moment.", 
+                    options: ["I are writing an email.", "I am writing an email at the moment.", "I writing an email."], 
+                    correct: 1, 
+                    exp: "Drop the final '-e' when adding '-ing' to verbs like 'write'." 
+                },
+                { 
+                    wrong: "What are you do?", 
+                    options: ["What are you doing?", "What do you doing?", "What are you do?"], 
+                    correct: 0, 
+                    exp: "Questions about actions happening right now require the verb + '-ing'." 
+                },
+                { 
+                    wrong: "She not listening to music.", 
+                    options: ["She are not listening.", "She not listening.", "She is not listening to music."], 
+                    correct: 2, 
+                    exp: "Negative sentences need the verb 'to be' + 'not' + verb-ing." 
+                },
+                { 
+                    wrong: "We are playying video games.", 
+                    options: ["We is playing video games.", "We are playing video games.", "We playing video games."], 
+                    correct: 1, 
+                    exp: "For verbs ending in 'y', simply add '-ing' without modifying or doubling the letters." 
+                },
+                { 
+                    wrong: "The dog is bark right now.", 
+                    options: ["The dog is barking right now.", "The dog barking right now.", "The dog are barking."], 
+                    correct: 0, 
+                    exp: "The structural combination requires both 'is/are' and the '-ing' suffix." 
+                },
+                { 
+                    wrong: "Are you work today?", 
+                    options: ["You are working today?", "Are you working today?", "Is you working today?"], 
+                    correct: 1, 
+                    exp: "Invert the position of the verb 'to be' and the subject to formulate standard questions." 
+                }
+            ],
+            round3: [
+                { text: "What are you doing right now?", icon: "💬" },
+                { text: "Look around your room. What is happening around you?", icon: "👀" },
+                { text: "What is your family or roommate doing at this moment?", icon: "🏠" },
+                { text: "What clothes are you wearing today?", icon: "👕" },
+                { text: "Think about your best friend. What are they probably doing right now?", icon: "🧘" },
+                { text: "What kind of projects are you working on these days?", icon: "💻" },
+                { text: "Is the weather changing outside right now? Describe it!", icon: "☀️" },
+                { text: "Imagine you are at a busy beach. What are the people doing?", icon: "🏖️" },
+                { text: "Imagine you are at a lively restaurant. What is happening around you?", icon: "🍕" },
+                { text: "What English skills are we practicing during this game session?", icon: "🧠" }
+            ]
+        };
+
+        // --- ENGINE RUNTIME REGISTRY STATES ---
+        let currentRound = 1; 
+        let currentIndex = 0;
+        let runningScore = 0;
+        let totalPossibleQuestions = gameData.round1.length + gameData.round2.length;
+        let optionSelectedState = false;
+
+        // --- ENGINE NAVIGATOR UTILITIES ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            currentRound = 1;
+            currentIndex = 0;
+            runningScore = 0;
+            showScreen('game-screen');
+            loadChallenge();
+        }
+
+        // --- CARD FACTORY INJECTORS ---
+        function loadChallenge() {
+            optionSelectedState = false;
+            document.getElementById('feedback-panel').className = "feedback-box";
+            document.getElementById('next-btn').style.display = "none";
+            document.getElementById('score-counter').innerText = runningScore;
+
+            if (currentRound === 1) {
+                document.getElementById('round-indicator').innerText = "Round 1: Choose the Correct Answer";
+                document.getElementById('current-step').innerText = currentIndex + 1;
+                document.getElementById('total-steps').innerText = gameData.round1.length;
+                
+                let qData = gameData.round1[currentIndex];
+                document.getElementById('question-text').innerText = qData.q;
+                
+                let optionsHtml = "";
+                qData.a.forEach((opt, idx) => {
+                    optionsHtml += `<button class="btn btn-option" onclick="verifyRound1Answer(${idx})">${opt}</button>`;
+                });
+                document.getElementById('options-container').innerHTML = optionsHtml;
+
+            } else if (currentRound === 2) {
+                document.getElementById('round-indicator').innerText = "Round 2: Fix the Mistake";
+                document.getElementById('current-step').innerText = currentIndex + 1;
+                document.getElementById('total-steps').innerText = gameData.round2.length;
+                
+                let qData = gameData.round2[currentIndex];
+                document.getElementById('question-text').innerHTML = `<span style="color:var(--error); font-size:0.95rem; display:block; margin-bottom:5px;">Incorrect Sentence:</span> "${qData.wrong}"`;
+                
+                let optionsHtml = "";
+                qData.options.forEach((opt, idx) => {
+                    optionsHtml += `<button class="btn btn-option" onclick="verifyRound2Answer(${idx})">${opt}</button>`;
+                });
+                document.getElementById('options-container').innerHTML = optionsHtml;
+
+            } else if (currentRound === 3) {
+                document.getElementById('round-indicator').innerText = "Round 3: Speaking Challenge (Answer Aloud!)";
+                document.getElementById('current-step').innerText = currentIndex + 1;
+                document.getElementById('total-steps').innerText = gameData.round3.length;
+                
+                let qData = gameData.round3[currentIndex];
+                document.getElementById('question-text').innerHTML = `
+                    <div class="speaking-graphic">${qData.icon}</div>
+                    <div style="font-size:1.6rem;">${qData.text}</div>
+                `;
+                document.getElementById('options-container').innerHTML = ""; 
+                document.getElementById('next-btn').innerText = currentIndex === gameData.round3.length - 1 ? "Finish Game 🎉" : "Next Prompt →";
+                document.getElementById('next-btn').style.display = "inline-block";
+            }
+        }
+
+        // --- ACTIONS VALIDATION INTERACTION ---
+        function verifyRound1Answer(chosenIdx) {
+            if (optionSelectedState) return;
+            optionSelectedState = true;
+
+            let targetCorrect = gameData.round1[currentIndex].c;
+            let optionButtons = document.getElementById('options-container').children;
+            let feedPanel = document.getElementById('feedback-panel');
+
+            if (chosenIdx === targetCorrect) {
+                optionButtons[chosenIdx].classList.add('correct');
+                feedPanel.className = "feedback-box correct";
+                feedPanel.innerText = "Excellent! That is correct.";
+                runningScore++;
+            } else {
+                optionButtons[chosenIdx].classList.add('wrong');
+                optionButtons[targetCorrect].classList.add('correct');
+                feedPanel.className = "feedback-box wrong";
+                feedPanel.innerText = `Oops! The correct answer is "${gameData.round1[currentIndex].a[targetCorrect]}".`;
+            }
+
+            document.getElementById('score-counter').innerText = runningScore;
+            document.getElementById('next-btn').innerText = "Next Question →";
+            document.getElementById('next-btn').style.display = "inline-block";
+        }
+
+        function verifyRound2Answer(chosenIdx) {
+            if (optionSelectedState) return;
+            optionSelectedState = true;
+
+            let currentItem = gameData.round2[currentIndex];
+            let targetCorrect = currentItem.correct;
+            let optionButtons = document.getElementById('options-container').children;
+            let feedPanel = document.getElementById('feedback-panel');
+
+            if (chosenIdx === targetCorrect) {
+                optionButtons[chosenIdx].classList.add('correct');
+                feedPanel.className = "feedback-box correct";
+                feedPanel.innerHTML = `Perfect! Correct version chosen. <span class="explanation">💡 ${currentItem.exp}</span>`;
+                runningScore++;
+            } else {
+                optionButtons[chosenIdx].classList.add('wrong');
+                optionButtons[targetCorrect].classList.add('correct');
+                feedPanel.className = "feedback-box wrong";
+                feedPanel.innerHTML = `Not quite. <span class="explanation">💡 ${currentItem.exp}</span>`;
+            }
+
+            document.getElementById('score-counter').innerText = runningScore;
+            document.getElementById('next-btn').innerText = "Next Question →";
+            document.getElementById('next-btn').style.display = "inline-block";
+        }
+
+        // --- FLOW LOGIC PIPELINE SYSTEM ---
+        function advanceGame() {
+            currentIndex++;
+
+            if (currentRound === 1 && currentIndex >= gameData.round1.length) {
+                currentRound = 2;
+                currentIndex = 0;
+            } else if (currentRound === 2 && currentIndex >= gameData.round2.length) {
+                currentRound = 3;
+                currentIndex = 0;
+            } else if (currentRound === 3 && currentIndex >= gameData.round3.length) {
+                endGameMetricsReport();
+                return;
+            }
+            loadChallenge();
+        }
+
+        function endGameMetricsReport() {
+            let parsedPercentage = Math.round((runningScore / totalPossibleQuestions) * 100);
+            document.getElementById('final-score').innerText = parsedPercentage;
+
+            let evaluationMessageStr = "";
+            if (parsedPercentage >= 90) {
+                evaluationMessageStr = "Excellent! You are using the Present Continuous very well!";
+            } else if (parsedPercentage >= 70) {
+                evaluationMessageStr = "Great job! Keep practicing!";
+            } else {
+                evaluationMessageStr = "Good effort! Practice more and try again!";
+            }
+
+            document.getElementById('final-message').innerText = evaluationMessageStr;
+            showScreen('end-screen');
+        }
+
+        function resetGameObj() {
+            showScreen('welcome-screen');
+        }
+    </script>
+</body>
+</html>
