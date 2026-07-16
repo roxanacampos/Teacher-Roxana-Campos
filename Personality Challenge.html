@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who Am I? – Personality Challenge</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-bg: #eff6ff;
+            --neutral-dark: #1e293b;
+            --neutral-light: #f8fafc;
+            --accent: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-success: #10b981;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--neutral-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 30px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--primary-light);
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Views management */
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Screen */
+        .instructions-card {
+            background-color: var(--neutral-light);
+            border-left: 5px solid var(--primary-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .instructions-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .instructions-card ol {
+            padding-left: 20px;
+        }
+
+        .instructions-card li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-accent { background-color: var(--accent); }
+        .btn-accent:hover { background-color: #f59e0bda; }
+        .btn-danger { background-color: var(--accent-danger); }
+        .btn-danger:hover { background-color: #ef4444d0; }
+        .btn-success { background-color: var(--accent-success); }
+        .btn-success:hover { background-color: #10b981d0; }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+
+        .btn-large {
+            font-size: 1.3rem;
+            padding: 16px 40px;
+            display: block;
+            margin: 30px auto 10px auto;
+            border-radius: 12px;
+        }
+
+        /* Main Game Layout */
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .game-grid {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+
+        /* Secret Card */
+        .card {
+            background: white;
+            border: 2px solid var(--primary-light);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card.hidden-state {
+            border-style: dashed;
+            background: var(--neutral-light);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+
+        .secret-word {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+            padding: 10px;
+            background: #e0f2fe;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            display: block;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card.hidden-state .secret-word {
+            display: none;
+        }
+
+        .word-blur {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: #cbd5e1;
+            color: #cbd5e1;
+            user-select: none;
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 10px;
+            text-shadow: 0 0 12px rgba(30,41,59,0.9);
+            display: none;
+        }
+
+        .card.hidden-state .word-blur {
+            display: block;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Hints and Forbiddens */
+        .info-section {
+            margin-top: 20px;
+            text-align: left;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #f1f5f9;
+        }
+
+        .info-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--neutral-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hints-list {
+            list-style-position: inside;
+            padding-left: 5px;
+        }
+
+        .hints-list li {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        .forbidden-tokens {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .token {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #fca5a5;
+            text-transform: lowercase;
+        }
+
+        /* Side Elements (Timer & Prompts) */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-box {
+            background: var(--neutral-light);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-box h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 10px 0;
+            color: var(--neutral-dark);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-display.warning {
+            color: var(--accent-danger);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .prompt-text {
+            font-style: italic;
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.4;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Teacher Actions Dashboard */
+        .teacher-dashboard {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Reflection Modal / View */
+        .reflection-box {
+            background: #f0fdf4;
+            border: 2px solid var(--accent-success);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .reflection-box h3 {
+            color: #166534;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .reflection-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 600px) {
+            .reflection-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .reflection-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-success);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .footer-info {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Who Am I?</h1>
+        <div class="subtitle">Personality Challenge</div>
+
+        <!-- VIEW 1: HOME / INSTRUCTIONS -->
+        <div id="homeView" class="view active">
+            <div class="instructions-card">
+                <h3>Game Instructions</h3>
+                <ol>
+                    <li>Click <strong>Start Game</strong> to draw your first character profile.</li>
+                    <li>The speaker looks at the <strong>Secret Personality</strong> card (the adjective is visible automatically).</li>
+                    <li>Use the random <strong>Conversation Starter</strong> prompt to talk about your behavior without saying the secret word or any of the 3 listed <strong>Forbidden Words</strong>.</li>
+                    <li>The rest of the class listens, asks follow-up questions, and guesses the secret trait before the <strong>90-second timer</strong> runs out.</li>
+                </ol>
+            </div>
+            <button class="btn btn-large" onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- VIEW 2: MAIN GAME BOARD -->
+        <div id="gameView" class="view">
+            <div class="game-grid">
+                
+                <!-- Main Secret Display Panel -->
+                <div class="card" id="personalityCard">
+                    <div class="card-icon" id="cardIcon">👤</div>
+                    <div class="card-title">Your Secret Personality</div>
+                    
+                    <div class="word-blur" id="blurredText">•••••••••••••</div>
+                    <div class="secret-word" id="secretWord">Outgoing</div>
+
+                    <button class="btn btn-secondary btn-sm" id="toggleWordBtn" onclick="toggleWordVisibility()">Hide Word</button>
+
+                    <!-- Hints Area -->
+                    <div class="info-section">
+                        <div class="info-title">💡 Descriptive Clues:</div>
+                        <ul class="hints-list" id="hintsList">
+                            <li>Loves meeting new people.</li>
+                            <li>Enjoys social events.</li>
+                            <li>Starts conversations safely and easily.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Forbidden Words Area -->
+                    <div class="info-section">
+                        <div class="info-title" style="color: var(--accent-danger);">⚠️ Forbidden Words (Do NOT Say):</div>
+                        <div class="forbidden-tokens" id="forbiddenTokens">
+                            <span class="token">social</span>
+                            <span class="token">friendly</span>
+                            <span class="token">extrovert</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side Mechanics Panels -->
+                <div class="side-panel">
+                    <!-- Speaking Countdown Timer -->
+                    <div class="panel-box">
+                        <h4>⏱️ Speaking Timer</h4>
+                        <div class="timer-display" id="timerDisplay">90</div>
+                        <div class="timer-controls">
+                            <button class="btn btn-sm btn-success" onclick="startTimer()">Start</button>
+                            <button class="btn btn-sm btn-accent" onclick="pauseTimer()">Pause</button>
+                            <button class="btn btn-sm btn-secondary" onclick="resetTimer()">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Vector -->
+                    <div class="panel-box">
+                        <h4>💬 Conversation Prompt</h4>
+                        <div class="prompt-text" id="promptText">Describe your daily behavior.</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Teacher Operational Controls Dashboard -->
+            <div class="teacher-dashboard">
+                <button class="btn btn-sm" onclick="drawNewPersonality()">New Personality</button>
+                <button class="btn btn-sm btn-accent" onclick="drawNewPrompt()">New Prompt</button>
+                <button class="btn btn-sm btn-success" onclick="revealCard(true)">Reveal Answer</button>
+                <button class="btn btn-sm btn-secondary" onclick="revealCard(false)">Hide Answer</button>
+                <button class="btn btn-sm" style="background-color: #4f46e5;" onclick="nextPlayer()">Next Player</button>
+                <button class="btn btn-sm btn-danger" onclick="resetEntireGame()">Reset Game</button>
+            </div>
+
+            <!-- Extra Assessment Features -->
+            <button class="btn btn-secondary btn-sm" style="margin-top: 20px; width: 100%;" onclick="toggleReflection()">💡 Show/Hide Reflection Questions</button>
+            
+            <div id="reflectionBox" class="reflection-box" style="display: none;">
+                <h3>Wrap-Up Reflection Questions</h3>
+                <div class="reflection-grid">
+                    <div class="reflection-item">Which personality was the hardest to describe?</div>
+                    <div class="reflection-item">Which new adjective did you learn today?</div>
+                    <div class="reflection-item">Which personality describes you best?</div>
+                    <div class="reflection-item">Which adjective would you like to use more often?</div>
+                </div>
+            </div>
+
+            <div class="footer-info" id="deckCounter">Cards remaining in deck: 60/60</div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA POOLS ---
+        const personalityDatabase = [
+            { word: "outgoing", icon: "📢", hints: ["Loves meeting new people.", "Enjoys busy social events.", "Starts conversations safely and easily."], avoid: ["social", "friendly", "extrovert"] },
+            { word: "reliable", icon: "🤝", hints: ["Keeps promises securely.", "People trust this person deeply.", "Always finishes responsibilities accurately."], avoid: ["trust", "always", "depend"] },
+            { word: "optimistic", icon: "☀️", hints: ["Always looks at the positive side.", "Believes good things will happen.", "Stays cheerful during tough times."], avoid: ["positive", "good", "hope"] },
+            { word: "adventurous", icon: "🧗", hints: ["Loves exploring brand-new places.", "Enjoys taking exciting risks.", "Hates staying in one boring routine."], avoid: ["explore", "risk", "travel"] },
+            { word: "creative", icon: "🎨", hints: ["Has a vivid, wild imagination.", "Good at making art or new concepts.", "Thinks outside the traditional box."], avoid: ["art", "imagine", "idea"] },
+            { word: "generous", icon: "🎁", hints: ["Loves giving things to others.", "Shares money, time, or food freely.", "Thinks about other people's needs."], avoid: ["give", "share", "kind"] },
+            { word: "thoughtful", icon: "🧠", hints: ["Remembers details like birthdays.", "Thinks deeply before acting or speaking.", "Cares deeply about others' comfort."], avoid: ["think", "kind", "consider"] },
+            { word: "patient", icon: "⏳", hints: ["Can wait smoothly for a long time.", "Does not get angry when things are slow.", "Handles slow situations calmly."], avoid: ["wait", "calm", "slow"] },
+            { word: "confident", icon: "😎", hints: ["Believes strongly in themselves.", "Not afraid to speak up in crowds.", "Sure of their skills or looks."], avoid: ["believe", "sure", "proud"] },
+            { word: "ambitious", icon: "🚀", hints: ["Has massive goals for the future.", "Works incredibly hard to find success.", "Wants a top career or position."], avoid: ["goal", "work", "success"] },
+            { word: "honest", icon: "😇", hints: ["Always speaks the pure truth.", "Never steals, cons, or cheats.", "Tells facts even when it hurts."], avoid: ["truth", "lie", "real"] },
+            { word: "independent", icon: "🦅", hints: ["Loves working entirely alone.", "Doesn't need help from anyone.", "Makes own choices confidently."], avoid: ["alone", "myself", "help"] },
+            { word: "cheerful", icon: "😊", hints: ["Filled with happiness and smiles.", "Spreads great energy to the room.", "Rarely looks sad or grumpy."], avoid: ["happy", "smile", "glad"] },
+            { word: "responsible", icon: "📅", hints: ["Takes care of duties correctly.", "Admits mistakes when things go wrong.", "Can be trusted with difficult jobs."], avoid: ["job", "duty", "blame"] },
+            { word: "friendly", icon: "👋", hints: ["Easy to approach and talk to.", "Kind to strangers and newcomers.", "Has lots of close companions."], avoid: ["nice", "kind", "friend"] },
+            { word: "calm", icon: "🧘", hints: ["Peaceful in stressful emergencies.", "Keeps voice quiet and smooth.", "Does not panic easily."], avoid: ["relaxed", "peace", "quiet"] },
+            { word: "curious", icon: "🧐", hints: ["Asks endless deep questions.", "Wants to learn how things work.", "Interested in brand new facts."], avoid: ["ask", "know", "wonder"] },
+            { word: "open-minded", icon: "🌍", hints: ["Accepts different ideas easily.", "Listens well to strange opinions.", "Loves learning from other cultures."], avoid: ["listen", "accept", "new"] },
+            { word: "easy-going", icon: "🍃", hints: ["Relaxed about how plans change.", "Rarely gets stressed or worried.", "Very flexible in groups."], avoid: ["relaxed", "chill", "calm"] },
+            { word: "supportive", icon: "❤️", hints: ["Encourages friends when they are down.", "Helps others achieve goals.", "Always cheers for your team."], avoid: ["help", "friend", "cheer"] },
+            { word: "shy", icon: "🫣", hints: ["Nervous around brand new faces.", "Hates being the center of attention.", "Prefers to stay quiet in groups."], avoid: ["quiet", "scared", "timid"] },
+            { word: "stubborn", icon: "🫏", hints: ["Refuses to change their mind.", "Will not listen to advice from anyone.", "Insists on doing things their way."], avoid: ["change", "mind", "no"] },
+            { word: "bossy", icon: "📣", hints: ["Constantly tells people what to do.", "Acts like the manager everywhere.", "Demands things be done their way."], avoid: ["order", "tell", "manager"] },
+            { word: "impatient", icon: "⏱️", hints: ["Hates waiting in long lines.", "Gets annoyed when things are slow.", "Wants results immediately."], avoid: ["wait", "slow", "fast"] },
+            { word: "selfish", icon: "🪙", hints: ["Only cares about their own needs.", "Hates sharing food or items.", "Thinks of themselves first."], avoid: ["me", "share", "own"] },
+            { word: "lazy", icon: "🦥", hints: ["Avoids doing physical work.", "Prefers lying down or watching TV.", "Puts off chores endlessly."], avoid: ["tired", "sleep", "work"] },
+            { word: "moody", icon: "🎭", hints: ["Changes emotions very quickly.", "Happy one minute, angry the next.", "Hard to predict how they feel."], avoid: ["happy", "sad", "change"] },
+            { word: "careless", icon: "💥", hints: ["Makes simple, silly mistakes.", "Does not check details closely.", "Drops or breaks things often."], avoid: ["mistake", "forget", "clumsy"] },
+            { word: "arrogant", icon: "👑", hints: ["Thinks they are better than all.", "Looks down on other classmates.", "Boasts about skills constantly."], avoid: ["best", "proud", "better"] },
+            { word: "pessimistic", icon: "🌧️", hints: ["Always expects the worst output.", "Focuses only on negative issues.", "Believes plans will fail."], avoid: ["bad", "fail", "negative"] },
+            { word: "forgetful", icon: "🗝️", hints: ["Loses keys or wallets often.", "Cannot remember phone numbers.", "Misses appointments regularly."], avoid: ["remember", "lose", "mind"] },
+            { word: "competitive", icon: "🏆", hints: ["Desperately wants to win games.", "Turns every activity into a race.", "Hates coming in second place."], avoid: ["win", "game", "play"] },
+            { word: "talkative", icon: "💬", hints: ["Speaks for hours without stopping.", "Uses a lot of words constantly.", "Enjoys long phone chats."], avoid: ["speak", "chat", "word"] },
+            { word: "quiet", icon: "🤫", hints: ["Makes very little loud noise.", "Speaks only when necessary.", "Enjoys peaceful, empty rooms."], avoid: ["silent", "shy", "loud"] },
+            { word: "organized", icon: "📁", hints: ["Keeps a highly neat desk room.", "Plans days with detailed schedules.", "Can find documents instantly."], avoid: ["neat", "clean", "plan"] },
+            { word: "messy", icon: "🌪️", hints: ["Leaves clothes all over floors.", "Desks are always chaotic.", "Spills things without cleaning."], avoid: ["dirty", "clean", "room"] },
+            { word: "brave", icon: "🦁", hints: ["Faces terrifying dangers safely.", "Stands up for what is right.", "Not afraid of pain or fear."], avoid: ["scared", "fear", "courage"] },
+            { word: "sensitive", icon: "🥺", hints: ["Cries easily during movies.", "Feelings get hurt very quickly.", "Notices others' emotions fast."], avoid: ["cry", "feel", "hurt"] },
+            { word: "flexible", icon: "🤸", hints: ["Changes plans without getting upset.", "Adapts easily to new schedules.", "Happy to try alternative choices."], avoid: ["change", "easy", "plan"] },
+            { word: "loyal", icon: "🐕", hints: ["Stays with companions through bad times.", "Never betrays a business or friend.", "Supports their group completely."], avoid: ["friend", "stay", "betray"] },
+            { word: "energetic", icon: "⚡", hints: ["Has boundless active stamina.", "Moves quickly and enthusiastically.", "Rarely feels physically drained."], avoid: ["tired", "active", "power"] },
+            { word: "humorous", icon: "🤡", hints: ["Excellent at making jokes.", "Makes people laugh out loud.", "Sees the funny side of life."], avoid: ["funny", "laugh", "joke"] },
+            { word: "mature", icon: "🍷", hints: ["Behaves like a wise adult.", "Handles crises very sensibly.", "Not childish in tough times."], avoid: ["adult", "old", "wise"] },
+            { word: "determined", icon: "🎯", hints: ["Never gives up on a mission.", "Keeps trying despite huge failures.", "Focused entirely on finishing."], avoid: ["stop", "try", "give up"] },
+            { word: "sociable", icon: "🥂", hints: ["Enjoys being around big groups.", "Seeks out constant human connection.", "Has a huge network of peers."], avoid: ["friend", "outgoing", "people"] },
+            { word: "respectful", icon: "🙇", hints: ["Shows deep honor to elders.", "Polite to everyone they greet.", "Listens without interrupting."], avoid: ["polite", "nice", "honor"] },
+            { word: "polite", icon: "🙏", hints: ["Always says please and thank you.", "Has flawless social manners.", "Never acts rude or offensive."], avoid: ["manner", "nice", "rude"] },
+            { word: "jealous", icon: "💚", hints: ["Wants what other people own.", "Dislikes seeing rivals succeed.", "Worries about losing a partner."], avoid: ["envy", "want", "envious"] },
+            { word: "insecure", icon: "🫣", hints: ["Doubts their own true value.", "Worries what people think of them.", "Uncomfortable in their own skin."], avoid: ["confident", "afraid", "worry"] },
+            { word: "dependable", icon: "🛡️", hints: ["You can rely on them totally.", "They perform exactly as expected.", "Never lets the team down."], avoid: ["trust", "reliable", "help"] },
+            { word: "punctual", icon: "⏰", hints: ["Always arrives exactly on time.", "Hates being late to class.", "Manages travel schedules perfectly."], avoid: ["time", "late", "arrive"] },
+            { word: "emotional", icon: "😭", hints: ["Expresses powerful feelings openly.", "Guided by heart rather than logic.", "Reacts strongly with tears or joy."], avoid: ["feel", "cry", "mood"] },
+            { word: "practical", icon: "🛠️", hints: ["Focuses on real world facts.", "Chooses useful items over pretty ones.", "Solves problems realistically."], avoid: ["real", "useful", "logic"] },
+            { word: "imaginative", icon: "🦄", hints: ["Invents highly unique stories.", "Creates complex worlds in mind.", "Sees magic in basic ideas."], avoid: ["creative", "think", "art"] },
+            { word: "disciplined", icon: "🥋", hints: ["Follows strict self-rules easily.", "Exercises daily without breaking.", "Controls bad temptations firmly."], avoid: ["rule", "control", "strict"] },
+            { word: "forgiving", icon: "🕊️", hints: ["Stops being angry at mistakes.", "Accepts apologies right away.", "Does not hold long grudges."], avoid: ["sorry", "angry", "forget"] },
+            { word: "demanding", icon: "😤", hints: ["Expects perfect work from others.", "Very hard to satisfy or please.", "Sets brutally high benchmarks."], avoid: ["hard", "want", "high"] },
+            { word: "enthusiastic", icon: "🤩", hints: ["Incredibly excited about tasks.", "Shows massive interest and passion.", "Eager to start new ideas."], avoid: ["excited", "happy", "eager"] },
+            { word: "resourceful", icon: "🧰", hints: ["Finds clever ways to solve traps.", "Good at using random items.", "Smart in unexpected emergencies."], avoid: ["smart", "solve", "find"] }
+        ];
+
+        const promptsDatabase = [
+            "Describe your daily behavior.",
+            "Talk about your relationships.",
+            "Describe how you work in a team.",
+            "Explain how you react under pressure.",
+            "Talk about your hobbies.",
+            "Describe yourself at school.",
+            "Describe yourself at work.",
+            "Tell a short story illustrating this trait.",
+            "How does this character act on vacation?",
+            "How does this person treat cashiers?",
+            "What does this person do on weekends?",
+            "Describe a family member with this trait.",
+            "How does this trait affect making friends?",
+            "Describe a movie character like this.",
+            "How do you handle an argument with this trait?",
+            "What is the best part about being this way?",
+            "What is the hardest part about being this way?",
+            "How does this person react to a surprise?",
+            "Describe a boss who acts like this.",
+            "How does this trait show during a party?",
+            "What kind of jobs fit this personality?",
+            "How does this trait appear on social media?",
+            "What does this person do when they are lost?",
+            "How does this trait change as people grow old?",
+            "Give advice to someone who is too much like this.",
+            "How does this person handle heavy traffic?",
+            "Describe a morning routine using this trait.",
+            "How does this character react to losing a game?",
+            "What would this person do with lottery money?",
+            "How does this personality handle a big secret?"
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let deck = [...personalityDatabase];
+        let currentCard = null;
+        let isRevealed = true; // Set to true so word is visible immediately
+
+        let timerInterval = null;
+        let timeLeft = 90;
+
+        // --- NAVIGATION ---
+        function startGame() {
+            document.getElementById('homeView').classList.remove('active');
+            document.getElementById('gameView').classList.add('active');
+            nextPlayer();
+        }
+
+        // --- GAMEPLAY MECHANICS ---
+        function shuffleDeck() {
+            deck = [...personalityDatabase];
+        }
+
+        function drawNewPersonality() {
+            if (deck.length === 0) {
+                alert("The deck is empty! Shuffling all 60 cards back in.");
+                shuffleDeck();
+            }
+
+            const index = Math.floor(Math.random() * deck.length);
+            currentCard = deck.splice(index, 1)[0];
+
+            document.getElementById('secretWord').innerText = currentCard.word;
+            document.getElementById('cardIcon').innerText = currentCard.icon;
+            
+            const hintsEl = document.getElementById('hintsList');
+            hintsEl.innerHTML = '';
+            currentCard.hints.forEach(hint => {
+                const li = document.createElement('li');
+                li.innerText = hint;
+                hintsEl.appendChild(li);
+            });
+
+            const forbiddenEl = document.getElementById('forbiddenTokens');
+            forbiddenEl.innerHTML = '';
+            currentCard.avoid.forEach(word => {
+                const span = document.createElement('span');
+                span.className = 'token';
+                span.innerText = word;
+                forbiddenEl.appendChild(span);
+            });
+
+            document.getElementById('deckCounter').innerText = `Cards remaining in deck: ${deck.length}/60`;
+            
+            // Render it visible immediately for the student
+            revealCard(true);
+        }
+
+        function drawNewPrompt() {
+            const index = Math.floor(Math.random() * promptsDatabase.length);
+            document.getElementById('promptText').innerText = promptsDatabase[index];
+        }
+
+        function revealCard(shouldReveal) {
+            isRevealed = shouldReveal;
+            const card = document.getElementById('personalityCard');
+            const btn = document.getElementById('toggleWordBtn');
+
+            if (isRevealed) {
+                card.classList.remove('hidden-state');
+                btn.innerText = "Hide Word";
+            } else {
+                card.classList.add('hidden-state');
+                btn.innerText = "Show Word";
+            }
+        }
+
+        function toggleWordVisibility() {
+            revealCard(!isRevealed);
+        }
+
+        function nextPlayer() {
+            drawNewPersonality();
+            drawNewPrompt();
+            resetTimer();
+        }
+
+        function toggleReflection() {
+            const box = document.getElementById('reflectionBox');
+            box.style.display = (box.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function resetEntireGame() {
+            if(confirm("Are you sure you want to completely restart? This resets the card deck.")) {
+                shuffleDeck();
+                document.getElementById('reflectionBox').style.display = 'none';
+                nextPlayer();
+            }
+        }
+
+        // --- TIMER MECHANICS ---
+        function updateTimerUI() {
+            const display = document.getElementById('timerDisplay');
+            display.innerText = timeLeft;
+            if (timeLeft <= 10) {
+                display.classList.add('warning');
+            } else {
+                display.classList.remove('warning');
+            }
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerUI();
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert("Time's Up! Give your classmates one last chance to guess.");
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timeLeft = 90;
+            updateTimerUI();
+        }
+    </script>
+</body>
+</html>
