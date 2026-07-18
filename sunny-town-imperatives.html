@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Sunny Town — Imperatives Adventure | Ready2Speak</title>
+<style>
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
+:root{
+  --sky-top:#bfe8ff;
+  --sky-bottom:#eef9ff;
+  --sun:#ffc93c;
+  --sun-dark:#f4a300;
+  --grass:#3faa5b;
+  --grass-dark:#2d8a46;
+  --road:#33415c;
+  --road-line:#ffd23f;
+  --coral:#ff6b5b;
+  --coral-dark:#e2503f;
+  --go:#2fae66;
+  --go-dark:#1f8f52;
+  --blue:#4fb0e8;
+  --blue-dark:#2f8fc9;
+  --purple:#9b6bd6;
+  --navy:#1c2b3a;
+  --ink-soft:#4a5b6c;
+  --card:#ffffff;
+  --card-border:#dbe9f5;
+  --shadow-sm: 0 4px 10px rgba(28,43,58,.10);
+  --shadow-md: 0 10px 25px rgba(28,43,58,.16);
+  --shadow-lg: 0 18px 40px rgba(28,43,58,.22);
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 9px;
+  --font-display:'Trebuchet MS','Segoe UI',Verdana,sans-serif;
+  --font-body:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'Courier New',monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  color:var(--navy);
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 88% 6%, rgba(255,201,60,.55), transparent 40%),
+    linear-gradient(180deg,var(--sky-top) 0%, var(--sky-bottom) 55%, #eafaef 100%);
+  overflow-x:hidden;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+}
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+button{font-family:inherit;}
+:focus-visible{outline:3px solid var(--blue-dark); outline-offset:3px; border-radius:6px;}
+
+/* ============================================================
+   2. LAYOUT — HEADER / ROAD PROGRESS / SCORE
+   ============================================================ */
+#app{display:flex; flex-direction:column; min-height:100vh;}
+
+.topbar{
+  position:sticky; top:0; z-index:50;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:14px;
+  padding:10px 18px;
+  background:rgba(255,255,255,.72);
+  backdrop-filter:blur(8px);
+  border-bottom:2px solid var(--card-border);
+}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand svg{width:44px; height:44px; flex:none;}
+.brand-text h1{
+  margin:0; font-family:var(--font-display); font-size:clamp(15px,3vw,20px);
+  letter-spacing:.3px; color:var(--navy); line-height:1.1;
+}
+.brand-text p{margin:0; font-size:11px; color:var(--ink-soft); letter-spacing:.4px;}
+
+.road-progress{width:100%; max-width:560px; justify-self:center;}
+.road-progress svg{width:100%; height:46px; display:block;}
+.road-progress-label{
+  text-align:center; font-size:11px; color:var(--ink-soft); margin-top:2px;
+  font-family:var(--font-mono);
+}
+
+.score-badge{
+  display:flex; align-items:center; gap:6px;
+  background:var(--navy); color:#fff;
+  padding:8px 14px; border-radius:999px; box-shadow:var(--shadow-sm);
+  font-family:var(--font-mono); font-weight:700; font-size:15px;
+  white-space:nowrap;
+}
+.score-badge svg{width:18px; height:18px;}
+
+/* ============================================================
+   3. MAIN CONTENT
+   ============================================================ */
+main{
+  flex:1; width:100%; max-width:920px; margin:0 auto;
+  padding:22px 16px 60px;
+}
+.screen{animation:fadeUp .5s ease both;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+
+.screen-head{text-align:center; margin-bottom:20px;}
+.eyebrow{
+  display:inline-block; font-family:var(--font-mono); font-size:12px;
+  letter-spacing:1.5px; text-transform:uppercase; color:var(--blue-dark);
+  background:#e7f5ff; border:1px solid #cfe9fb; padding:4px 12px; border-radius:999px;
+  margin-bottom:10px;
+}
+.screen-head h2{
+  font-family:var(--font-display); font-size:clamp(22px,4.2vw,32px);
+  margin:0 0 8px; color:var(--navy);
+}
+.screen-head p{margin:0; color:var(--ink-soft); font-size:15px; max-width:560px; margin-inline:auto;}
+
+.card{
+  background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-md); padding:22px;
+}
+
+/* Buttons */
+.btn{
+  border:none; cursor:pointer; font-weight:700; font-family:var(--font-body);
+  border-radius:999px; padding:13px 26px; font-size:15.5px;
+  display:inline-flex; align-items:center; gap:8px; justify-content:center;
+  box-shadow:var(--shadow-sm); transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.btn:hover{transform:translateY(-2px); box-shadow:var(--shadow-md);}
+.btn:active{transform:translateY(0) scale(.97);}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none;}
+.btn-go{background:linear-gradient(180deg,var(--go),var(--go-dark)); color:#fff;}
+.btn-sky{background:linear-gradient(180deg,var(--blue),var(--blue-dark)); color:#fff;}
+.btn-sun{background:linear-gradient(180deg,var(--sun),var(--sun-dark)); color:var(--navy);}
+.btn-coral{background:linear-gradient(180deg,var(--coral),var(--coral-dark)); color:#fff;}
+.btn-ghost{background:#fff; color:var(--navy); border:2px solid var(--card-border);}
+.btn-lg{padding:16px 34px; font-size:18px;}
+.btn svg{width:18px; height:18px;}
+
+.actions-row{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:22px;}
+
+/* Listen button */
+.listen-bar{display:flex; justify-content:center; margin-bottom:18px;}
+.listen-btn{
+  display:flex; align-items:center; gap:10px; background:#fff;
+  border:2px solid var(--sun-dark); color:var(--navy); border-radius:999px;
+  padding:10px 20px; font-weight:700; cursor:pointer; box-shadow:var(--shadow-sm);
+}
+.listen-btn svg{width:22px; height:22px;}
+.listen-btn.speaking{animation:pulseRing 1s ease-in-out infinite;}
+@keyframes pulseRing{0%,100%{box-shadow:0 0 0 0 rgba(244,163,0,.45);} 50%{box-shadow:0 0 0 8px rgba(244,163,0,0);}}
+
+.prompt-text{
+  text-align:center; font-family:var(--font-display); font-size:clamp(18px,3vw,24px);
+  color:var(--navy); margin:2px 0 18px;
+}
+
+/* Option grid (Activity 1) */
+.option-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px;
+}
+.option-card{
+  background:#fff; border:2px solid var(--card-border); border-radius:var(--radius-md);
+  padding:14px 10px 12px; cursor:pointer; text-align:center; transition:transform .15s, border-color .15s, box-shadow .15s;
+}
+.option-card:hover{transform:translateY(-3px); border-color:var(--blue); box-shadow:var(--shadow-sm);}
+.option-card svg{width:64px; height:64px;}
+.option-card .cap{display:block; font-size:13.5px; font-weight:600; margin-top:6px; color:var(--navy);}
+.option-card.correct{background:#e8fbef; border-color:var(--go); animation:pop .4s ease;}
+.option-card.incorrect{background:#ffecea; border-color:var(--coral); animation:shake .45s ease;}
+.option-card.dim{opacity:.5; pointer-events:none;}
+
+@keyframes pop{0%{transform:scale(1);} 40%{transform:scale(1.08);} 100%{transform:scale(1);}}
+@keyframes shake{
+  10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(4px);}
+  30%,50%,70%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);}
+}
+
+/* Feedback toast */
+.feedback{
+  display:flex; align-items:center; gap:10px; justify-content:center;
+  font-family:var(--font-display); font-size:17px; font-weight:700;
+  padding:12px 18px; border-radius:var(--radius-md); margin:16px auto 0; max-width:420px;
+  animation:slideDown .35s ease both;
+}
+.feedback.good{background:#e6faed; color:var(--go-dark); border:2px solid var(--go);}
+.feedback.bad{background:#fff0ee; color:var(--coral-dark); border:2px solid var(--coral);}
+@keyframes slideDown{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);}}
+
+/* Progress within an activity */
+.mini-progress{max-width:420px; margin:0 auto 16px;}
+.mini-progress-track{
+  height:10px; border-radius:999px; background:#e2eef7; overflow:hidden;
+}
+.mini-progress-fill{
+  height:100%; border-radius:999px; background:linear-gradient(90deg,var(--sun),var(--go));
+  transition:width .4s ease;
+}
+.mini-progress-text{text-align:center; font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); margin-top:4px;}
+
+/* ============================================================
+   4. ACTIVITY 2 — DRAG THE COMMAND
+   ============================================================ */
+.city-scene{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:14px; margin-bottom:24px;
+}
+.drop-zone{
+  background:#f5fbff; border:2.5px dashed #b9dcf2; border-radius:var(--radius-md);
+  padding:14px 8px; text-align:center; min-height:126px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; position:relative; transition:border-color .15s, background .15s;
+}
+.drop-zone svg{width:68px; height:68px;}
+.drop-zone.hover{border-color:var(--blue-dark); background:#e7f5ff;}
+.drop-zone.filled{border-style:solid; background:#e8fbef; border-color:var(--go);}
+.drop-zone.wrong-flash{border-color:var(--coral); background:#fff0ee; animation:shake .45s ease;}
+.drop-zone .placed-card{
+  position:absolute; top:-14px; background:var(--go); color:#fff; font-size:11px; font-weight:700;
+  padding:3px 8px; border-radius:999px; box-shadow:var(--shadow-sm);
+}
+
+.card-tray{
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:14px;
+  background:#fff; border:1px solid var(--card-border); border-radius:var(--radius-md);
+}
+.command-card{
+  background:linear-gradient(180deg,#ffffff,#f4f9ff); border:2px solid var(--blue);
+  color:var(--navy); font-weight:700; font-size:14px; padding:11px 16px; border-radius:999px;
+  cursor:grab; touch-action:none; user-select:none; box-shadow:var(--shadow-sm);
+  transition:transform .12s, box-shadow .12s, opacity .2s;
+}
+.command-card.negative{border-color:var(--coral); background:linear-gradient(180deg,#ffffff,#fff5f3);}
+.command-card.selected{outline:3px solid var(--sun-dark); outline-offset:2px;}
+.command-card.dragging{opacity:.35;}
+.command-card.placed{display:none;}
+.command-card:active{cursor:grabbing;}
+.ghost-card{
+  position:fixed; z-index:999; pointer-events:none; transform:translate(-50%,-50%) scale(1.06);
+  box-shadow:var(--shadow-lg);
+}
+
+/* ============================================================
+   5. ACTIVITY 3 — IS IT CORRECT?
+   ============================================================ */
+.situation-card{text-align:center;}
+.situation-illustration{width:min(100%,320px); margin:0 auto 18px; display:block;}
+.choice-pair{display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
+.choice-btn{
+  min-width:150px; background:#fff; border:2.5px solid var(--card-border);
+  border-radius:var(--radius-md); padding:16px 20px; font-family:var(--font-display);
+  font-size:17px; font-weight:700; cursor:pointer; color:var(--navy); transition:all .15s;
+}
+.choice-btn:hover{border-color:var(--blue); transform:translateY(-2px);}
+.choice-btn.correct{background:#e6faed; border-color:var(--go); color:var(--go-dark); animation:pop .4s ease;}
+.choice-btn.incorrect{background:#fff0ee; border-color:var(--coral); color:var(--coral-dark); animation:shake .45s ease;}
+
+/* ============================================================
+   6. ACTIVITY 4 — BUILD THE SENTENCE
+   ============================================================ */
+.sentence-slot-row{
+  display:flex; flex-wrap:wrap; gap:8px; justify-content:center; min-height:58px;
+  padding:12px; background:#f5fbff; border:2px dashed #b9dcf2; border-radius:var(--radius-md); margin-bottom:18px;
+}
+.slot{
+  min-width:64px; height:44px; border-bottom:3px solid var(--blue); display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:16px; color:var(--navy);
+}
+.slot.has-word{border-bottom-color:var(--go);}
+.word-bank{display:flex; flex-wrap:wrap; gap:10px; justify-content:center;}
+.word-tile{
+  background:#fff; border:2px solid var(--sun-dark); border-radius:var(--radius-sm);
+  padding:10px 16px; font-family:var(--font-display); font-size:16px; cursor:pointer;
+  box-shadow:var(--shadow-sm); transition:transform .12s, opacity .2s;
+}
+.word-tile:hover{transform:translateY(-2px);}
+.word-tile.used{opacity:.25; pointer-events:none;}
+
+/* ============================================================
+   7. ACTIVITY 5 — SPEAKING CHALLENGE
+   ============================================================ */
+.mic-btn{
+  width:88px; height:88px; border-radius:50%; border:none; cursor:pointer;
+  background:radial-gradient(circle at 35% 30%, #ff9a8b, var(--coral-dark));
+  color:#fff; box-shadow:var(--shadow-md); display:flex; align-items:center; justify-content:center;
+  margin:6px auto 10px;
+}
+.mic-btn svg{width:38px; height:38px;}
+.mic-btn.listening{animation:micPulse 1.1s ease-in-out infinite;}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,91,.45);} 50%{box-shadow:0 0 0 14px rgba(255,107,91,0);}}
+.heard-text{
+  text-align:center; font-family:var(--font-mono); font-size:14px; color:var(--ink-soft);
+  min-height:20px; margin-top:8px;
+}
+
+/* ============================================================
+   8. FINAL CHALLENGE — CITY MAP
+   ============================================================ */
+.town-map{
+  position:relative; padding:16px 14px 14px; border-radius:var(--radius-lg);
+  background:linear-gradient(180deg,#eafaf1,#eafaf1 62%, #33415c 62%, #33415c 78%, #eafaf1 78%);
+  margin-bottom:6px;
+}
+.town-map-road-line{
+  position:absolute; left:14px; right:14px; top:calc(62% + 8px); height:2px;
+  background:repeating-linear-gradient(90deg,var(--road-line) 0 14px, transparent 14px 26px);
+  pointer-events:none;
+}
+.map-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; position:relative;
+}
+.map-tile{
+  background:#fff; border:2.5px solid var(--card-border); border-radius:var(--radius-md);
+  padding:12px 8px 10px; cursor:pointer; text-align:center; transition:transform .15s ease, border-color .15s, box-shadow .15s;
+}
+.map-tile svg{width:52px; height:52px;}
+.map-tile .cap{display:block; font-size:12px; font-weight:700; margin-top:4px; color:var(--navy);}
+.map-tile:hover{transform:translateY(-3px); border-color:var(--blue); box-shadow:var(--shadow-sm);}
+.map-tile:focus-visible{transform:translateY(-3px);}
+.map-tile.correct-flash{background:#e8fbef; border-color:var(--go); animation:pop .4s ease;}
+.map-tile.wrong-flash{background:#ffecea; border-color:var(--coral); animation:shake .45s ease;}
+.map-tile.dim{opacity:.5; pointer-events:none;}
+
+/* ============================================================
+   9. RESULTS SCREEN
+   ============================================================ */
+.results-wrap{text-align:center;}
+.stars-row{font-size:44px; margin:10px 0 6px; letter-spacing:6px;}
+.score-big{font-family:var(--font-mono); font-size:46px; font-weight:700; color:var(--navy); margin:6px 0;}
+.results-msg{font-family:var(--font-display); font-size:22px; color:var(--go-dark); margin-bottom:6px;}
+.results-breakdown{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin:22px 0; text-align:left;
+}
+.results-breakdown .item{
+  background:#fff; border:1px solid var(--card-border); border-radius:var(--radius-md); padding:12px 14px;
+  display:flex; justify-content:space-between; align-items:center; font-size:14px;
+}
+.results-breakdown .item b{font-family:var(--font-mono);}
+
+#confettiLayer{position:fixed; inset:0; pointer-events:none; z-index:200; overflow:hidden;}
+
+/* decorative footer strip */
+.grass-strip{
+  height:26px; background:linear-gradient(180deg,var(--grass),var(--grass-dark));
+  border-top:4px solid #2a7a41; margin-top:auto;
+}
+
+/* Responsive tweaks */
+@media (max-width:640px){
+  .topbar{grid-template-columns:auto 1fr auto; gap:8px; padding:8px 10px;}
+  .brand-text p{display:none;}
+  .road-progress{display:none;}
+  .score-badge{padding:6px 10px; font-size:13px;}
+  .option-card svg{width:52px; height:52px;}
+  .choice-btn{min-width:120px; padding:13px 14px; font-size:15px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="34" fill="#ffc93c"/><circle cx="50" cy="50" r="34" fill="none" stroke="#f4a300" stroke-width="4"/><g stroke="#f4a300" stroke-width="5" stroke-linecap="round"><line x1="50" y1="6" x2="50" y2="16"/><line x1="50" y1="84" x2="50" y2="94"/><line x1="6" y1="50" x2="16" y2="50"/><line x1="84" y1="50" x2="94" y2="50"/><line x1="18" y1="18" x2="25" y2="25"/><line x1="75" y1="75" x2="82" y2="82"/><line x1="82" y1="18" x2="75" y2="25"/><line x1="25" y1="75" x2="18" y2="82"/></g><rect x="30" y="44" width="40" height="12" rx="6" fill="#1c2b3a"/><path d="M38 66 Q50 74 62 66" stroke="#1c2b3a" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+      <div class="brand-text">
+        <h1>Sunny Town</h1>
+        <p>An Imperatives Adventure · Ready2Speak</p>
+      </div>
+    </div>
+
+    <div class="road-progress" aria-hidden="true">
+      <svg viewBox="0 0 560 46" id="roadSvg">
+        <path id="roadPath" d="M10,23 C120,5 180,42 280,23 C380,5 440,42 550,23" stroke="#33415c" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <path d="M10,23 C120,5 180,42 280,23 C380,5 440,42 550,23" stroke="#ffd23f" stroke-width="2" stroke-dasharray="8 8" fill="none"/>
+        <g id="roadStops"></g>
+        <g id="roadCar" transform="translate(10,23)">
+          <g transform="translate(-13,-9)">
+            <rect x="0" y="7" width="26" height="10" rx="4" fill="#ff6b5b"/>
+            <rect x="5" y="2" width="14" height="8" rx="3" fill="#ff6b5b"/>
+            <rect x="7" y="3.5" width="4.5" height="5" rx="1" fill="#eafaff"/>
+            <rect x="13" y="3.5" width="4.5" height="5" rx="1" fill="#eafaff"/>
+            <circle cx="6.5" cy="18" r="3.4" fill="#1c2b3a"/>
+            <circle cx="19.5" cy="18" r="3.4" fill="#1c2b3a"/>
+          </g>
+        </g>
+      </svg>
+      <div class="road-progress-label" id="roadLabel">Start your trip →</div>
+    </div>
+
+    <div class="score-badge" aria-live="polite">
+      <svg viewBox="0 0 24 24" fill="#ffc93c"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.9L5.8 21l1.6-7-5.4-4.7 7.1-.6z"/></svg>
+      <span id="scoreCount">0</span>
+    </div>
+  </header>
+
+  <main id="main" role="main"></main>
+
+  <div id="confettiLayer" aria-hidden="true"></div>
+  <div id="srLive" class="sr-only" role="status" aria-live="polite"></div>
+  <div class="grass-strip"></div>
+</div>
+
+<script>
+/* ============================================================
+   SUNNY TOWN — IMPERATIVES ADVENTURE
+   Vanilla JS, no external assets/libraries. Fully offline.
+   Sections:
+     A. Palette + icon library (inline SVG)
+     B. Audio: speech synthesis + Web Audio sound effects
+     C. Speech recognition helper
+     D. App state, road progress, navigation
+     E. Activity 1 — Listen & Choose
+     F. Activity 2 — Drag the Command
+     G. Activity 3 — Is It Correct?
+     H. Activity 4 — Build the Sentence
+     I. Activity 5 — Speaking Challenge
+     J. Final Challenge — City Map
+     K. Start / Results screens + confetti
+   ============================================================ */
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------
+   A. PALETTE + ICON LIBRARY
+   ------------------------------------------------------------ */
+const C = {
+  navy:'#1c2b3a', wall:'#fff6e6', wall2:'#ffe7c2', roof:'#ff6b5b', roof2:'#e2503f',
+  blue:'#4fb0e8', blueD:'#2f8fc9', grass:'#3faa5b', grassD:'#2d8a46',
+  sun:'#ffc93c', sunD:'#f4a300', go:'#2fae66', goD:'#1f8f52',
+  coral:'#ff6b5b', coralD:'#e2503f', purple:'#9b6bd6', purpleD:'#7a4fc0',
+  white:'#ffffff', brown:'#a9713a', skin:'#f4c39a', hair:'#4a3223', paper:'#f5fbff'
+};
+
+function svg(inner, vb){ vb = vb || 100; return '<svg viewBox="0 0 '+vb+' '+vb+'" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">'+inner+'</svg>'; }
+
+const ICONS = {
+  bank: svg('<rect x="8" y="55" width="84" height="34" rx="3" fill="'+C.wall+'"/><polygon points="50,10 92,42 8,42" fill="'+C.roof+'"/><rect x="8" y="42" width="84" height="8" fill="'+C.roof2+'"/>'+
+    ['20','35','50','65','80'].map(function(x){return '<rect x="'+(+x-3)+'" y="50" width="6" height="34" fill="'+C.blueD+'"/>';}).join('')+
+    '<rect x="4" y="89" width="92" height="6" rx="2" fill="'+C.navy+'"/>'),
+  pharmacy: svg('<rect x="10" y="34" width="80" height="55" rx="6" fill="'+C.white+'"/><rect x="10" y="34" width="80" height="14" fill="'+C.go+'"/>'+
+    '<rect x="38" y="55" width="24" height="8" rx="2" fill="'+C.go+'"/><rect x="46" y="47" width="8" height="24" rx="2" fill="'+C.go+'"/>'+
+    '<rect x="20" y="70" width="16" height="19" fill="'+C.blue+'"/><rect x="64" y="70" width="16" height="19" fill="'+C.blue+'"/>'),
+  school: svg('<rect x="14" y="46" width="72" height="43" rx="4" fill="'+C.wall2+'"/><polygon points="50,18 88,46 12,46" fill="'+C.blueD+'"/>'+
+    '<rect x="46" y="6" width="4" height="16" fill="'+C.navy+'"/><polygon points="50,7 68,12 50,17" fill="'+C.coral+'"/>'+
+    '<rect x="24" y="58" width="14" height="14" rx="2" fill="'+C.blue+'"/><rect x="62" y="58" width="14" height="14" rx="2" fill="'+C.blue+'"/>'+
+    '<rect x="42" y="70" width="16" height="19" rx="2" fill="'+C.navy+'"/>'),
+  supermarket: svg('<rect x="10" y="42" width="80" height="47" rx="4" fill="'+C.wall+'"/>'+
+    '<path d="M8,42 L20,26 L80,26 L92,42 Z" fill="'+C.coral+'"/>'+
+    ['0','20','40','60'].map(function(x,i){return '<polygon points="'+(20+ +x)+',26 '+(38+ +x)+',26 '+(34+ +x)+',42 '+(16+ +x)+',42" fill="'+(i%2?C.white:C.coralD)+'"/>';}).join('')+
+    '<circle cx="34" cy="80" r="10" fill="'+C.blue+'"/><rect x="26" y="66" width="16" height="12" rx="2" fill="'+C.blueD+'"/>'+
+    '<circle cx="66" cy="83" r="4" fill="'+C.navy+'"/><circle cx="80" cy="83" r="4" fill="'+C.navy+'"/><path d="M58,66 h6 l6,17 h20" stroke="'+C.navy+'" stroke-width="3" fill="none"/>'),
+  library: svg('<rect x="10" y="52" width="80" height="37" rx="3" fill="'+C.wall2+'"/><polygon points="50,20 90,52 10,52" fill="'+C.purple+'"/><rect x="10" y="52" width="80" height="6" fill="'+C.purpleD+'"/>'+
+    ['22','38','54','70'].map(function(x){return '<rect x="'+x+'" y="58" width="8" height="31" fill="'+C.purpleD+'"/>';}).join('')+
+    '<path d="M30,42 q10,-8 20,0 q10,-8 20,0" stroke="'+C.navy+'" stroke-width="3" fill="none" stroke-linecap="round"/>'),
+  park: svg('<rect x="0" y="72" width="100" height="18" fill="'+C.grass+'"/><circle cx="60" cy="34" r="22" fill="'+C.grassD+'"/><rect x="56" y="50" width="8" height="24" fill="'+C.brown+'"/>'+
+    '<circle cx="60" cy="34" r="22" fill="'+C.grass+'" opacity="0.6"/>'+
+    '<circle cx="22" cy="18" r="10" fill="'+C.sun+'"/>'+
+    '<rect x="12" y="76" width="30" height="5" rx="2" fill="'+C.brown+'"/><rect x="14" y="81" width="4" height="8" fill="'+C.brown+'"/><rect x="36" y="81" width="4" height="8" fill="'+C.brown+'"/>'),
+  restaurant: svg('<rect x="10" y="44" width="80" height="45" rx="4" fill="'+C.wall+'"/><path d="M8,44 Q50,20 92,44 Z" fill="'+C.coral+'"/>'+
+    '<circle cx="50" cy="66" r="15" fill="'+C.white+'" stroke="'+C.coralD+'" stroke-width="3"/>'+
+    '<path d="M44,58 v9 M46,58 v9 M48,58 v9" stroke="'+C.navy+'" stroke-width="2" stroke-linecap="round"/>'+
+    '<path d="M58,58 v9 m-2,-9 a2,2 0 1,0 4,0" stroke="'+C.navy+'" stroke-width="2" fill="none" stroke-linecap="round"/>'),
+  hospital: svg('<rect x="14" y="38" width="72" height="51" rx="4" fill="'+C.white+'" stroke="'+C.blue+'" stroke-width="3"/>'+
+    '<rect x="42" y="12" width="16" height="34" rx="3" fill="'+C.coral+'"/>'+
+    '<rect x="34" y="20" width="32" height="18" rx="3" fill="'+C.coral+'"/>'+
+    '<rect x="46" y="24" width="8" height="10" fill="'+C.white+'"/><rect x="42" y="26" width="16" height="6" fill="'+C.white+'"/>'+
+    '<rect x="24" y="60" width="14" height="14" rx="2" fill="'+C.blue+'"/><rect x="62" y="60" width="14" height="14" rx="2" fill="'+C.blue+'"/>'),
+  museum: svg('<rect x="8" y="55" width="84" height="34" rx="3" fill="'+C.wall2+'"/><polygon points="50,12 92,42 8,42" fill="'+C.purple+'"/><rect x="8" y="42" width="84" height="8" fill="'+C.purpleD+'"/>'+
+    ['20','35','50','65','80'].map(function(x){return '<rect x="'+(+x-3)+'" y="50" width="6" height="34" fill="'+C.purpleD+'"/>';}).join('')+
+    '<rect x="10" y="89" width="80" height="5" fill="'+C.navy+'"/><rect x="4" y="94" width="92" height="5" fill="'+C.navy+'" opacity="0.5"/>'),
+
+  walk: svg('<circle cx="50" cy="20" r="10" fill="'+C.skin+'"/><path d="M50 30 v22" stroke="'+C.blueD+'" stroke-width="9" stroke-linecap="round"/>'+
+    '<path d="M50 34 L34 26" stroke="'+C.blueD+'" stroke-width="7" stroke-linecap="round"/><path d="M50 34 L68 44" stroke="'+C.blueD+'" stroke-width="7" stroke-linecap="round"/>'+
+    '<path d="M50 52 L34 78" stroke="'+C.navy+'" stroke-width="8" stroke-linecap="round"/><path d="M50 52 L66 72" stroke="'+C.navy+'" stroke-width="8" stroke-linecap="round"/>'),
+  run: svg('<circle cx="46" cy="18" r="10" fill="'+C.skin+'"/><path d="M46 28 L58 48" stroke="'+C.coral+'" stroke-width="9" stroke-linecap="round"/>'+
+    '<path d="M50 34 L70 24" stroke="'+C.coral+'" stroke-width="7" stroke-linecap="round"/><path d="M55 40 L34 30" stroke="'+C.coral+'" stroke-width="7" stroke-linecap="round"/>'+
+    '<path d="M58 48 L76 60" stroke="'+C.navy+'" stroke-width="8" stroke-linecap="round"/><path d="M58 48 L44 78" stroke="'+C.navy+'" stroke-width="8" stroke-linecap="round"/>'),
+  car: svg('<rect x="10" y="42" width="80" height="26" rx="10" fill="'+C.blue+'"/><rect x="24" y="24" width="46" height="24" rx="8" fill="'+C.blue+'"/>'+
+    '<rect x="29" y="29" width="16" height="14" rx="2" fill="'+C.paper+'"/><rect x="49" y="29" width="16" height="14" rx="2" fill="'+C.paper+'"/>'+
+    '<circle cx="28" cy="70" r="10" fill="'+C.navy+'"/><circle cx="72" cy="70" r="10" fill="'+C.navy+'"/><circle cx="28" cy="70" r="4" fill="#ccc"/><circle cx="72" cy="70" r="4" fill="#ccc"/>'),
+  bus: svg('<rect x="8" y="26" width="84" height="44" rx="8" fill="'+C.sun+'"/><rect x="14" y="32" width="18" height="14" rx="2" fill="'+C.paper+'"/>'+
+    '<rect x="36" y="32" width="18" height="14" rx="2" fill="'+C.paper+'"/><rect x="58" y="32" width="18" height="14" rx="2" fill="'+C.paper+'"/>'+
+    '<rect x="8" y="52" width="84" height="8" fill="'+C.sunD+'"/><circle cx="26" cy="76" r="9" fill="'+C.navy+'"/><circle cx="74" cy="76" r="9" fill="'+C.navy+'"/>'),
+  taxi: svg('<rect x="10" y="42" width="80" height="24" rx="10" fill="'+C.sun+'"/><rect x="24" y="24" width="46" height="22" rx="8" fill="'+C.sun+'"/>'+
+    '<rect x="29" y="29" width="16" height="12" rx="2" fill="'+C.navy+'" opacity="0.15"/><rect x="49" y="29" width="16" height="12" rx="2" fill="'+C.navy+'" opacity="0.15"/>'+
+    '<rect x="18" y="30" width="14" height="8" fill="'+C.navy+'"/><rect x="18" y="30" width="14" height="8" fill="url(#chk)" opacity="0.4"/>'+
+    '<circle cx="28" cy="68" r="10" fill="'+C.navy+'"/><circle cx="72" cy="68" r="10" fill="'+C.navy+'"/>'+
+    '<text x="50" y="58" font-size="10" font-weight="bold" fill="'+C.navy+'" text-anchor="middle">TAXI</text>'),
+  stopSign: svg('<polygon points="35,8 65,8 92,35 92,65 65,92 35,92 8,65 8,35" fill="'+C.coral+'" stroke="'+C.white+'" stroke-width="4"/>'+
+    '<text x="50" y="58" font-size="22" font-weight="bold" fill="'+C.white+'" text-anchor="middle" font-family="Arial">STOP</text>'),
+  trafficRed: svg('<rect x="40" y="6" width="20" height="60" rx="6" fill="'+C.navy+'"/><circle cx="50" cy="18" r="7" fill="'+C.coral+'"/><circle cx="50" cy="34" r="7" fill="#5a4a20"/><circle cx="50" cy="50" r="7" fill="#2a4a2f"/><rect x="46" y="66" width="8" height="26" fill="#888"/>'),
+  trafficGreen: svg('<rect x="40" y="6" width="20" height="60" rx="6" fill="'+C.navy+'"/><circle cx="50" cy="18" r="7" fill="#5a2a20"/><circle cx="50" cy="34" r="7" fill="#5a4a20"/><circle cx="50" cy="50" r="7" fill="'+C.go+'"/><rect x="46" y="66" width="8" height="26" fill="#888"/>'),
+  noParking: svg('<circle cx="50" cy="50" r="42" fill="'+C.coral+'"/><circle cx="50" cy="50" r="34" fill="'+C.white+'"/>'+
+    '<text x="42" y="62" font-size="42" font-weight="bold" fill="'+C.navy+'" font-family="Arial">P</text>'+
+    '<rect x="12" y="46" width="76" height="10" fill="'+C.coral+'" transform="rotate(-40 50 50)"/>'),
+  crosswalk: svg('<rect x="0" y="0" width="100" height="100" fill="'+C.paper+'"/>'+
+    ['8','24','40','56','72','88'].map(function(x){return '<rect x="'+x+'" y="10" width="9" height="80" fill="'+C.navy+'" opacity="0.65"/>';}).join('')),
+  doorOpen: svg('<rect x="20" y="10" width="60" height="82" fill="'+C.wall2+'" stroke="'+C.brown+'" stroke-width="3"/>'+
+    '<polygon points="52,14 78,24 78,88 52,88" fill="'+C.brown+'" opacity="0.85"/><circle cx="70" cy="52" r="3" fill="'+C.sun+'"/>'),
+  doorClosed: svg('<rect x="26" y="8" width="48" height="86" rx="3" fill="'+C.brown+'"/><circle cx="62" cy="52" r="3.5" fill="'+C.sun+'"/>'+
+    '<rect x="26" y="8" width="48" height="86" rx="3" fill="none" stroke="'+C.navy+'" stroke-width="2"/>'),
+  stoveHot: svg('<rect x="14" y="52" width="72" height="30" rx="4" fill="#555"/><circle cx="34" cy="52" r="16" fill="'+C.navy+'"/><circle cx="66" cy="52" r="16" fill="'+C.navy+'"/>'+
+    '<ellipse cx="34" cy="46" rx="12" ry="7" fill="'+C.blue+'"/>'+
+    '<path d="M28,26 q3,-10 0,-18 M40,26 q3,-10 0,-18" stroke="#bbb" stroke-width="3" fill="none" stroke-linecap="round"/>'),
+  pillowSoft: svg('<rect x="14" y="30" width="72" height="46" rx="20" fill="'+C.blue+'"/><rect x="14" y="30" width="72" height="46" rx="20" fill="none" stroke="'+C.blueD+'" stroke-width="3"/>'+
+    '<path d="M30,42 q20,10 40,0 M30,60 q20,10 40,0" stroke="'+C.white+'" stroke-width="2" fill="none" opacity="0.6"/>'),
+  turnSign: svg('<circle cx="50" cy="50" r="42" fill="'+C.blue+'"/><path d="M62,32 v14 h-22 M40,46 l10,-10 M40,46 l10,10" stroke="'+C.white+'" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'),
+  noTurnSign: svg('<circle cx="50" cy="50" r="42" fill="'+C.coral+'"/><path d="M62,32 v14 h-22 M40,46 l10,-10 M40,46 l10,10" stroke="'+C.white+'" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<rect x="10" y="46" width="80" height="9" fill="'+C.white+'" transform="rotate(-40 50 50)"/>'),
+  busStopSign: svg('<rect x="46" y="24" width="8" height="66" fill="#999"/><rect x="26" y="8" width="48" height="26" rx="4" fill="'+C.blue+'"/>'+
+    '<text x="50" y="26" font-size="13" font-weight="bold" fill="'+C.white+'" text-anchor="middle" font-family="Arial">BUS</text>'+
+    '<rect x="14" y="70" width="72" height="8" fill="'+C.brown+'"/><rect x="18" y="78" width="6" height="14" fill="'+C.brown+'"/><rect x="76" y="78" width="6" height="14" fill="'+C.brown+'"/>'),
+  hand: svg('<path d="M40,90 v-40 q0,-8 8,-8 q8,0 8,8 v14 M56,64 v-24 q0,-8 8,-8 q8,0 8,8 v30 M72,70 v-16 q0,-7 7,-7 q7,0 7,7 v22 q0,20 -20,20 h-16 q-14,0 -18,-14 l-8,-18 q-3,-7 4,-10 q7,-3 10,4 l4,8 v-49 q0,-8 8,-8 q8,0 8,8 v33" fill="'+C.skin+'" stroke="'+C.navy+'" stroke-width="2" stroke-linejoin="round"/>'),
+  mascotHappy: svg('<circle cx="50" cy="50" r="38" fill="'+C.sun+'"/><circle cx="50" cy="50" r="38" fill="none" stroke="'+C.sunD+'" stroke-width="4"/>'+
+    '<circle cx="36" cy="44" r="6" fill="'+C.navy+'"/><circle cx="64" cy="44" r="6" fill="'+C.navy+'"/>'+
+    '<path d="M30,60 Q50,80 70,60" stroke="'+C.navy+'" stroke-width="5" fill="none" stroke-linecap="round"/>'),
+  mascotSad: svg('<circle cx="50" cy="50" r="38" fill="'+C.sun+'"/><circle cx="50" cy="50" r="38" fill="none" stroke="'+C.sunD+'" stroke-width="4"/>'+
+    '<circle cx="36" cy="46" r="6" fill="'+C.navy+'"/><circle cx="64" cy="46" r="6" fill="'+C.navy+'"/>'+
+    '<path d="M30,68 Q50,52 70,68" stroke="'+C.navy+'" stroke-width="5" fill="none" stroke-linecap="round"/>')
+};
+
+/* Compose "place + traveller" scene icon for option cards / drop zones */
+function sceneIcon(place, mover){
+  // returns two stacked svgs (place background small + mover) as a mini composite using CSS flex
+  return '<span style="display:inline-flex;flex-direction:column;align-items:center;gap:2px;">'+
+    '<span style="width:44px;height:44px;display:block;">'+ICONS[place]+'</span>'+
+    (mover ? '<span style="width:26px;height:26px;display:block;margin-top:-8px;">'+ICONS[mover]+'</span>' : '')+
+    '</span>';
+}
+
+const PLACE_LABEL = {bank:'Bank',pharmacy:'Pharmacy',school:'School',supermarket:'Supermarket',library:'Library',park:'Park',restaurant:'Restaurant',busStop:'Bus Stop',hospital:'Hospital',museum:'Museum'};
+
+/* ------------------------------------------------------------
+   B. AUDIO — SPEECH SYNTHESIS + WEB AUDIO SOUND EFFECTS
+   ------------------------------------------------------------ */
+let audioCtx = null;
+function getCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+  }
+  return audioCtx;
+}
+function beep(freq,start,dur,type,vol){
+  const ctx = getCtx(); if(!ctx) return;
+  const osc = ctx.createOscillator(); const gain = ctx.createGain();
+  osc.type = type||'sine'; osc.frequency.setValueAtTime(freq, ctx.currentTime+start);
+  gain.gain.setValueAtTime(0, ctx.currentTime+start);
+  gain.gain.linearRampToValueAtTime(vol||0.2, ctx.currentTime+start+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+start+dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(ctx.currentTime+start); osc.stop(ctx.currentTime+start+dur+0.05);
+}
+function playCorrect(){ beep(523.25,0,.14,'sine',.22); beep(659.25,.12,.14,'sine',.22); beep(783.99,.24,.22,'sine',.24); }
+function playIncorrect(){ beep(180,0,.22,'square',.12); beep(140,.12,.26,'square',.10); }
+function playCelebration(){
+  const notes = [523.25,587.33,659.25,698.46,783.99,880,987.77,1046.5];
+  notes.forEach(function(f,i){ beep(f, i*0.09, .2, 'triangle', .16); });
+}
+function playClick(){ beep(880,0,.06,'sine',.10); }
+
+function speak(text, rate){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = rate || 0.85; u.pitch = 1; u.lang = 'en-US';
+    const btn = document.getElementById('listenBtn');
+    if(btn){ btn.classList.add('speaking'); u.onend = function(){ btn.classList.remove('speaking'); }; }
+    window.speechSynthesis.speak(u);
+  }catch(e){/* silent */}
+  const live = document.getElementById('srLive'); if(live) live.textContent = text;
+}
+
+/* ------------------------------------------------------------
+   C. SPEECH RECOGNITION HELPER
+   ------------------------------------------------------------ */
+const SRClass = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+/* ------------------------------------------------------------
+   D. APP STATE + NAVIGATION + ROAD PROGRESS
+   ------------------------------------------------------------ */
+const SCREENS = ['start','act1','act2','act3','act4','act5','final','results'];
+const STOP_PLACES = ['bank','pharmacy','school','supermarket','library','park'];
+const state = {
+  idx: 0,
+  score: 0,
+  total: 0,
+  breakdown: [] // {name, correct, total}
+};
+
+function resetState(){
+  state.idx = 0; state.score = 0; state.total = 0; state.breakdown = [];
+  updateScoreBadge(); updateRoad();
+}
+
+function updateScoreBadge(){
+  document.getElementById('scoreCount').textContent = state.score;
+}
+
+function roadLen(path){
+  try{ return path.getTotalLength(); }catch(e){ return 540; }
+}
+function roadPoint(path, len, frac){
+  try{ return path.getPointAtLength(len*frac); }catch(e){ return {x:10+540*frac, y:23}; }
+}
+
+function buildRoadStops(){
+  const g = document.getElementById('roadStops');
+  const path = document.getElementById('roadPath');
+  if(!g || !path) return;
+  const len = roadLen(path);
+  let html = '';
+  const n = SCREENS.length - 2; // exclude start & results
+  for(let i=1;i<=n;i++){
+    const pt = roadPoint(path, len, i/(n+1));
+    html += '<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="4.5" fill="#fff" stroke="#33415c" stroke-width="2" data-stop="'+i+'"></circle>';
+  }
+  g.innerHTML = html;
+}
+
+function updateRoad(){
+  const path = document.getElementById('roadPath');
+  const car = document.getElementById('roadCar');
+  const label = document.getElementById('roadLabel');
+  if(!path || !car || !label) return;
+  const len = roadLen(path);
+  const frac = SCREENS.length<=1 ? 0 : state.idx/(SCREENS.length-1);
+  const pt = roadPoint(path, len, frac);
+  car.setAttribute('transform','translate('+pt.x.toFixed(1)+','+pt.y.toFixed(1)+')');
+  document.querySelectorAll('#roadStops circle').forEach(function(c){
+    const s = +c.getAttribute('data-stop');
+    c.setAttribute('fill', s <= state.idx ? '#2fae66' : '#fff');
+  });
+  const names = {start:'Ready to start!',act1:'Listen & Choose',act2:'Drag the Command',act3:'Is It Correct?',act4:'Build the Sentence',act5:'Speaking Challenge',final:'Final Challenge',results:'Trip complete! 🎉'};
+  label.textContent = names[SCREENS[state.idx]] || '';
+}
+
+function goTo(screenId){
+  state.idx = SCREENS.indexOf(screenId);
+  updateRoad();
+  window.scrollTo({top:0,behavior:'smooth'});
+  RENDER[screenId]();
+}
+
+function recordActivity(name, correct, total){
+  state.breakdown.push({name:name, correct:correct, total:total});
+}
+
+function addScore(n){ state.score += n; updateScoreBadge(); }
+
+/* Generic feedback element injector */
+function showFeedback(container, isGood, msg){
+  const old = container.querySelector('.feedback'); if(old) old.remove();
+  const div = document.createElement('div');
+  div.className = 'feedback ' + (isGood?'good':'bad');
+  div.innerHTML = (isGood?'⭐ ':'💡 ') + msg;
+  container.appendChild(div);
+  return div;
+}
+const GOOD_MSGS = ['⭐ Excellent!','🎉 Great job!','👏 Nice!','✨ Well done!'];
+const BAD_MSGS = ['Try again!','Listen carefully.','Almost!'];
+function randomGood(){ return GOOD_MSGS[Math.floor(Math.random()*GOOD_MSGS.length)]; }
+function randomBad(){ return BAD_MSGS[Math.floor(Math.random()*BAD_MSGS.length)]; }
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+function miniProgress(current,total){
+  return '<div class="mini-progress"><div class="mini-progress-track"><div class="mini-progress-fill" style="width:'+(100*current/total)+'%"></div></div>'+
+    '<div class="mini-progress-text">Question '+current+' of '+total+'</div></div>';
+}
+
+/* ============================================================
+   E. ACTIVITY 1 — LISTEN & CHOOSE
+   ============================================================ */
+const ACT1_DATA = [
+  {text:"Walk to the library.", place:'library', mover:'walk', distract:['school','park','museum']},
+  {text:"Drive to the hospital.", place:'hospital', mover:'car', distract:['bank','supermarket','school']},
+  {text:"Take the bus to the museum.", place:'museum', mover:'bus', distract:['library','park','restaurant']},
+  {text:"Don't cross the street.", place:'crosswalk', mover:null, isSign:true, distract:['trafficGreen','stopSign','noParking']},
+  {text:"Don't drive to the park.", place:'park', mover:'noEntry', distract:['bank','school','restaurant'], custom:true},
+  {text:"Take a taxi to the restaurant.", place:'restaurant', mover:'taxi', distract:['pharmacy','busStop','bank']},
+  {text:"Don't turn left.", place:'noTurnSign', mover:null, isSign:true, distract:['turnSign','stopSign','trafficGreen']},
+  {text:"Walk to the bank.", place:'bank', mover:'walk', distract:['hospital','museum','supermarket']}
+];
+
+function act1OptionCard(key, isPlaceType){
+  if(isPlaceType==='sign'){
+    return {icon:ICONS[key], label: key==='crosswalk'?'Crosswalk':key==='trafficGreen'?'Green light':key==='stopSign'?'Stop sign':key==='noParking'?'No parking':key==='noTurnSign'?"Don't turn":key==='turnSign'?'Turn':key};
+  }
+  return null;
+}
+
+let act1State = {i:0, correct:0, order:[]};
+
+function renderAct1(){
+  act1State = {i:0, correct:0, order: shuffle(ACT1_DATA.map(function(_,idx){return idx;}))};
+  paintAct1();
+}
+function paintAct1(){
+  const q = ACT1_DATA[act1State.order[act1State.i]];
+  const main = document.getElementById('main');
+  // build options: target + 3 distractors, shuffled
+  let options = [];
+  if(q.isSign){
+    options.push({key:q.place, type:'sign', target:true});
+    q.distract.forEach(function(d){ options.push({key:d, type:'sign', target:false}); });
+  } else if(q.custom){
+    options.push({key:q.place, type:'noentry', target:true});
+    q.distract.forEach(function(d){ options.push({key:d, type:'place', target:false}); });
+  } else {
+    options.push({key:q.place, mover:q.mover, type:'place', target:true});
+    q.distract.forEach(function(d){ options.push({key:d, mover:q.mover, type:'place', target:false}); });
+  }
+  options = shuffle(options);
+
+  main.innerHTML =
+    '<section class="screen" aria-label="Activity 1: Listen and Choose">'+
+      '<div class="screen-head"><span class="eyebrow">Activity 1 · Listening</span><h2>Listen and Choose 🔊</h2><p>Listen to the command and click the matching picture.</p></div>'+
+      miniProgress(act1State.i+1, ACT1_DATA.length)+
+      '<div class="card">'+
+        '<div class="listen-bar"><button class="listen-btn" id="listenBtn" aria-label="Listen again">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="#1c2b3a" stroke-width="2"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 010 8" /><path d="M19 5a9 9 0 010 14"/></svg> Listen Again</button></div>'+
+        '<div class="option-grid" id="optionGrid" role="group" aria-label="Choose the picture that matches"></div>'+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  const grid = document.getElementById('optionGrid');
+  grid.innerHTML = options.map(function(opt,i){
+    let iconHtml, label;
+    if(opt.type==='sign'){
+      const c = act1OptionCard(opt.key,'sign'); iconHtml = c.icon; label = c.label;
+    } else if(opt.type==='noentry'){
+      iconHtml = '<span style="position:relative;display:inline-block;width:44px;height:44px;">'+ICONS[opt.key]+'<span style="position:absolute;inset:0;">'+ICONS.stopSign+'</span></span>';
+      label = "Don't drive to "+PLACE_LABEL[opt.key];
+    } else {
+      iconHtml = sceneIcon(opt.key, opt.mover); label = (opt.mover==='car'?'Drive to ':opt.mover==='bus'?'Bus to ':opt.mover==='taxi'?'Taxi to ':'Walk to ')+PLACE_LABEL[opt.key];
+    }
+    return '<button class="option-card" data-target="'+(opt.target?1:0)+'" data-idx="'+i+'" aria-label="'+label+'">'+iconHtml+'<span class="cap">'+label+'</span></button>';
+  }).join('');
+
+  document.getElementById('listenBtn').addEventListener('click', function(){ speak(q.text,0.85); });
+  speak(q.text,0.85);
+
+  let answered = false;
+  grid.querySelectorAll('.option-card').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(answered) return; answered = true;
+      const good = btn.getAttribute('data-target')==='1';
+      grid.querySelectorAll('.option-card').forEach(function(b){ b.classList.add('dim'); });
+      btn.classList.remove('dim');
+      btn.classList.add(good?'correct':'incorrect');
+      if(good){ playCorrect(); addScore(10); act1State.correct++; } else {
+        playIncorrect();
+        grid.querySelector('[data-target="1"]').classList.remove('dim');
+        grid.querySelector('[data-target="1"]').classList.add('correct');
+      }
+      showFeedback(document.querySelector('.card'), good, good?randomGood():randomBad()+' The answer is: "'+q.text+'"');
+      state.total++;
+      setTimeout(function(){
+        act1State.i++;
+        if(act1State.i < ACT1_DATA.length){ paintAct1(); }
+        else { recordActivity('Listen & Choose', act1State.correct, ACT1_DATA.length); goTo('act2'); }
+      }, 1400);
+    });
+  });
+}
+
+/* ============================================================
+   F. ACTIVITY 2 — DRAG THE COMMAND
+   ============================================================ */
+const ACT2_DATA = [
+  {cmd:"Walk to the bank.", zone:'z-bank'},
+  {cmd:"Don't drive.", zone:'z-noDrive'},
+  {cmd:"Take the bus.", zone:'z-busStop'},
+  {cmd:"Don't cross.", zone:'z-noCross'},
+  {cmd:"Drive to the restaurant.", zone:'z-restaurant'},
+  {cmd:"Take a taxi.", zone:'z-taxi'},
+  {cmd:"Go to the pharmacy.", zone:'z-pharmacy'},
+  {cmd:"Don't turn left.", zone:'z-noTurn'}
+];
+const ACT2_ZONES = [
+  {id:'z-bank', icon:ICONS.bank, cap:'Bank'},
+  {id:'z-noDrive', icon:'<span style="position:relative;display:inline-block;width:56px;height:56px;">'+ICONS.car+'<span style="position:absolute;inset:0;">'+ICONS.stopSign+'</span></span>', cap:"Don't drive"},
+  {id:'z-busStop', icon:ICONS.busStopSign, cap:'Bus Stop'},
+  {id:'z-noCross', icon:ICONS.trafficRed, cap:"Don't cross"},
+  {id:'z-restaurant', icon:ICONS.restaurant, cap:'Restaurant'},
+  {id:'z-taxi', icon:ICONS.taxi, cap:'Taxi'},
+  {id:'z-pharmacy', icon:ICONS.pharmacy, cap:'Pharmacy'},
+  {id:'z-noTurn', icon:ICONS.noTurnSign, cap:"Don't turn left"}
+];
+
+let act2State = {placed:0, correctCount:0};
+
+function renderAct2(){
+  act2State = {placed:0, correctCount:0};
+  const main = document.getElementById('main');
+  const zonesHtml = shuffle(ACT2_ZONES).map(function(z){
+    return '<div class="drop-zone" id="'+z.id+'" data-zone="'+z.id+'" tabindex="0" role="button" '+
+      'aria-label="Drop zone: '+z.cap+'">'+z.icon+'</div>';
+  }).join('');
+  const cardsHtml = shuffle(ACT2_DATA).map(function(d,i){
+    const neg = d.cmd.trim().toLowerCase().indexOf("don't")===0;
+    return '<div class="command-card'+(neg?' negative':'')+'" draggable="true" data-cmd="'+encodeURIComponent(d.cmd)+'" data-zone="'+d.zone+'" tabindex="0" role="button" aria-label="Command card: '+d.cmd+'. Activate, then choose a destination.">'+d.cmd+'</div>';
+  }).join('');
+
+  main.innerHTML =
+    '<section class="screen" aria-label="Activity 2: Drag the Command">'+
+      '<div class="screen-head"><span class="eyebrow">Activity 2 · Drag &amp; Drop</span><h2>Drag the Command 🏙️</h2>'+
+      '<p>Look at the pictures — no words! Drag each command card onto the picture it matches. On touch devices, tap a card then tap its picture.</p></div>'+
+      miniProgress(0, ACT2_DATA.length)+' '.repeat(0)+
+      '<div class="card">'+
+        '<div class="city-scene" id="cityScene">'+zonesHtml+'</div>'+
+        '<div class="card-tray" id="cardTray" aria-label="Command cards">'+cardsHtml+'</div>'+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  wireDragDrop();
+}
+
+function wireDragDrop(){
+  const tray = document.getElementById('cardTray');
+  const scene = document.getElementById('cityScene');
+  let selectedCard = null; // for click/tap fallback
+  let dragCard = null;
+
+  function checkDrop(card, zoneEl){
+    const cardZone = card.getAttribute('data-zone');
+    const zoneId = zoneEl.getAttribute('data-zone');
+    const cmd = decodeURIComponent(card.getAttribute('data-cmd'));
+    if(cardZone === zoneId){
+      zoneEl.classList.remove('hover','wrong-flash');
+      zoneEl.classList.add('filled');
+      const tag = document.createElement('div');
+      tag.className = 'placed-card'; tag.textContent = '✔ ' + cmd;
+      zoneEl.appendChild(tag);
+      card.classList.add('placed');
+      playCorrect(); addScore(10);
+      act2State.correctCount++; act2State.placed++;
+      showFeedback(document.querySelector('.card'), true, randomGood());
+    } else {
+      zoneEl.classList.add('wrong-flash');
+      playIncorrect();
+      showFeedback(document.querySelector('.card'), false, randomBad());
+      setTimeout(function(){ zoneEl.classList.remove('wrong-flash'); }, 500);
+    }
+    document.querySelectorAll('.mini-progress-text')[0] && (document.querySelectorAll('.mini-progress-text')[0].textContent = 'Placed '+act2State.placed+' of '+ACT2_DATA.length);
+    document.querySelector('.mini-progress-fill').style.width = (100*act2State.placed/ACT2_DATA.length)+'%';
+    if(act2State.placed >= ACT2_DATA.length){
+      state.total += ACT2_DATA.length;
+      recordActivity('Drag the Command', act2State.correctCount, ACT2_DATA.length);
+      setTimeout(function(){ goTo('act3'); }, 1100);
+    }
+  }
+
+  // Native HTML5 drag (desktop mouse)
+  tray.querySelectorAll('.command-card').forEach(function(card){
+    card.addEventListener('dragstart', function(e){
+      dragCard = card; card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', card.getAttribute('data-zone'));
+    });
+    card.addEventListener('dragend', function(){ card.classList.remove('dragging'); });
+
+    // Click / tap fallback (works on mobile + keyboard, more reliable than HTML5 DnD)
+    card.addEventListener('click', function(){
+      if(card.classList.contains('placed')) return;
+      tray.querySelectorAll('.command-card').forEach(function(c){ c.classList.remove('selected'); });
+      selectedCard = card; card.classList.add('selected'); playClick();
+    });
+    card.addEventListener('keydown', function(e){
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.click(); }
+    });
+  });
+
+  scene.querySelectorAll('.drop-zone').forEach(function(zone){
+    zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.classList.add('hover'); });
+    zone.addEventListener('dragleave', function(){ zone.classList.remove('hover'); });
+    zone.addEventListener('drop', function(e){
+      e.preventDefault(); zone.classList.remove('hover');
+      if(!dragCard || dragCard.classList.contains('placed')) return;
+      checkDrop(dragCard, zone); dragCard = null;
+    });
+    zone.addEventListener('click', function(){
+      if(zone.classList.contains('filled')) return;
+      if(selectedCard){ checkDrop(selectedCard, zone); selectedCard.classList.remove('selected'); selectedCard = null; }
+    });
+    zone.addEventListener('keydown', function(e){
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); zone.click(); }
+    });
+  });
+}
+
+/* ============================================================
+   G. ACTIVITY 3 — IS IT CORRECT?
+   ============================================================ */
+const ACT3_DATA = [
+  {scene:'trafficRed', desc:'The light is red. A person is at the crossing.', a:'Cross.', b:"Don't cross.", correct:'b'},
+  {scene:'trafficGreen', desc:'The light is green. A person is at the crossing.', a:'Walk.', b:"Don't walk.", correct:'a'},
+  {scene:'noParking', desc:'There is a "No Parking" sign. A car wants to stop here.', a:'Park.', b:"Don't park.", correct:'b'},
+  {scene:'car', desc:'This is an empty parking spot. No signs here.', a:'Park.', b:"Don't park.", correct:'a'},
+  {scene:'stoveHot', desc:'The stove is hot! Steam is rising from the pan.', a:'Touch.', b:"Don't touch.", correct:'b'},
+  {scene:'pillowSoft', desc:'This is a soft, cool pillow.', a:'Touch.', b:"Don't touch.", correct:'a'},
+  {scene:'stopSign', desc:'There is a stop sign at the corner. A car is coming.', a:'Stop.', b:"Don't stop.", correct:'a'},
+  {scene:'trafficGreen', desc:'The light is green for the cars. Traffic is moving.', a:'Stop.', b:"Don't stop.", correct:'b'},
+  {scene:'noParking', desc:'A "No Running" sign is next to the pool. Custom: imagine it says no running.', a:'Run.', b:"Don't run.", correct:'b', overrideIcon:'stopSign', overrideDesc:'There is a "No Running" sign next to the swimming pool.'},
+  {scene:'park', desc:'This is an open field in the park. It is safe to play.', a:'Run.', b:"Don't run.", correct:'a'},
+  {scene:'noTurnSign', desc:'There is a "No Left Turn" sign at the junction.', a:'Turn left.', b:"Don't turn left.", correct:'b'},
+  {scene:'turnSign', desc:'There is a blue turn-left arrow sign. It is allowed here.', a:'Turn left.', b:"Don't turn left.", correct:'a'}
+];
+
+let act3State = {i:0, correct:0, order:[]};
+
+function renderAct3(){
+  act3State = {i:0, correct:0, order: shuffle(ACT3_DATA.map(function(_,idx){return idx;}))};
+  paintAct3();
+}
+function paintAct3(){
+  const q = ACT3_DATA[act3State.order[act3State.i]];
+  const iconKey = q.overrideIcon || q.scene;
+  const desc = q.overrideDesc || q.desc;
+  const main = document.getElementById('main');
+  main.innerHTML =
+    '<section class="screen" aria-label="Activity 3: Is It Correct?">'+
+      '<div class="screen-head"><span class="eyebrow">Activity 3 · Decision</span><h2>Is It Correct? ✔</h2><p>Look at the situation. Choose the correct instruction.</p></div>'+
+      miniProgress(act3State.i+1, ACT3_DATA.length)+
+      '<div class="card situation-card">'+
+        '<div class="situation-illustration">'+ICONS[iconKey]+'</div>'+
+        '<p style="color:var(--ink-soft);font-size:14px;max-width:420px;margin:0 auto 16px;">'+desc+'</p>'+
+        '<div class="choice-pair">'+
+          '<button class="choice-btn" data-ans="a">'+q.a+'</button>'+
+          '<button class="choice-btn" data-ans="b">'+q.b+'</button>'+
+        '</div>'+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  speak(desc, 0.9);
+  let answered = false;
+  document.querySelectorAll('.choice-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(answered) return; answered = true;
+      const good = btn.getAttribute('data-ans') === q.correct;
+      document.querySelectorAll('.choice-btn').forEach(function(b){
+        if(b===btn) b.classList.add(good?'correct':'incorrect');
+        if(b.getAttribute('data-ans')===q.correct) b.classList.add('correct');
+      });
+      if(good){ playCorrect(); addScore(10); act3State.correct++; } else { playIncorrect(); }
+      showFeedback(document.querySelector('.card'), good, good?randomGood():randomBad());
+      state.total++;
+      setTimeout(function(){
+        act3State.i++;
+        if(act3State.i < ACT3_DATA.length){ paintAct3(); }
+        else { recordActivity('Is It Correct?', act3State.correct, ACT3_DATA.length); goTo('act4'); }
+      }, 1300);
+    });
+  });
+}
+
+/* ============================================================
+   H. ACTIVITY 4 — BUILD THE SENTENCE
+   ============================================================ */
+const ACT4_DATA = [
+  {words:['Walk','to','the','library'], answer:'Walk to the library.'},
+  {words:["Don't",'drive','to','school'], answer:"Don't drive to school."},
+  {words:['Take','the','bus'], answer:'Take the bus.'},
+  {words:["Don't",'cross','the','street'], answer:"Don't cross the street."},
+  {words:['Go','to','the','hospital'], answer:'Go to the hospital.'},
+  {words:["Don't",'open','the','door'], answer:"Don't open the door."}
+];
+
+let act4State = {i:0, correct:0, order:[], built:[]};
+
+function renderAct4(){
+  act4State = {i:0, correct:0, order: shuffle(ACT4_DATA.map(function(_,idx){return idx;})), built:[]};
+  paintAct4();
+}
+function paintAct4(){
+  const q = ACT4_DATA[act4State.order[act4State.i]];
+  act4State.built = new Array(q.words.length).fill(null);
+  const shuffled = shuffle(q.words.map(function(w,i){return {w:w,orig:i};}));
+  const main = document.getElementById('main');
+  main.innerHTML =
+    '<section class="screen" aria-label="Activity 4: Build the Sentence">'+
+      '<div class="screen-head"><span class="eyebrow">Activity 4 · Sentence Building</span><h2>Build the Sentence 🧩</h2><p>Tap or drag the words in the right order.</p></div>'+
+      miniProgress(act4State.i+1, ACT4_DATA.length)+
+      '<div class="card">'+
+        '<div class="sentence-slot-row" id="slotRow"></div>'+
+        '<div class="word-bank" id="wordBank"></div>'+
+        '<div class="actions-row"><button class="btn btn-ghost" id="resetSentence">↺ Reset</button></div>'+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  const slotRow = document.getElementById('slotRow');
+  slotRow.innerHTML = q.words.map(function(_,i){ return '<div class="slot" data-slot="'+i+'">&nbsp;</div>'; }).join('');
+  const wordBank = document.getElementById('wordBank');
+  wordBank.innerHTML = shuffled.map(function(item,i){
+    return '<button class="word-tile" data-word-idx="'+i+'" data-orig="'+item.orig+'" draggable="true">'+item.w+'</button>';
+  }).join('');
+
+  let placedCount = 0;
+  let answered = false;
+
+  function tryComplete(){
+    if(placedCount < q.words.length || answered) return;
+    answered = true;
+    const built = act4State.built.map(function(x){return x.w;}).join(' ') + '.';
+    const good = built.toLowerCase() === q.answer.toLowerCase();
+    if(good){ playCorrect(); addScore(10); act4State.correct++; } else { playIncorrect(); }
+    state.total++;
+    showFeedback(document.querySelector('.card'), good, good?randomGood():('Correct answer: "'+q.answer+'"'));
+    speak(q.answer, 0.85);
+    setTimeout(function(){
+      act4State.i++;
+      if(act4State.i < ACT4_DATA.length){ paintAct4(); }
+      else { recordActivity('Build the Sentence', act4State.correct, ACT4_DATA.length); goTo('act5'); }
+    }, 1600);
+  }
+
+  function placeWord(tile){
+    if(tile.classList.contains('used') || answered) return;
+    const slot = slotRow.querySelector('.slot:not(.has-word)');
+    if(!slot) return;
+    const idx = +slot.getAttribute('data-slot');
+    const word = tile.textContent;
+    slot.textContent = word; slot.classList.add('has-word');
+    tile.classList.add('used');
+    act4State.built[idx] = {w:word, tileIdx:tile.getAttribute('data-word-idx')};
+    placedCount++;
+    playClick();
+    tryComplete();
+  }
+
+  wordBank.querySelectorAll('.word-tile').forEach(function(tile){
+    tile.addEventListener('click', function(){ placeWord(tile); });
+    tile.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); placeWord(tile);} });
+    tile.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain', tile.getAttribute('data-word-idx')); });
+  });
+  slotRow.querySelectorAll('.slot').forEach(function(slot){
+    slot.addEventListener('dragover', function(e){ e.preventDefault(); });
+    slot.addEventListener('drop', function(e){
+      e.preventDefault();
+      const idx = e.dataTransfer.getData('text/plain');
+      const tile = wordBank.querySelector('[data-word-idx="'+idx+'"]');
+      if(tile && !slot.classList.contains('has-word')) placeWord(tile);
+    });
+  });
+
+  document.getElementById('resetSentence').addEventListener('click', function(){
+    if(answered) return;
+    slotRow.querySelectorAll('.slot').forEach(function(s){ s.textContent=''; s.classList.remove('has-word'); s.innerHTML='&nbsp;'; });
+    wordBank.querySelectorAll('.word-tile').forEach(function(t){ t.classList.remove('used'); });
+    act4State.built = new Array(q.words.length).fill(null);
+    placedCount = 0;
+  });
+}
+
+/* ============================================================
+   I. ACTIVITY 5 — SPEAKING CHALLENGE
+   ============================================================ */
+const ACT5_DATA = [
+  {icon:'hospital', mover:'walk', sentence:'Walk to the hospital.', expect:['walk to the hospital'], keyPhrase:'walk to the hospital'},
+  {icon:'crosswalk', mover:null, sentence:"Don't cross.", expect:["don't cross"], keyPhrase:"don't cross"},
+  {icon:'school', mover:'car', sentence:'Drive to school.', expect:['drive to school','drive to the school','go to school'], keyPhrase:'drive to school'},
+  {icon:'stoveHot', mover:null, sentence:"Don't touch.", expect:["don't touch"], keyPhrase:"don't touch"}
+];
+
+let act5State = {i:0, correct:0, skipped:0};
+
+function renderAct5(){
+  act5State = {i:0, correct:0, skipped:0};
+  paintAct5();
+}
+function normalizeSpeech(s){
+  return s.toLowerCase().replace(/[.,!?]/g,'').replace(/\s+/g,' ').trim();
+}
+function paintAct5(){
+  const q = ACT5_DATA[act5State.i];
+  const main = document.getElementById('main');
+  const srAvailable = !!SRClass;
+  main.innerHTML =
+    '<section class="screen" aria-label="Activity 5: Speaking Challenge">'+
+      '<div class="screen-head"><span class="eyebrow">Activity 5 · Reading &amp; Speaking</span><h2>Speaking Challenge 🎤</h2><p>Look at the picture, read the sentence, then press the microphone and say it aloud.</p></div>'+
+      miniProgress(act5State.i+1, ACT5_DATA.length)+
+      '<div class="card situation-card">'+
+        '<div class="situation-illustration">'+ICONS[q.icon]+'</div>'+
+        '<div class="prompt-text">"'+q.sentence+'"</div>'+
+        (srAvailable
+          ? ('<button class="mic-btn" id="micBtn" aria-label="Start recording"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>'+
+             '<div class="heard-text" id="heardText">Tap the microphone and read the sentence aloud.</div>')
+          : '<p style="color:var(--coral-dark);font-weight:600;">Speech recognition is not supported in your browser.</p>'
+        )+
+        '<div class="actions-row">'+
+          '<button class="btn btn-ghost" id="skipBtn">Skip →</button>'+
+        '</div>'+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  function nextQuestion(){
+    act5State.i++;
+    if(act5State.i < ACT5_DATA.length){ paintAct5(); }
+    else { recordActivity('Speaking Challenge', act5State.correct, ACT5_DATA.length - act5State.skipped || 1); goTo('final'); }
+  }
+  document.getElementById('skipBtn').addEventListener('click', function(){ act5State.skipped++; nextQuestion(); });
+
+  if(srAvailable){
+    const micBtn = document.getElementById('micBtn');
+    const heard = document.getElementById('heardText');
+    let recognizing = false;
+    micBtn.addEventListener('click', function(){
+      if(recognizing) return;
+      const rec = new SRClass();
+      rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 3;
+      recognizing = true; micBtn.classList.add('listening');
+      heard.textContent = 'Listening…';
+      rec.onresult = function(ev){
+        const said = normalizeSpeech(ev.results[0][0].transcript);
+        heard.textContent = 'You said: "' + ev.results[0][0].transcript + '"';
+        const good = q.expect.some(function(exp){ return said.indexOf(normalizeSpeech(exp)) !== -1; });
+        state.total++;
+        if(good){ playCorrect(); addScore(10); act5State.correct++; } else { playIncorrect(); }
+        showFeedback(document.querySelector('.card'), good, good? randomGood() : ('Try reading: "'+q.sentence+'"'));
+        setTimeout(nextQuestion, 1600);
+      };
+      rec.onerror = function(){ recognizing=false; micBtn.classList.remove('listening'); heard.textContent = "Didn't catch that. Try again or skip."; };
+      rec.onend = function(){ recognizing=false; micBtn.classList.remove('listening'); };
+      try{ rec.start(); }catch(e){ recognizing=false; micBtn.classList.remove('listening'); }
+    });
+  }
+}
+
+/* ============================================================
+   J. FINAL CHALLENGE — CITY MAP
+   ============================================================ */
+const MAP_LAYOUT = [
+  {key:'bank', label:'Bank'},
+  {key:'pharmacy', label:'Pharmacy'},
+  {key:'school', label:'School'},
+  {key:'supermarket', label:'Supermarket'},
+  {key:'library', label:'Library'},
+  {key:'hospital', label:'Hospital'},
+  {key:'park', label:'Park'},
+  {key:'restaurant', label:'Restaurant'},
+  {key:'museum', label:'Museum'},
+  {key:'busStop', label:'Bus Stop', icon:'busStopSign'},
+  {key:'crossing', label:'Street Crossing', icon:'crosswalk'},
+  {key:'corner', label:'Corner (turning)', icon:'noTurnSign'}
+];
+const FINAL_POOL = [
+  {text:'Walk to the bank.', target:'bank'},
+  {text:"Don't cross the street.", target:'crossing'},
+  {text:'Take the bus to the hospital.', target:'hospital'},
+  {text:'Go to the pharmacy.', target:'pharmacy'},
+  {text:"Don't turn left.", target:'corner'},
+  {text:'Drive to the supermarket.', target:'supermarket'},
+  {text:'Walk to the library.', target:'library'},
+  {text:'Take a taxi to the restaurant.', target:'restaurant'},
+  {text:"Don't stop at the museum.", target:'museum'},
+  {text:'Go to the school.', target:'school'},
+  {text:'Walk to the park.', target:'park'},
+  {text:'Wait at the bus stop.', target:'busStop'},
+  {text:"Don't cross now.", target:'crossing'},
+  {text:'Take the bus to the museum.', target:'museum'}
+];
+
+let finalState = {i:0, correct:0, order:[], layout:[]};
+
+function renderFinal(){
+  finalState = {i:0, correct:0, order: shuffle(FINAL_POOL.map(function(_,i){return i;})).slice(0,10), layout: shuffle(MAP_LAYOUT)};
+  paintFinal();
+}
+function buildTownMapHTML(){
+  const tiles = finalState.layout.map(function(p){
+    const icon = p.icon || p.key;
+    return '<button class="map-tile" type="button" data-key="'+p.key+'" aria-label="'+p.label+'">'+ICONS[icon]+'<span class="cap">'+p.label+'</span></button>';
+  }).join('');
+  return '<div class="town-map"><div class="town-map-road-line" aria-hidden="true"></div><div class="map-grid" role="group" aria-label="Sunny Town map">'+tiles+'</div></div>';
+}
+function paintFinal(){
+  const qIdx = finalState.order[finalState.i];
+  const q = FINAL_POOL[qIdx];
+  const main = document.getElementById('main');
+  main.innerHTML =
+    '<section class="screen" aria-label="Final Challenge: City Map">'+
+      '<div class="screen-head"><span class="eyebrow">Final Challenge · City Map</span><h2>Explore Sunny Town 🗺️</h2><p>Listen to the direction and click the correct place on the map.</p></div>'+
+      miniProgress(finalState.i+1, finalState.order.length)+
+      '<div class="card">'+
+        '<div class="listen-bar"><button class="listen-btn" id="listenBtn"><svg viewBox="0 0 24 24" fill="none" stroke="#1c2b3a" stroke-width="2"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 010 8"/><path d="M19 5a9 9 0 010 14"/></svg> Listen Again</button></div>'+
+        '<div class="prompt-text" id="promptText">"'+q.text+'"</div>'+
+        buildTownMapHTML()+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  speak(q.text, 0.85);
+  document.getElementById('listenBtn').addEventListener('click', function(){ speak(q.text,0.85); });
+
+  let answered = false;
+  document.querySelectorAll('.map-tile').forEach(function(g){
+    function handle(){
+      if(answered) return; answered = true;
+      const good = g.getAttribute('data-key') === q.target;
+      document.querySelectorAll('.map-tile').forEach(function(t){ if(t!==g) t.classList.add('dim'); });
+      g.classList.remove('dim');
+      g.classList.add(good?'correct-flash':'wrong-flash');
+      if(good){ playCorrect(); addScore(10); finalState.correct++; } else {
+        playIncorrect();
+        const correctEl = document.querySelector('.map-tile[data-key="'+q.target+'"]');
+        if(correctEl){ correctEl.classList.remove('dim'); correctEl.classList.add('correct-flash'); }
+      }
+      state.total++;
+      showFeedback(document.querySelector('.card'), good, good?randomGood():randomBad());
+      setTimeout(function(){
+        finalState.i++;
+        if(finalState.i < finalState.order.length){ paintFinal(); }
+        else { recordActivity('Final Challenge', finalState.correct, finalState.order.length); goTo('results'); }
+      }, 1300);
+    }
+    g.addEventListener('click', handle);
+    g.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handle(); } });
+  });
+}
+
+/* ============================================================
+   K. START / RESULTS SCREENS + CONFETTI
+   ============================================================ */
+function renderStart(){
+  resetState();
+  const main = document.getElementById('main');
+  main.innerHTML =
+    '<section class="screen" aria-label="Welcome">'+
+      '<div class="screen-head">'+
+        '<span class="eyebrow">Ready2Speak · A1 English</span>'+
+        '<h2>Welcome to Sunny Town!</h2>'+
+        '<p>Practice giving directions and instructions with affirmative and negative imperatives. Listen, drag, choose, build, and speak your way across town!</p>'+
+      '</div>'+
+      '<div class="card" style="text-align:center;">'+
+        '<div style="width:140px;margin:0 auto 14px;">'+ICONS.mascotHappy+'</div>'+
+        '<p style="max-width:480px;margin:0 auto 18px;color:var(--ink-soft);">'+
+        'You will complete <b>6 stops</b>: Listen &amp; Choose, Drag the Command, Is It Correct?, Build the Sentence, Speaking Challenge, and the Final City Map Challenge. Turn your sound on! 🔊</p>'+
+        '<button class="btn btn-go btn-lg" id="startBtn">🚗 Start the Trip</button>'+
+      '</div>'+
+    '</section>';
+  document.getElementById('startBtn').addEventListener('click', function(){ getCtx(); playClick(); goTo('act1'); });
+}
+
+function renderResults(){
+  const main = document.getElementById('main');
+  const pct = state.total ? Math.round(100*state.score/(state.total*10)) : 0;
+  let stars = pct>=90?5:pct>=75?4:pct>=55?3:pct>=35?2:1;
+  const starRow = '★'.repeat(stars) + '☆'.repeat(5-stars);
+  const msg = pct>=70 ? 'Excellent! You know Sunny Town very well!' : 'Keep practicing! You are learning fast.';
+  main.innerHTML =
+    '<section class="screen results-wrap" aria-label="Results">'+
+      '<div class="screen-head"><span class="eyebrow">Trip Complete</span><h2>Great work exploring Sunny Town! 🎉</h2></div>'+
+      '<div class="card">'+
+        '<div style="width:110px;margin:0 auto;">'+(pct>=70?ICONS.mascotHappy:ICONS.mascotSad)+'</div>'+
+        '<div class="stars-row" aria-hidden="true">'+starRow+'</div>'+
+        '<div class="score-big">'+state.score/10+' / '+state.total+'</div>'+
+        '<div class="results-msg">'+msg+'</div>'+
+        '<div class="results-breakdown">'+
+          state.breakdown.map(function(b){ return '<div class="item"><span>'+b.name+'</span><b>'+b.correct+' / '+b.total+'</b></div>'; }).join('')+
+        '</div>'+
+        '<div class="actions-row">'+
+          '<button class="btn btn-go btn-lg" id="againBtn">🔁 Play Again</button>'+
+        '</div>'+
+      '</div>'+
+    '</section>';
+  playCelebration();
+  launchConfetti();
+  document.getElementById('againBtn').addEventListener('click', function(){ playClick(); goTo('start'); });
+}
+
+function launchConfetti(){
+  const layer = document.getElementById('confettiLayer');
+  layer.innerHTML = '';
+  const colors = ['#ffc93c','#ff6b5b','#4fb0e8','#3faa5b','#9b6bd6'];
+  const n = 90;
+  for(let i=0;i<n;i++){
+    const el = document.createElement('div');
+    const size = 6 + Math.random()*7;
+    const left = Math.random()*100;
+    const delay = Math.random()*0.6;
+    const dur = 2.4 + Math.random()*1.8;
+    const rotate = Math.random()*360;
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    el.style.cssText = 'position:absolute; top:-20px; left:'+left+'vw; width:'+size+'px; height:'+(size*0.5)+'px; background:'+color+'; opacity:.95; transform:rotate('+rotate+'deg); border-radius:2px; animation:confettiFall '+dur+'s ease-in '+delay+'s forwards;';
+    layer.appendChild(el);
+  }
+  if(!document.getElementById('confettiKeyframes')){
+    const style = document.createElement('style');
+    style.id = 'confettiKeyframes';
+    style.textContent = '@keyframes confettiFall{to{ transform:translateY(105vh) rotate(600deg); opacity:.15; }}';
+    document.head.appendChild(style);
+  }
+  setTimeout(function(){ layer.innerHTML=''; }, 5200);
+}
+
+/* ------------------------------------------------------------
+   RENDER DISPATCH TABLE
+   ------------------------------------------------------------ */
+const RENDER = {
+  start: renderStart,
+  act1: renderAct1,
+  act2: renderAct2,
+  act3: renderAct3,
+  act4: renderAct4,
+  act5: renderAct5,
+  final: renderFinal,
+  results: renderResults
+};
+
+/* ------------------------------------------------------------
+   BOOT
+   ------------------------------------------------------------ */
+document.addEventListener('DOMContentLoaded', function(){
+  buildRoadStops();
+  updateRoad();
+  renderStart();
+  document.body.addEventListener('click', function(){ getCtx(); }, {once:true});
+});
+
+})();
+</script>
+</body>
+</html>
