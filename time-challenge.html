@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Challenge! ⏰</title>
+<style>
+/* =====================================================
+   TIME CHALLENGE - A1 English Telling-Time Review Game
+   All styles use CSS variables so colors are easy to edit.
+   ===================================================== */
+:root{
+  --blue-pale:#eaf6ff;
+  --blue-light:#bfe9ff;
+  --blue:#4fc3f7;
+  --blue-dark:#1e88e5;
+  --blue-deep:#0d47a1;
+  --yellow:#ffd54f;
+  --yellow-dark:#ffa000;
+  --white:#ffffff;
+  --ink:#26333d;
+  --green:#43a047;
+  --green-light:#c8f7c5;
+  --red:#e53935;
+  --red-light:#ffd6d6;
+  --radius:22px;
+  --shadow:0 8px 0 rgba(13,71,161,0.18), 0 12px 24px rgba(13,71,161,0.12);
+  --font: "Trebuchet MS", "Segoe UI", Verdana, Arial, sans-serif;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  font-family:var(--font);
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 10%, var(--yellow) 0%, transparent 22%),
+    radial-gradient(circle at 90% 15%, var(--yellow) 0%, transparent 18%),
+    radial-gradient(circle at 85% 90%, var(--blue-light) 0%, transparent 25%),
+    linear-gradient(160deg, var(--blue-pale) 0%, var(--blue-light) 100%);
+  background-attachment:fixed;
+  font-size:18px;
+  -webkit-tap-highlight-color:transparent;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+}
+
+.app{ max-width:900px; margin:0 auto; padding:20px 16px 60px; }
+
+.top-bar{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  background:var(--white); border-radius:var(--radius); padding:12px 18px;
+  box-shadow:var(--shadow); margin-bottom:18px;
+}
+.hud-item{
+  display:flex; align-items:center; gap:6px; font-weight:700; font-size:1.15rem;
+  background:var(--blue-pale); border-radius:999px; padding:6px 14px;
+}
+.hud-item.lives .heart{ display:inline-block; transition:transform .2s; }
+.hud-item.lives .heart.lost{ opacity:.25; transform:scale(.8); }
+.hud-item.best{ background:var(--yellow); }
+
+.progress-wrap{
+  background:var(--white); border-radius:999px; height:22px; box-shadow:var(--shadow);
+  margin-bottom:22px; overflow:hidden; border:3px solid var(--white);
+}
+.progress-bar{
+  height:100%; width:0%; border-radius:999px;
+  background:linear-gradient(90deg, var(--yellow), var(--blue));
+  transition:width .5s ease; position:relative;
+}
+.progress-bar::after{
+  content:"⏰"; position:absolute; right:-4px; top:50%;
+  transform:translateY(-50%); font-size:1.1rem;
+}
+
+.panel{
+  background:var(--white); border-radius:calc(var(--radius) + 6px); box-shadow:var(--shadow);
+  padding:28px 22px; text-align:center; animation:pop-in .35s ease;
+}
+@keyframes pop-in{
+  from{ opacity:0; transform:translateY(14px) scale(.97); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+.title-hero{ text-align:center; margin-bottom:10px; }
+.title-hero h1{
+  font-size:2.6rem; margin:6px 0 2px; color:var(--blue-deep); text-shadow:2px 2px 0 var(--yellow);
+}
+.title-hero .subtitle{ font-size:1.3rem; color:var(--blue-dark); font-weight:600; margin:0; }
+.bounce{ display:inline-block; animation:bounce 1.8s ease-in-out infinite; }
+@keyframes bounce{
+  0%,100%{ transform:translateY(0) rotate(0deg); }
+  25%{ transform:translateY(-8px) rotate(-6deg); }
+  50%{ transform:translateY(0) rotate(0deg); }
+  75%{ transform:translateY(-4px) rotate(6deg); }
+}
+
+.instructions-list{ text-align:left; max-width:520px; margin:18px auto; font-size:1.15rem; line-height:1.7; }
+.instructions-list li{ margin-bottom:6px; }
+
+.btn{
+  font-family:var(--font); font-size:1.1rem; font-weight:700; color:var(--white);
+  background:linear-gradient(180deg, var(--blue), var(--blue-dark)); border:none;
+  border-radius:999px; padding:14px 30px; cursor:pointer; box-shadow:0 6px 0 var(--blue-deep);
+  transition:transform .12s ease, box-shadow .12s ease; min-height:52px; touch-action:manipulation;
+}
+.btn:hover{ transform:translateY(-2px); }
+.btn:active{ transform:translateY(3px); box-shadow:0 2px 0 var(--blue-deep); }
+.btn:focus-visible{ outline:4px solid var(--yellow-dark); outline-offset:3px; }
+.btn.btn-big{ font-size:1.5rem; padding:20px 44px; box-shadow:0 8px 0 var(--blue-deep); }
+.btn.btn-yellow{
+  background:linear-gradient(180deg, var(--yellow), var(--yellow-dark));
+  box-shadow:0 6px 0 #b57500; color:var(--ink);
+}
+.btn.btn-yellow:active{ box-shadow:0 2px 0 #b57500; }
+.btn:disabled{ opacity:.5; cursor:default; transform:none; }
+
+.options-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:560px; margin:20px auto 0; }
+@media (max-width:520px){ .options-grid{ grid-template-columns:1fr; } }
+.option-btn{
+  font-family:var(--font); font-size:1.15rem; font-weight:600; color:var(--blue-deep);
+  background:var(--blue-pale); border:3px solid var(--blue-light); border-radius:16px;
+  padding:16px 12px; cursor:pointer; min-height:60px;
+  transition:transform .12s ease, background .15s ease, border-color .15s ease;
+}
+.option-btn:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--blue); background:var(--blue-light); }
+.option-btn:focus-visible{ outline:4px solid var(--yellow-dark); outline-offset:2px; }
+.option-btn.correct{ background:var(--green-light); border-color:var(--green); color:#1b5e20; animation:wiggle-good .4s ease; }
+.option-btn.wrong{ background:var(--red-light); border-color:var(--red); color:#b71c1c; animation:shake .4s ease; }
+.option-btn:disabled{ cursor:default; }
+@keyframes wiggle-good{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+@keyframes shake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
+
+.feedback{ min-height:40px; font-size:1.3rem; font-weight:800; margin-top:14px; transition:opacity .2s ease; }
+.feedback.correct-msg{ color:var(--green); }
+.feedback.wrong-msg{ color:var(--red); }
+
+.clock-wrap{ display:flex; justify-content:center; margin:6px auto 8px; }
+.clock-wrap svg{ filter:drop-shadow(0 6px 10px rgba(13,71,161,0.18)); }
+
+.digital-display{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  background:linear-gradient(180deg, #0d1b2a, #1b3a5c);
+  border-radius:14px; border:4px solid var(--blue);
+  padding:12px 10px; min-width:120px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.4);
+}
+.digital-display .digi-time{
+  font-family:"Courier New", monospace;
+  font-size:1.5rem; font-weight:800; letter-spacing:1px;
+  color:#7fffd4; text-shadow:0 0 6px rgba(127,255,212,0.7);
+}
+.digital-display .digi-icon{ font-size:1.3rem; }
+
+.round-label{
+  display:inline-block; background:var(--yellow); color:var(--ink); font-weight:800;
+  border-radius:999px; padding:6px 18px; margin-bottom:12px; font-size:1rem; letter-spacing:.5px;
+}
+.question-count{ color:var(--blue-dark); font-weight:700; margin-bottom:6px;}
+
+.match-board{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; align-items:start; }
+@media (max-width:560px){ .match-board{ grid-template-columns:1fr; } }
+.match-col h3{ color:var(--blue-dark); margin:0 0 10px; }
+.dropzone{
+  display:flex; align-items:center; gap:10px; background:var(--blue-pale);
+  border:3px dashed var(--blue-light); border-radius:16px; padding:10px; margin-bottom:14px;
+  min-height:96px; transition:background .15s ease, border-color .15s ease;
+}
+.dropzone.filled{ border-style:solid; background:var(--green-light); border-color:var(--green); }
+.dropzone.drag-over{ border-color:var(--yellow-dark); background:var(--yellow); }
+.dropzone .zone-slot{
+  flex:1; min-height:36px; display:flex; align-items:center; justify-content:center;
+  font-weight:700; color:var(--blue-deep); text-align:center; border-radius:10px; padding:6px;
+}
+.chip-list{ display:flex; flex-direction:column; gap:10px; }
+.chip{
+  font-family:var(--font); font-size:1.02rem; font-weight:700; color:var(--white);
+  background:linear-gradient(180deg, var(--blue), var(--blue-dark)); border:none;
+  border-radius:14px; padding:14px 12px; cursor:grab; box-shadow:0 4px 0 var(--blue-deep);
+  transition:transform .12s ease, opacity .15s ease;
+}
+.chip:active{ cursor:grabbing; }
+.chip.selected{ outline:4px solid var(--yellow-dark); transform:translateY(-2px); }
+.chip.used{ opacity:.35; pointer-events:none; }
+.chip:focus-visible{ outline:4px solid var(--yellow-dark); outline-offset:2px; }
+
+.timer-ring-wrap{ display:flex; justify-content:center; margin-bottom:6px; }
+.timer-number{ font-size:2.2rem; font-weight:800; color:var(--blue-deep); }
+.timer-number.urgent{ color:var(--red); animation:pulse .5s infinite; }
+@keyframes pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.15); } }
+
+.celebrate-layer{ position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden; }
+.confetti{ position:absolute; top:-20px; font-size:1.6rem; animation:fall linear forwards; }
+@keyframes fall{ to{ transform:translateY(110vh) rotate(360deg); opacity:.9; } }
+
+.stats-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:560px; margin:20px auto; }
+@media (max-width:520px){ .stats-grid{ grid-template-columns:1fr; } }
+.stat-box{ background:var(--blue-pale); border-radius:16px; padding:16px 8px; }
+.stat-box .stat-value{ font-size:1.8rem; font-weight:800; color:var(--blue-deep); }
+.stat-box .stat-label{ font-size:.95rem; color:var(--ink); font-weight:600; }
+
+.hidden{ display:none !important; }
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+footer.credit{ text-align:center; color:var(--blue-dark); font-size:.85rem; margin-top:26px; opacity:.7; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== HUD (hidden on welcome screen) ===================== -->
+  <div class="top-bar hidden" id="hud" aria-live="off">
+    <div class="hud-item score">⭐ <span id="hud-score">0</span></div>
+    <div class="hud-item lives" aria-label="Lives remaining">
+      <span class="heart" id="heart-1">❤️</span><span class="heart" id="heart-2">❤️</span><span class="heart" id="heart-3">❤️</span>
+    </div>
+    <div class="hud-item best">🏆 <span id="hud-best">0</span></div>
+  </div>
+  <div class="progress-wrap hidden" id="progress-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Game progress">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- ===================== WELCOME SCREEN ===================== -->
+  <section class="panel" id="screen-welcome">
+    <div class="title-hero">
+      <span class="bounce" style="font-size:3rem;">⏰</span>
+      <h1>Time Challenge!</h1>
+      <p class="subtitle">Can you read the clock?</p>
+    </div>
+    <ul class="instructions-list">
+      <li>👀 Look at each clock and choose the correct answer.</li>
+      <li>🎮 Play 4 fun rounds: Match the Clock, Digital vs Analog, Drag &amp; Drop, and Beat the Clock.</li>
+      <li>🏆 Complete all challenges to become the Time Master!</li>
+    </ul>
+    <button class="btn btn-big" id="btn-start">Start Game ▶</button>
+  </section>
+
+  <!-- ===================== ROUND 1: Match the Clock ===================== -->
+  <section class="panel hidden" id="screen-round1">
+    <span class="round-label">Round 1 · Match the Clock</span>
+    <p class="question-count" id="r1-count">Question 1 of 8</p>
+    <div class="clock-wrap" id="r1-clock"></div>
+    <div class="options-grid" id="r1-options"></div>
+    <p class="feedback" id="r1-feedback" aria-live="polite"></p>
+  </section>
+
+  <!-- ===================== ROUND 2: Digital vs Analog ===================== -->
+  <section class="panel hidden" id="screen-round2">
+    <span class="round-label">Round 2 · Digital vs Analog</span>
+    <p class="question-count" id="r2-count">Question 1 of 6</p>
+    <p style="font-weight:600;color:var(--blue-dark);">Which digital time matches this clock?</p>
+    <div class="clock-wrap" id="r2-clock"></div>
+    <div class="options-grid" id="r2-options"></div>
+    <p class="feedback" id="r2-feedback" aria-live="polite"></p>
+  </section>
+
+  <!-- ===================== ROUND 3: Drag and Drop ===================== -->
+  <section class="panel hidden" id="screen-round3">
+    <span class="round-label">Round 3 · Match Them Up</span>
+    <p style="font-weight:600;color:var(--blue-dark);">Drag (or tap) each answer to the correct clock!</p>
+    <div class="match-board">
+      <div class="match-col">
+        <h3>🕐 Clocks</h3>
+        <div id="r3-clocks"></div>
+      </div>
+      <div class="match-col">
+        <h3>💬 Answers</h3>
+        <div class="chip-list" id="r3-chips"></div>
+      </div>
+    </div>
+    <p class="feedback" id="r3-feedback" aria-live="polite"></p>
+  </section>
+
+  <!-- ===================== ROUND 4: Beat the Clock ===================== -->
+  <section class="panel hidden" id="screen-round4">
+    <span class="round-label">Round 4 · Beat the Clock!</span>
+    <p class="question-count" id="r4-count">Question 1 of 10</p>
+    <div class="timer-ring-wrap">
+      <div class="timer-number" id="r4-timer">10</div>
+    </div>
+    <div class="clock-wrap" id="r4-clock"></div>
+    <div class="options-grid" id="r4-options"></div>
+    <p class="feedback" id="r4-feedback" aria-live="polite"></p>
+  </section>
+
+  <!-- ===================== END SCREEN ===================== -->
+  <section class="panel hidden" id="screen-end">
+    <div class="title-hero">
+      <span class="bounce" style="font-size:3rem;">🏆</span>
+      <h1>Congratulations!</h1>
+      <p class="subtitle">You are a Time Master!</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-value" id="end-score">0</div><div class="stat-label">⭐ Final Score</div></div>
+      <div class="stat-box"><div class="stat-value" id="end-correct">0</div><div class="stat-label">✅ Correct Answers</div></div>
+      <div class="stat-box"><div class="stat-value" id="end-accuracy">0%</div><div class="stat-label">🎯 Accuracy</div></div>
+    </div>
+    <p id="end-best-msg" style="font-weight:700;color:var(--yellow-dark);"></p>
+    <button class="btn btn-big btn-yellow" id="btn-again">🔁 Play Again</button>
+  </section>
+
+  <footer class="credit">Time Challenge · A telling-time review game</footer>
+</div>
+
+<!-- Layer for confetti / celebration animations -->
+<div class="celebrate-layer" id="celebrate-layer" aria-hidden="true"></div>
+
+<span class="sr-only" id="live-region" aria-live="assertive"></span>
+<script>
+/* =====================================================
+   TIME CHALLENGE - GAME LOGIC
+   Organized into: DATA, AUDIO, CLOCK DRAWING, STATE,
+   ROUND 1-4 controllers, and END/INIT logic.
+   Edit the TIME_BANK array to add/remove vocabulary.
+   ===================================================== */
+
+/* ---------------------------------------------------
+   1. DATA: the time "concepts" used across the whole game.
+   Each entry = one clock face + one or more accepted phrases.
+   (Some times have two natural phrasings in English, e.g.
+   "one fifteen" / "a quarter after one" - both are valid,
+   so we never let two phrases from the SAME entry appear
+   as rival multiple-choice options.)
+--------------------------------------------------- */
+const TIME_BANK = [
+  { id:'t100',  hour:1,  minute:0,  digital:'1:00 PM',  digitalNote:'1:00 PM',              phrases:["It's one o'clock."] },
+  { id:'t115',  hour:1,  minute:15, digital:'1:15 PM',  digitalNote:'1:15 PM',              phrases:["It's one fifteen.", "It's a quarter after one."] },
+  { id:'t120',  hour:1,  minute:20, digital:'1:20 PM',  digitalNote:'1:20 PM',              phrases:["It's one twenty.", "It's twenty after one."] },
+  { id:'t130',  hour:1,  minute:30, digital:'1:30 PM',  digitalNote:'1:30 PM',              phrases:["It's one thirty.", "It's half past one."] },
+  { id:'t140',  hour:1,  minute:40, digital:'1:40 PM',  digitalNote:'1:40 PM',              phrases:["It's one forty.", "It's twenty to two."] },
+  { id:'t145',  hour:1,  minute:45, digital:'1:45 PM',  digitalNote:'1:45 PM',              phrases:["It's one forty-five.", "It's a quarter to two."] },
+  { id:'noon',  hour:12, minute:0,  digital:'12:00 PM', digitalNote:'12:00 PM (Noon)',      phrases:["It's noon."],     icon:'☀️', bg:'#fff8e1' },
+  { id:'mid',   hour:12, minute:0,  digital:'12:00 AM', digitalNote:'12:00 AM (Midnight)',  phrases:["It's midnight."], icon:'🌙', bg:'#e8eaf6' },
+];
+/* Noon and midnight both point to 12:00 on a real analog clock - there is
+   no way to tell them apart from the hands alone. To keep the game fair
+   and readable, those two entries get a small sun/moon icon and a tinted
+   clock face (handled in buildClockSVG) so students can visually tell
+   them apart, the same way a wall clock is understood using daylight
+   context in real life. */
+
+/* ---------------------------------------------------
+   2. AUDIO: tiny synthesized sound effects (Web Audio API).
+   No external audio files, so the game works fully offline.
+--------------------------------------------------- */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+  return audioCtx;
+}
+function playTone(freq, start, duration, type='sine', gainPeak=0.18){
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+  gain.gain.setValueAtTime(0, ctx.currentTime + start);
+  gain.gain.linearRampToValueAtTime(gainPeak, ctx.currentTime + start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + duration + 0.02);
+}
+function soundCorrect(){
+  playTone(523.25, 0, 0.14, 'triangle');   // C5
+  playTone(659.25, 0.12, 0.14, 'triangle'); // E5
+  playTone(783.99, 0.24, 0.22, 'triangle'); // G5
+}
+function soundWrong(){
+  playTone(220, 0, 0.18, 'sawtooth', 0.12);
+  playTone(174.6, 0.14, 0.28, 'sawtooth', 0.12);
+}
+function soundComplete(){
+  const notes = [523.25, 587.33, 659.25, 783.99, 1046.5];
+  notes.forEach((f,i)=> playTone(f, i*0.14, 0.3, 'triangle'));
+}
+function soundTick(){
+  playTone(880, 0, 0.06, 'square', 0.08);
+}
+
+/* ---------------------------------------------------
+   3. CLOCK DRAWING: builds an accurate analog clock as SVG.
+--------------------------------------------------- */
+function buildClockSVG(hour, minute, size=210, icon=null, faceColor='#ffffff'){
+  const cx = size/2, cy = size/2, r = size/2 - 8;
+  const hourAngle = ((hour % 12) + minute/60) * 30;   // 30deg per hour
+  const minuteAngle = minute * 6;                      // 6deg per minute
+
+  let ticks = '';
+  for(let i=0;i<60;i++){
+    const angle = i*6;
+    const isHour = i % 5 === 0;
+    const len = isHour ? 14 : 6;
+    const w = isHour ? 3 : 1.5;
+    const x1 = cx + (r-4)*Math.sin(angle*Math.PI/180);
+    const y1 = cy - (r-4)*Math.cos(angle*Math.PI/180);
+    const x2 = cx + (r-4-len)*Math.sin(angle*Math.PI/180);
+    const y2 = cy - (r-4-len)*Math.cos(angle*Math.PI/180);
+    ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--blue-dark)" stroke-width="${w}" stroke-linecap="round"/>`;
+  }
+
+  let numbers = '';
+  for(let n=1;n<=12;n++){
+    const angle = n*30;
+    const nr = r - 30;
+    const x = cx + nr*Math.sin(angle*Math.PI/180);
+    const y = cy - nr*Math.cos(angle*Math.PI/180);
+    numbers += `<text x="${x.toFixed(1)}" y="${(y+7).toFixed(1)}" text-anchor="middle" font-size="18" font-weight="700" font-family="Trebuchet MS, sans-serif" fill="#0d47a1">${n}</text>`;
+  }
+
+  // Small sun/moon badge (only passed in for noon vs. midnight) so two
+  // clocks that would otherwise look identical are easy to tell apart.
+  const badge = icon ? `
+    <circle cx="${size-22}" cy="22" r="17" fill="#ffffff" stroke="#ffa000" stroke-width="2"/>
+    <text x="${size-22}" y="28" text-anchor="middle" font-size="18">${icon}</text>` : '';
+
+  const svg = `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Analog clock">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${faceColor}" stroke="#4fc3f7" stroke-width="6"/>
+    <circle cx="${cx}" cy="${cy}" r="${r-2}" fill="none" stroke="#eaf6ff" stroke-width="2"/>
+    ${ticks}
+    ${numbers}
+    <line x1="${cx}" y1="${cy}" x2="${(cx + (r*0.5)*Math.sin(hourAngle*Math.PI/180)).toFixed(1)}" y2="${(cy - (r*0.5)*Math.cos(hourAngle*Math.PI/180)).toFixed(1)}" stroke="#0d47a1" stroke-width="6" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${cy}" x2="${(cx + (r*0.75)*Math.sin(minuteAngle*Math.PI/180)).toFixed(1)}" y2="${(cy - (r*0.75)*Math.cos(minuteAngle*Math.PI/180)).toFixed(1)}" stroke="#ffa000" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="7" fill="#0d47a1"/>
+    ${badge}
+  </svg>`;
+  return svg;
+}
+
+/* Builds a bright LED-style digital clock readout, used in Round 3
+   so students can read the time clearly without squinting at hands. */
+function buildDigitalDisplay(entry){
+  const iconHtml = entry.icon ? `<span class="digi-icon">${entry.icon}</span>` : '';
+  return `<div class="digital-display" role="img" aria-label="Digital clock showing ${entry.digital}">
+      ${iconHtml}<span class="digi-time">${entry.digital}</span>
+    </div>`;
+}
+
+/* ---------------------------------------------------
+   4. UTILITIES
+--------------------------------------------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pickRandom(arr, n){ return shuffle(arr).slice(0,n); }
+function announce(msg){ document.getElementById('live-region').textContent = msg; }
+
+/* ---------------------------------------------------
+   5. GAME STATE
+--------------------------------------------------- */
+const TOTAL_STEPS = 8 + 6 + 5 + 10; // R1 + R2 + R3(pairs) + R4
+const state = {
+  score:0,
+  lives:3,
+  correctCount:0,
+  totalAnswered:0,
+  stepsDone:0,
+  bestScore: Number(localStorage.getItem('timeChallengeBestScore') || 0)
+};
+
+function resetState(){
+  state.score=0; state.lives=3; state.correctCount=0; state.totalAnswered=0; state.stepsDone=0;
+  document.querySelectorAll('.heart').forEach(h=>h.classList.remove('lost'));
+  updateHUD();
+  updateProgress();
+}
+
+function updateHUD(){
+  document.getElementById('hud-score').textContent = state.score;
+  document.getElementById('hud-best').textContent = state.bestScore;
+  for(let i=1;i<=3;i++){
+    document.getElementById('heart-'+i).classList.toggle('lost', i > state.lives);
+  }
+}
+
+function updateProgress(){
+  const pct = Math.min(100, Math.round((state.stepsDone/TOTAL_STEPS)*100));
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = pct + '%';
+  document.getElementById('progress-wrap').setAttribute('aria-valuenow', pct);
+}
+
+function addScore(points){
+  state.score += points;
+  state.correctCount += 1;
+  updateHUD();
+}
+function loseLife(){
+  state.lives = Math.max(0, state.lives - 1);
+  updateHUD();
+  // Encouraging design choice: running out of hearts never stops the
+  // game (this is a low-stakes review activity, not a test) — hearts
+  // simply refill quietly so students keep practicing without penalty.
+  if(state.lives === 0){
+    setTimeout(()=>{ state.lives = 3; updateHUD(); }, 700);
+  }
+}
+function advanceStep(){
+  state.stepsDone += 1;
+  updateProgress();
+}
+
+/* ---------------------------------------------------
+   6. CELEBRATION CONFETTI
+--------------------------------------------------- */
+function burstConfetti(emoji='🎉'){
+  const layer = document.getElementById('celebrate-layer');
+  const icons = ['⭐','🎉','✨','🎈'];
+  for(let i=0;i<14;i++){
+    const span = document.createElement('span');
+    span.className = 'confetti';
+    span.textContent = Math.random()<0.4 ? emoji : icons[Math.floor(Math.random()*icons.length)];
+    span.style.left = Math.random()*100 + 'vw';
+    span.style.animationDuration = (1.4 + Math.random()*1.2) + 's';
+    span.style.fontSize = (1.2 + Math.random()*1.2) + 'rem';
+    layer.appendChild(span);
+    setTimeout(()=> span.remove(), 3000);
+  }
+}
+
+/* ---------------------------------------------------
+   7. SCREEN NAVIGATION
+--------------------------------------------------- */
+function showScreen(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+/* ---------------------------------------------------
+   8. ROUND 1 - Match the Clock (analog clock -> pick phrase)
+--------------------------------------------------- */
+const r1 = { queue:[], index:0 };
+
+function startRound1(){
+  r1.queue = shuffle(TIME_BANK); // every entry once, random order each playthrough
+  r1.index = 0;
+  showScreen('screen-round1');
+  renderRound1();
+}
+
+function renderRound1(){
+  if(r1.index >= r1.queue.length){ startRound2(); return; }
+  const entry = r1.queue[r1.index];
+  document.getElementById('r1-count').textContent = `Question ${r1.index+1} of ${r1.queue.length}`;
+  document.getElementById('r1-clock').innerHTML = buildClockSVG(entry.hour, entry.minute, 210, entry.icon, entry.bg || '#ffffff');
+  document.getElementById('r1-feedback').textContent = '';
+  document.getElementById('r1-feedback').className = 'feedback';
+
+  const correctPhrase = entry.phrases[Math.floor(Math.random()*entry.phrases.length)];
+  const otherEntries = TIME_BANK.filter(t => t.id !== entry.id);
+  const distractors = pickRandom(otherEntries, 3).map(t => t.phrases[Math.floor(Math.random()*t.phrases.length)]);
+  const options = shuffle([correctPhrase, ...distractors]);
+
+  const wrap = document.getElementById('r1-options');
+  wrap.innerHTML = '';
+  options.forEach(text=>{
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = text;
+    btn.addEventListener('click', ()=> handleRound1Answer(btn, text === correctPhrase, correctPhrase));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleRound1Answer(btn, isCorrect, correctPhrase){
+  const allBtns = document.querySelectorAll('#r1-options .option-btn');
+  allBtns.forEach(b=> b.disabled = true);
+  const fb = document.getElementById('r1-feedback');
+  state.totalAnswered++;
+
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.textContent = '✅ Correct!';
+    fb.className = 'feedback correct-msg';
+    addScore(10);
+    soundCorrect();
+    burstConfetti('⭐');
+    announce('Correct!');
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = "❌ Try again! The answer was: " + correctPhrase;
+    fb.className = 'feedback wrong-msg';
+    loseLife();
+    soundWrong();
+    announce('Not quite. The correct answer was ' + correctPhrase);
+    allBtns.forEach(b=>{ if(b.textContent === correctPhrase) b.classList.add('correct'); });
+  }
+  advanceStep();
+  setTimeout(()=>{ r1.index++; renderRound1(); }, 1300);
+}
+
+/* ---------------------------------------------------
+   9. ROUND 2 - Digital vs Analog (analog clock -> pick digital time)
+--------------------------------------------------- */
+const r2 = { queue:[], index:0, count:6 };
+
+function startRound2(){
+  r2.queue = pickRandom(TIME_BANK, r2.count);
+  r2.index = 0;
+  showScreen('screen-round2');
+  renderRound2();
+}
+
+function renderRound2(){
+  if(r2.index >= r2.queue.length){ startRound3(); return; }
+  const entry = r2.queue[r2.index];
+  document.getElementById('r2-count').textContent = `Question ${r2.index+1} of ${r2.queue.length}`;
+  document.getElementById('r2-clock').innerHTML = buildClockSVG(entry.hour, entry.minute, 210, entry.icon, entry.bg || '#ffffff');
+  document.getElementById('r2-feedback').textContent = '';
+  document.getElementById('r2-feedback').className = 'feedback';
+
+  const otherEntries = TIME_BANK.filter(t => t.id !== entry.id);
+  const distractors = pickRandom(otherEntries, 2);
+  const optionEntries = shuffle([entry, ...distractors]);
+
+  const wrap = document.getElementById('r2-options');
+  wrap.innerHTML = '';
+  optionEntries.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt.digitalNote;
+    btn.addEventListener('click', ()=> handleRound2Answer(btn, opt.id === entry.id, entry.digitalNote));
+    wrap.appendChild(btn);
+  });
+}
+
+function handleRound2Answer(btn, isCorrect, correctLabel){
+  const allBtns = document.querySelectorAll('#r2-options .option-btn');
+  allBtns.forEach(b=> b.disabled = true);
+  const fb = document.getElementById('r2-feedback');
+  state.totalAnswered++;
+
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.textContent = '✅ Correct!';
+    fb.className = 'feedback correct-msg';
+    addScore(10);
+    soundCorrect();
+    burstConfetti('⭐');
+    announce('Correct!');
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '❌ Try again! The answer was: ' + correctLabel;
+    fb.className = 'feedback wrong-msg';
+    loseLife();
+    soundWrong();
+    announce('Not quite. The correct answer was ' + correctLabel);
+    allBtns.forEach(b=>{ if(b.textContent === correctLabel) b.classList.add('correct'); });
+  }
+  advanceStep();
+  setTimeout(()=>{ r2.index++; renderRound2(); }, 1300);
+}
+
+/* ---------------------------------------------------
+   10. ROUND 3 - Drag and Drop matching
+   Supports: native HTML5 drag & drop (mouse), plus a
+   click/tap "select then place" mode so the round is
+   fully usable with touch screens and keyboards.
+--------------------------------------------------- */
+const r3 = { entries:[], selectedChip:null, filled:0 };
+
+function startRound3(){
+  r3.entries = pickRandom(TIME_BANK, 5);
+  r3.selectedChip = null;
+  r3.filled = 0;
+  showScreen('screen-round3');
+  renderRound3();
+}
+
+function renderRound3(){
+  document.getElementById('r3-feedback').textContent = '';
+  document.getElementById('r3-feedback').className = 'feedback';
+
+  // Build clock dropzones (left column) in one random order
+  const clockOrder = shuffle(r3.entries);
+  const clocksWrap = document.getElementById('r3-clocks');
+  clocksWrap.innerHTML = '';
+  clockOrder.forEach(entry=>{
+    const zone = document.createElement('div');
+    zone.className = 'dropzone';
+    zone.dataset.entryId = entry.id;
+    zone.innerHTML = `
+      <div class="clock-wrap" style="margin:0;">${buildDigitalDisplay(entry)}</div>
+      <div class="zone-slot" data-role="slot">Drop here</div>
+    `;
+    // Native drag & drop targets
+    zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', ()=> zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e=>{
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const chipId = e.dataTransfer.getData('text/plain');
+      const chip = document.querySelector(`.chip[data-chip-id="${chipId}"]`);
+      if(chip && !chip.classList.contains('used')) placeChipInZone(chip, zone);
+    });
+    // Tap-to-place mode: clicking a filled/empty zone while a chip is selected
+    zone.addEventListener('click', ()=>{
+      if(r3.selectedChip) placeChipInZone(r3.selectedChip, zone);
+    });
+    clocksWrap.appendChild(zone);
+  });
+
+  // Build answer chips (right column) in random order, one phrase per entry
+  const chipsWrap = document.getElementById('r3-chips');
+  chipsWrap.innerHTML = '';
+  const chipData = shuffle(r3.entries.map(e => ({
+    entryId: e.id,
+    text: e.phrases[Math.floor(Math.random()*e.phrases.length)]
+  })));
+  chipData.forEach((c, i)=>{
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.textContent = c.text;
+    chip.dataset.chipId = 'chip'+i;
+    chip.dataset.entryId = c.entryId;
+    chip.draggable = true;
+    chip.setAttribute('aria-pressed','false');
+    chip.addEventListener('dragstart', e=>{
+      e.dataTransfer.setData('text/plain', chip.dataset.chipId);
+    });
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('used')) return;
+      document.querySelectorAll('.chip').forEach(c2=>{ c2.classList.remove('selected'); c2.setAttribute('aria-pressed','false'); });
+      if(r3.selectedChip === chip){ r3.selectedChip = null; return; }
+      r3.selectedChip = chip;
+      chip.classList.add('selected');
+      chip.setAttribute('aria-pressed','true');
+    });
+    chipsWrap.appendChild(chip);
+  });
+}
+
+function placeChipInZone(chip, zone){
+  const slot = zone.querySelector('[data-role="slot"]');
+  const isCorrect = chip.dataset.entryId === zone.dataset.entryId;
+  state.totalAnswered++;
+
+  if(isCorrect){
+    slot.textContent = chip.textContent;
+    zone.classList.add('filled');
+    chip.classList.add('used');
+    chip.classList.remove('selected');
+    chip.setAttribute('aria-pressed','true');
+    r3.selectedChip = null;
+    r3.filled++;
+    addScore(10);
+    soundCorrect();
+    advanceStep();
+    announce('Correct match!');
+    if(r3.filled >= r3.entries.length){
+      document.getElementById('r3-feedback').textContent = '🎉 Great Job!';
+      document.getElementById('r3-feedback').className = 'feedback correct-msg';
+      burstConfetti('🎉');
+      soundComplete();
+      setTimeout(()=> startRound4(), 1600);
+    }
+  } else {
+    // Wrong match: brief shake, chip stays available to try again
+    zone.classList.add('drag-over');
+    slot.textContent = '❌ Not this one';
+    loseLife();
+    soundWrong();
+    announce('That is not the right match, try again.');
+    setTimeout(()=>{
+      zone.classList.remove('drag-over');
+      if(!zone.classList.contains('filled')) slot.textContent = 'Drop here';
+    }, 700);
+  }
+}
+
+/* ---------------------------------------------------
+   11. ROUND 4 - Beat the Clock (10 questions, 10s each)
+--------------------------------------------------- */
+const r4 = { queue:[], index:0, count:10, timeLeft:10, timerId:null };
+
+function startRound4(){
+  // Allow repeats since there are only 8 unique time concepts but 10 questions
+  r4.queue = [];
+  while(r4.queue.length < r4.count){
+    r4.queue.push(...shuffle(TIME_BANK));
+  }
+  r4.queue = r4.queue.slice(0, r4.count);
+  r4.index = 0;
+  showScreen('screen-round4');
+  renderRound4();
+}
+
+function renderRound4(){
+  clearInterval(r4.timerId);
+  if(r4.index >= r4.queue.length){ endGame(); return; }
+  const entry = r4.queue[r4.index];
+  document.getElementById('r4-count').textContent = `Question ${r4.index+1} of ${r4.queue.length}`;
+  document.getElementById('r4-clock').innerHTML = buildClockSVG(entry.hour, entry.minute, 210, entry.icon, entry.bg || '#ffffff');
+  document.getElementById('r4-feedback').textContent = '';
+  document.getElementById('r4-feedback').className = 'feedback';
+
+  const correctPhrase = entry.phrases[Math.floor(Math.random()*entry.phrases.length)];
+  const otherEntries = TIME_BANK.filter(t => t.id !== entry.id);
+  const distractors = pickRandom(otherEntries, 3).map(t => t.phrases[Math.floor(Math.random()*t.phrases.length)]);
+  const options = shuffle([correctPhrase, ...distractors]);
+
+  const wrap = document.getElementById('r4-options');
+  wrap.innerHTML = '';
+  options.forEach(text=>{
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = text;
+    btn.addEventListener('click', ()=> handleRound4Answer(btn, text === correctPhrase, correctPhrase));
+    wrap.appendChild(btn);
+  });
+
+  // 10-second countdown timer for this question
+  r4.timeLeft = 10;
+  const timerEl = document.getElementById('r4-timer');
+  timerEl.textContent = r4.timeLeft;
+  timerEl.classList.remove('urgent');
+  r4.timerId = setInterval(()=>{
+    r4.timeLeft--;
+    timerEl.textContent = r4.timeLeft;
+    if(r4.timeLeft <= 3){ timerEl.classList.add('urgent'); soundTick(); }
+    if(r4.timeLeft <= 0){
+      clearInterval(r4.timerId);
+      handleRound4Answer(null, false, correctPhrase); // time's up = wrong
+    }
+  }, 1000);
+}
+
+function handleRound4Answer(btn, isCorrect, correctPhrase){
+  clearInterval(r4.timerId);
+  const allBtns = document.querySelectorAll('#r4-options .option-btn');
+  allBtns.forEach(b=> b.disabled = true);
+  const fb = document.getElementById('r4-feedback');
+  state.totalAnswered++;
+
+  if(isCorrect){
+    if(btn) btn.classList.add('correct');
+    fb.textContent = '⭐ +10 points';
+    fb.className = 'feedback correct-msg';
+    addScore(10);
+    soundCorrect();
+    burstConfetti('⭐');
+    announce('Correct! Plus 10 points.');
+  } else {
+    if(btn) btn.classList.add('wrong');
+    fb.textContent = "❌ The correct answer was: " + correctPhrase;
+    fb.className = 'feedback wrong-msg';
+    loseLife();
+    soundWrong();
+    announce('Time is up or incorrect. The correct answer was ' + correctPhrase);
+    allBtns.forEach(b=>{ if(b.textContent === correctPhrase) b.classList.add('correct'); });
+  }
+  advanceStep();
+  setTimeout(()=>{ r4.index++; renderRound4(); }, 1300);
+}
+
+/* ---------------------------------------------------
+   12. END SCREEN
+--------------------------------------------------- */
+function endGame(){
+  showScreen('screen-end');
+  soundComplete();
+  burstConfetti('🏆');
+
+  document.getElementById('end-score').textContent = state.score;
+  document.getElementById('end-correct').textContent = state.correctCount;
+  const accuracy = state.totalAnswered ? Math.round((state.correctCount/state.totalAnswered)*100) : 0;
+  document.getElementById('end-accuracy').textContent = accuracy + '%';
+
+  const bestMsg = document.getElementById('end-best-msg');
+  if(state.score > state.bestScore){
+    state.bestScore = state.score;
+    localStorage.setItem('timeChallengeBestScore', String(state.bestScore));
+    bestMsg.textContent = '🌟 New Best Score!';
+  } else {
+    bestMsg.textContent = '';
+  }
+  updateHUD();
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+/* ---------------------------------------------------
+   13. INIT / EVENT WIRING
+--------------------------------------------------- */
+function startGame(){
+  resetState();
+  document.getElementById('hud').classList.remove('hidden');
+  document.getElementById('progress-wrap').classList.remove('hidden');
+  startRound1();
+}
+
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-again').addEventListener('click', startGame);
+
+// Initialize HUD with saved best score on first load
+updateHUD();
+</script>
+</body>
+</html>
