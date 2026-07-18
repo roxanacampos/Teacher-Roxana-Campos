@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Speaking Practice: Infinitive of Purpose</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .card {
+      background: #4CAF50;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 30px;
+      transition: background 0.3s;
+    }
+    .card:hover {
+      background: #45a049;
+    }
+    #questionBox {
+      margin-top: 40px;
+      font-size: 22px;
+      color: #222;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 Speaking Practice: Infinitive of Purpose</h1>
+  <p>Choose a number to reveal a question. Answer using <b>to + verb</b>.</p>
+
+  <div class="grid">
+    <div class="card" onclick="showQuestion(1)">1</div>
+    <div class="card" onclick="showQuestion(2)">2</div>
+    <div class="card" onclick="showQuestion(3)">3</div>
+    <div class="card" onclick="showQuestion(4)">4</div>
+    <div class="card" onclick="showQuestion(5)">5</div>
+    <div class="card" onclick="showQuestion(6)">6</div>
+    <div class="card" onclick="showQuestion(7)">7</div>
+    <div class="card" onclick="showQuestion(8)">8</div>
+    <div class="card" onclick="showQuestion(9)">9</div>
+    <div class="card" onclick="showQuestion(10)">10</div>
+    <div class="card" onclick="showQuestion(11)">11</div>
+    <div class="card" onclick="showQuestion(12)">12</div>
+  </div>
+
+  <div id="questionBox">Click a number to start!</div>
+
+  <script>
+    const questions = {
+      1: "Why did you open your notebook?",
+      2: "Why did you go to the supermarket?",
+      3: "Why did you turn on the computer?",
+      4: "Why did you call your friend?",
+      5: "Why did you wake up early?",
+      6: "Why did you bring your phone?",
+      7: "Why did you study English?",
+      8: "Why did you open the window?",
+      9: "Why did you write that word?",
+      10: "Why did you go to the park?",
+      11: "Why did you drink coffee?",
+      12: "Why did you visit the library?"
+    };
+
+    function showQuestion(num) {
+      document.getElementById("questionBox").innerText = questions[num];
+    }
+  </script>
+</body>
+</html>
