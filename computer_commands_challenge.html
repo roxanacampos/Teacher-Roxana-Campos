@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Computer Commands Challenge</title>
+<style>
+  :root{
+    --blue:#2563eb;
+    --blue-dark:#1447c9;
+    --blue-light:#93c5fd;
+    --sky:#e8f1ff;
+    --white:#ffffff;
+    --gray-light:#eef2f7;
+    --gray:#94a3b8;
+    --gray-dark:#33415a;
+    --ink:#1c2b4a;
+    --green:#1fa452;
+    --green-light:#e4faed;
+    --red:#e0413a;
+    --red-light:#fdeaea;
+    --amber:#f6a609;
+    --yellow:#fde878;
+    --purple:#7c5cf0;
+    --radius:16px;
+    --radius-sm:10px;
+    --font-display:'Trebuchet MS','Segoe UI',Verdana,sans-serif;
+    --font-body:'Segoe UI',Tahoma,Verdana,sans-serif;
+    --font-mono:'Consolas','Courier New',monospace;
+    --shadow:0 10px 30px rgba(20,50,110,.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,.35) 0, transparent 40%),
+      radial-gradient(circle at 85% 75%, rgba(255,255,255,.25) 0, transparent 45%),
+      linear-gradient(160deg,#4f8ff7 0%,#2563eb 45%,#1447c9 100%);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:18px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+
+  /* ---------- OS WINDOW CHROME ---------- */
+  .os-window{
+    width:100%;
+    max-width:980px;
+    background:var(--white);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.5);
+  }
+  .os-titlebar{
+    background:linear-gradient(180deg,#2b3550,#1c2338);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 16px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    letter-spacing:.3px;
+  }
+  .os-dots{display:flex;gap:7px;margin-right:6px;}
+  .os-dots span{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  .os-dots span:nth-child(1){background:#ff5f57;}
+  .os-dots span:nth-child(2){background:#febc2e;}
+  .os-dots span:nth-child(3){background:#28c840;}
+  .os-titlebar .title-text{opacity:.9;}
+  .os-menubar{
+    background:#f4f6fb;
+    border-bottom:1px solid #dbe3f0;
+    display:flex;
+    gap:18px;
+    padding:7px 16px;
+    font-size:13px;
+    color:#5b6b8c;
+    font-family:var(--font-mono);
+  }
+  .os-menubar span{cursor:default;}
+
+  /* ---------- HEADER / HUD ---------- */
+  .hud{
+    padding:16px 20px 12px;
+    background:linear-gradient(180deg,#f7faff,#eef3fc);
+    border-bottom:1px solid #dbe3f0;
+  }
+  .hud-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .hud-title{
+    font-family:var(--font-display);
+    font-size:clamp(20px,3.4vw,28px);
+    font-weight:700;
+    color:var(--blue-dark);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .hud-stats{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .pill{
+    background:var(--white);
+    border:2px solid var(--blue-light);
+    color:var(--blue-dark);
+    font-weight:700;
+    padding:7px 14px;
+    border-radius:999px;
+    font-size:14px;
+    font-family:var(--font-mono);
+    box-shadow:0 2px 6px rgba(37,99,235,.12);
+  }
+  .btn-restart{
+    background:var(--white);
+    border:2px solid var(--red);
+    color:var(--red);
+    font-weight:700;
+    padding:7px 14px;
+    border-radius:999px;
+    font-size:13px;
+    cursor:pointer;
+    font-family:var(--font-body);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn-restart:hover{background:var(--red-light); transform:translateY(-1px);}
+  .progress-track{
+    width:100%;
+    height:14px;
+    background:#dbe3f0;
+    border-radius:999px;
+    overflow:hidden;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.15);
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--blue-light),var(--blue));
+    border-radius:999px;
+    transition:width .5s cubic-bezier(.4,1.4,.6,1);
+  }
+  .progress-label{
+    font-size:12px;
+    color:#5b6b8c;
+    margin-top:5px;
+    font-family:var(--font-mono);
+  }
+
+  /* ---------- MAIN CONTENT ---------- */
+  .os-content{
+    padding:22px 22px 28px;
+    background:
+      repeating-linear-gradient(135deg, rgba(37,99,235,.025) 0 2px, transparent 2px 40px),
+      var(--gray-light);
+    min-height:420px;
+  }
+  .screen{display:none;animation:fadein .35s ease;}
+  .screen.active{display:block;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  h2.activity-title{
+    font-family:var(--font-display);
+    color:var(--blue-dark);
+    font-size:clamp(19px,3vw,24px);
+    margin:0 0 6px;
+  }
+  p.activity-desc{
+    color:#4c5a78;
+    margin:0 0 18px;
+    font-size:15px;
+    line-height:1.5;
+  }
+  .instruction-box{
+    background:var(--sky);
+    border:2px dashed var(--blue-light);
+    border-radius:var(--radius-sm);
+    padding:12px 16px;
+    margin-bottom:18px;
+    font-size:14px;
+    color:var(--blue-dark);
+  }
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:16px;
+    padding:14px 28px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    box-shadow:0 6px 0 rgba(0,0,0,.12);
+  }
+  .btn:active{transform:translateY(3px); box-shadow:0 3px 0 rgba(0,0,0,.12);}
+  .btn:focus-visible{outline:3px solid var(--amber); outline-offset:3px;}
+  .btn-primary{background:linear-gradient(180deg,#4f8ff7,var(--blue)); color:#fff;}
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-green{background:linear-gradient(180deg,#33c46f,var(--green)); color:#fff;}
+  .btn-amber{background:linear-gradient(180deg,#ffcf4d,var(--amber)); color:#4a3300;}
+  .btn-lg{font-size:20px; padding:18px 40px;}
+  .btn-sound{
+    background:var(--white);
+    border:3px solid var(--blue);
+    color:var(--blue-dark);
+    font-size:17px;
+    padding:13px 22px;
+    border-radius:999px;
+    cursor:pointer;
+    font-weight:700;
+    box-shadow:0 4px 0 var(--blue-light);
+  }
+  .btn-sound:active{transform:translateY(3px); box-shadow:none;}
+  .center{text-align:center;}
+
+  /* ---------- START SCREEN ---------- */
+  .start-hero{
+    text-align:center;
+    padding:20px 10px 6px;
+  }
+  .start-hero .big-emoji{font-size:64px; display:block; margin-bottom:8px;}
+  .start-list{
+    max-width:520px;
+    margin:18px auto 26px;
+    text-align:left;
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:18px 22px;
+    box-shadow:0 4px 14px rgba(20,50,110,.08);
+    font-size:14px;
+    color:#4c5a78;
+  }
+  .start-list li{margin-bottom:6px;}
+
+  /* ---------- MONITOR MOCKUP (shared act 1 & 4) ---------- */
+  .monitor{
+    background:#0f1830;
+    border-radius:18px;
+    padding:14px 14px 22px;
+    box-shadow:0 12px 26px rgba(10,20,50,.35);
+    max-width:640px;
+    margin:0 auto;
+  }
+  .monitor-stand{
+    width:90px;height:14px;background:#0f1830;margin:0 auto;border-radius:0 0 8px 8px;
+  }
+  .screen-glass{
+    background:var(--white);
+    border-radius:10px;
+    overflow:hidden;
+    border:3px solid #223057;
+  }
+  .app-window-mock .titlebar-mock{
+    background:linear-gradient(180deg,#3a4668,#28324f);
+    color:#fff;
+    font-size:11px;
+    font-family:var(--font-mono);
+    padding:6px 10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .app-window-mock .titlebar-mock .dots{display:flex;gap:4px;}
+  .app-window-mock .titlebar-mock .dots span{width:7px;height:7px;border-radius:50%;background:#8fa0c9;}
+  .menubar-mock{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    background:#f4f6fb;
+    padding:5px 10px;
+    font-size:11px;
+    color:#5b6b8c;
+    border-bottom:1px solid #dbe3f0;
+    font-family:var(--font-mono);
+  }
+  .target{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    font-family:inherit;
+    padding:0;
+  }
+  .target:focus-visible{outline:3px solid var(--amber); outline-offset:2px; border-radius:6px;}
+  .menu-mock-btn{
+    background:var(--white);
+    border:1px solid #c9d4e8 !important;
+    border-radius:5px;
+    padding:3px 9px;
+    font-weight:700;
+    color:var(--blue-dark);
+  }
+  .toolbar-mock{
+    display:flex;
+    gap:6px;
+    padding:7px 10px;
+    background:#e9edf7;
+    border-bottom:1px solid #dbe3f0;
+  }
+  .toolbar-mock .tbtn{
+    width:22px;height:22px;border-radius:5px;background:var(--white);border:1px solid #c9d4e8;
+    display:flex;align-items:center;justify-content:center;font-size:11px;
+  }
+  .body-mock{display:flex; gap:0;}
+  .document-mock{
+    flex:1;
+    background:#fff;
+    padding:16px 14px;
+    position:relative;
+    min-height:150px;
+    text-align:left;
+  }
+  .text-line{
+    height:9px;
+    background:#d7deee;
+    border-radius:4px;
+    margin-bottom:9px;
+    width:88%;
+  }
+  .text-line.short{width:55%;}
+  .highlight-mock{
+    background:var(--yellow) !important;
+    display:block;
+    width:100%;
+    padding:0;
+  }
+  .icon-mock{
+    position:absolute;
+    right:14px;
+    bottom:14px;
+    width:34px;height:34px;
+    background:#fbeecb;
+    border:1px solid var(--amber);
+    border-radius:7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+  }
+  .cursor-mock{
+    position:absolute;
+    left:44%;
+    top:38%;
+    width:20px;height:20px;
+  }
+  .cursor-shape{
+    width:100%;height:100%;
+    background:#1c2b4a;
+    clip-path:polygon(0 0, 0 70%, 25% 55%, 40% 100%, 55% 92%, 40% 55%, 70% 55%);
+  }
+  .scrollbar-mock{
+    width:20px;
+    background:#e9edf7;
+    display:flex;
+    justify-content:center;
+    padding:6px 0;
+    border-left:1px solid #dbe3f0;
+  }
+  .scrollbar-thumb{
+    width:9px;height:56px;
+    background:#aebbdb;
+    border-radius:6px;
+  }
+  .target.flash-correct{animation:flashGreen .6s ease;}
+  .target.flash-incorrect{animation:shakeErr .5s ease;}
+  @keyframes flashGreen{
+    0%{filter:none;} 40%{filter:drop-shadow(0 0 0 var(--green)); }
+    50%{ outline:4px solid var(--green); border-radius:8px;}
+    100%{outline:4px solid var(--green); border-radius:8px;}
+  }
+  @keyframes shakeErr{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-6px);}
+    40%{transform:translateX(6px);}
+    60%{transform:translateX(-5px);}
+    80%{transform:translateX(5px);}
+  }
+  .target-correct-locked{outline:4px solid var(--green); border-radius:8px; background:var(--green-light) !important;}
+  .target-wrong-flash{outline:4px solid var(--red); border-radius:8px;}
+
+  .act1-hint{
+    text-align:center;
+    margin-top:16px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:#5b6b8c;
+  }
+  .act1-controls{text-align:center; margin-bottom:18px;}
+
+  /* ---------- ACTIVITY 2: DRAG & DROP ---------- */
+  .a2-wrap{display:flex; flex-direction:column; gap:22px;}
+  .word-bank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:14px;
+    background:var(--white);
+    border-radius:var(--radius);
+    box-shadow:0 4px 14px rgba(20,50,110,.08);
+    min-height:64px;
+  }
+  .word-chip{
+    background:linear-gradient(180deg,#fff,#eef3fc);
+    border:2px solid var(--blue-light);
+    color:var(--blue-dark);
+    font-weight:700;
+    padding:10px 16px;
+    border-radius:999px;
+    cursor:grab;
+    font-size:14px;
+    touch-action:none;
+    user-select:none;
+    transition:box-shadow .15s ease, transform .1s ease;
+  }
+  .word-chip.selected{
+    outline:3px solid var(--amber);
+    background:#fff6df;
+  }
+  .word-chip.dragging{opacity:.35;}
+  .word-chip.used{visibility:hidden;}
+  .drop-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(130px,1fr));
+    gap:12px;
+  }
+  .drop-slot{
+    background:var(--white);
+    border:2px dashed #b9c6e4;
+    border-radius:var(--radius-sm);
+    min-height:104px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:8px 6px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s ease, background .2s ease;
+  }
+  .drop-slot:focus-visible{outline:3px solid var(--amber);}
+  .drop-slot.over{border-color:var(--blue); background:var(--sky);}
+  .drop-slot .slot-icon{font-size:26px; line-height:1;}
+  .drop-slot .slot-label{
+    font-size:11.5px;
+    color:var(--gray);
+    font-family:var(--font-mono);
+    min-height:14px;
+  }
+  .drop-slot.filled{
+    border-style:solid;
+    border-color:var(--green);
+    background:var(--green-light);
+    cursor:default;
+  }
+  .drop-slot.filled .slot-label{color:var(--green); font-weight:700;}
+  .drop-slot.wrong-shake{animation:shakeErr .5s ease; border-color:var(--red);}
+
+  .mini{width:34px;height:34px; position:relative; display:flex; align-items:center; justify-content:center;}
+  .mini-menu{flex-direction:column; gap:2px;}
+  .mini-menu-bar{width:28px;height:6px;background:#c9d4e8;border-radius:2px;}
+  .mini-menu-list{width:28px; background:#fff; border:1px solid #c9d4e8; border-radius:2px; padding:2px; display:flex; flex-direction:column; gap:2px;}
+  .mini-menu-list span{height:3px; background:#d7deee; border-radius:2px;}
+  .mini-toolbar{gap:3px;}
+  .mini-toolbar span{width:6px;height:14px;background:var(--blue-light); border-radius:2px;}
+  .mini-cursor .cursor-shape{width:22px;height:22px;}
+  .mini-scrollbar{width:12px;height:32px;background:#e9edf7;border-radius:3px;justify-content:flex-start;padding-top:3px;}
+  .mini-scrollbar-thumb{width:7px;height:14px;background:#aebbdb;border-radius:3px;}
+  .mini-highlight{width:34px;height:16px;}
+  .mini-highlight span{width:34px;height:10px;background:var(--yellow);border-radius:2px; display:block;}
+  .mini-emoji{font-size:26px;}
+
+  /* ---------- ACTIVITY 3: MULTIPLE CHOICE ---------- */
+  .mc-progress{font-family:var(--font-mono); font-size:13px; color:#5b6b8c; margin-bottom:8px;}
+  .mc-card{
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:22px 22px 18px;
+    box-shadow:0 4px 14px rgba(20,50,110,.08);
+    max-width:600px;
+    margin:0 auto;
+  }
+  .mc-scenario{
+    font-size:17px;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:16px;
+    line-height:1.5;
+  }
+  .mc-options{display:flex; flex-direction:column; gap:10px;}
+  .mc-option{
+    background:var(--gray-light);
+    border:2px solid transparent;
+    border-radius:var(--radius-sm);
+    padding:13px 16px;
+    font-size:15px;
+    text-align:left;
+    cursor:pointer;
+    font-family:var(--font-body);
+    color:var(--ink);
+    transition:transform .1s ease, background .15s ease;
+  }
+  .mc-option:hover:not(:disabled){background:var(--sky); transform:translateX(3px);}
+  .mc-option:focus-visible{outline:3px solid var(--amber);}
+  .mc-option.correct{background:var(--green-light); border-color:var(--green); font-weight:700;}
+  .mc-option.incorrect{background:var(--red-light); border-color:var(--red);}
+  .mc-option:disabled{cursor:default;}
+  .mc-feedback{
+    margin-top:14px;
+    font-weight:700;
+    font-size:14px;
+    min-height:20px;
+  }
+  .mc-feedback.correct{color:var(--green);}
+  .mc-feedback.incorrect{color:var(--red);}
+  .mc-next-wrap{text-align:right; margin-top:14px;}
+
+  /* ---------- ACTIVITY 4: SPEED CHALLENGE ---------- */
+  .speed-hud{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .speed-pill{
+    font-family:var(--font-mono);
+    font-weight:700;
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:14px;
+    background:var(--white);
+    border:2px solid var(--blue-light);
+    color:var(--blue-dark);
+  }
+  .speed-pill.timer{border-color:var(--amber); color:#8a5b00;}
+  .speed-command{
+    text-align:center;
+    font-family:var(--font-display);
+    font-size:clamp(20px,3.6vw,28px);
+    font-weight:700;
+    color:var(--blue-dark);
+    margin:6px 0 18px;
+    min-height:38px;
+  }
+  .speed-result-overlay{
+    text-align:center;
+    padding:40px 20px;
+  }
+
+  /* ---------- FINAL CHALLENGE ---------- */
+  .final-steps{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .step-dot{
+    font-family:var(--font-mono);
+    font-size:12px;
+    padding:6px 12px;
+    border-radius:999px;
+    background:var(--white);
+    border:2px solid #c9d4e8;
+    color:var(--gray);
+  }
+  .step-dot.active{border-color:var(--blue); color:var(--blue-dark); background:var(--sky); font-weight:700;}
+  .step-dot.done{border-color:var(--green); color:var(--green); background:var(--green-light);}
+  .final-desktop{
+    max-width:640px;
+    margin:0 auto;
+    background:linear-gradient(160deg,#7fb3ff,#3f7ce8);
+    border-radius:16px;
+    padding:20px;
+    min-height:300px;
+    box-shadow:0 10px 24px rgba(20,50,110,.25);
+  }
+  .final-file-icon{
+    width:78px;
+    text-align:center;
+    background:rgba(255,255,255,.15);
+    border:2px solid transparent;
+    border-radius:10px;
+    padding:8px 4px;
+    cursor:pointer;
+    color:#fff;
+    font-size:11px;
+    font-family:var(--font-mono);
+  }
+  .final-file-icon .fi-emoji{font-size:34px; display:block;}
+  .final-file-icon:hover, .final-file-icon:focus-visible{background:rgba(255,255,255,.3);}
+  .final-doc-window{
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,.2);
+  }
+  .final-doc-toolbar{
+    display:flex;
+    gap:8px;
+    padding:8px 10px;
+    background:#e9edf7;
+    border-bottom:1px solid #dbe3f0;
+    flex-wrap:wrap;
+  }
+  .final-doc-toolbar button{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:700;
+    padding:6px 12px;
+    border-radius:6px;
+    border:1px solid #c9d4e8;
+    background:#fff;
+    color:var(--blue-dark);
+    cursor:pointer;
+  }
+  .final-doc-toolbar button:focus-visible{outline:3px solid var(--amber);}
+  .final-doc-body{padding:16px; text-align:left;}
+  .final-text-line{
+    padding:6px 8px;
+    border-radius:5px;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-size:14px;
+    color:var(--ink);
+    background:#f4f6fb;
+    border:2px solid transparent;
+  }
+  .final-text-line.selected{background:var(--yellow); border-color:#e0c435;}
+  .final-instruction{
+    text-align:center;
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:17px;
+    margin-bottom:14px;
+    text-shadow:0 2px 4px rgba(0,0,0,.2);
+  }
+  .final-congrats{
+    text-align:center;
+    color:#fff;
+    padding:30px 10px;
+  }
+
+  /* ---------- END SCREEN ---------- */
+  .end-screen{text-align:center; padding:10px 6px;}
+  .trophy{font-size:70px; display:block; margin-bottom:6px;}
+  .end-title{font-family:var(--font-display); font-size:28px; color:var(--blue-dark); margin-bottom:18px;}
+  .end-stats{
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .end-stat-card{
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:16px 24px;
+    box-shadow:0 4px 14px rgba(20,50,110,.1);
+    min-width:140px;
+  }
+  .end-stat-card .num{font-family:var(--font-mono); font-size:26px; font-weight:700; color:var(--blue-dark);}
+  .end-stat-card .lbl{font-size:12px; color:var(--gray); margin-top:2px;}
+  .stars{font-size:44px; margin:10px 0 6px; letter-spacing:4px;}
+  .star-msg{font-weight:700; color:var(--gray-dark); margin-bottom:22px; font-size:16px;}
+
+  #confetti-canvas{
+    position:fixed; inset:0; pointer-events:none; z-index:999;
+  }
+
+  .visually-hidden{
+    position:absolute; width:1px;height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+  }
+
+  @media (max-width:560px){
+    .os-content{padding:16px 12px 22px;}
+    .btn-lg{font-size:17px; padding:15px 26px;}
+    .hud-title{font-size:19px;}
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="os-window">
+  <div class="os-titlebar">
+    <div class="os-dots"><span></span><span></span><span></span></div>
+    <span class="title-text">Computer Commands Challenge.exe</span>
+  </div>
+  <div class="os-menubar"><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+
+  <div class="hud">
+    <div class="hud-top">
+      <div class="hud-title">🖥️ Computer Commands Challenge</div>
+      <div class="hud-stats">
+        <span class="pill" id="score-pill">⭐ Score: 0</span>
+        <button class="btn-restart" id="restart-btn" type="button">🔄 Restart</button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">Get ready to begin!</div>
+  </div>
+
+  <div class="os-content">
+
+    <!-- START SCREEN -->
+    <section class="screen active" id="screen-start">
+      <div class="start-hero">
+        <span class="big-emoji">🖥️✨</span>
+        <h2 class="activity-title">Welcome, Computer Explorer!</h2>
+        <p class="activity-desc">Practice computer vocabulary through five fun activities. Listen, drag, choose, race the clock, and complete a real task on the desktop!</p>
+      </div>
+      <ul class="start-list">
+        <li>🔊 <strong>Activity 1:</strong> Listen and Find — click what you hear</li>
+        <li>🧩 <strong>Activity 2:</strong> Drag and Drop — match all 14 words</li>
+        <li>❓ <strong>Activity 3:</strong> Choose the Correct Command</li>
+        <li>⏱️ <strong>Activity 4:</strong> Speed Challenge — 60 seconds!</li>
+        <li>🏁 <strong>Final Challenge:</strong> Complete the Task in order</li>
+      </ul>
+      <div class="center"><button class="btn btn-primary btn-lg" id="start-btn" type="button">▶️ Start Challenge</button></div>
+    </section>
+
+    <!-- ACTIVITY 1 -->
+    <section class="screen" id="screen-act1">
+      <h2 class="activity-title">🔊 Activity 1 — Listen and Find</h2>
+      <p class="activity-desc">Press <strong>Listen</strong>, then click the correct part of the screen.</p>
+      <div class="instruction-box" id="a1-instruction">Press "Listen" to hear your first command.</div>
+      <div class="act1-controls">
+        <button class="btn-sound" id="a1-listen-btn" type="button">🔊 Listen</button>
+      </div>
+      <div class="monitor">
+        <div class="screen-glass">
+          <div class="app-window-mock">
+            <div class="titlebar-mock"><span class="dots"><span></span><span></span><span></span></span> MyEssay.docx</div>
+            <div class="menubar-mock">
+              <button class="target menu-mock-btn" data-target="menu" id="a1-menu" aria-label="pull-down menu">File ▾</button>
+              <span>Edit</span><span>View</span><span>Help</span>
+            </div>
+            <div class="toolbar-mock target" data-target="toolbar" id="a1-toolbar" role="button" tabindex="0" aria-label="tool bar">
+              <span class="tbtn">B</span><span class="tbtn">I</span><span class="tbtn">U</span><span class="tbtn">💾</span>
+            </div>
+            <div class="body-mock">
+              <div class="document-mock target" data-target="document" id="a1-document" role="button" tabindex="0" aria-label="document">
+                <div class="text-line"></div>
+                <button class="target text-line highlight-mock" data-target="highlight" id="a1-highlight" aria-label="highlighted text" style="display:block;"></button>
+                <div class="text-line short"></div>
+                <button class="target cursor-mock" data-target="cursor" id="a1-cursor" aria-label="cursor"><span class="cursor-shape"></span></button>
+                <button class="target icon-mock" data-target="icon" id="a1-icon" aria-label="icon">📁</button>
+              </div>
+              <div class="target scrollbar-mock" data-target="scrollbar" id="a1-scrollbar" role="button" tabindex="0" aria-label="scroll bar">
+                <div class="scrollbar-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="monitor-stand"></div>
+      <div class="act1-hint" id="a1-progress-text">Item 1 of 7</div>
+    </section>
+
+    <!-- ACTIVITY 2 -->
+    <section class="screen" id="screen-act2">
+      <h2 class="activity-title">🧩 Activity 2 — Drag and Drop</h2>
+      <p class="activity-desc">Drag each word onto the matching picture. (Tip: you can also tap a word, then tap the picture to place it.)</p>
+      <div class="instruction-box">Match all 14 vocabulary words to their icons below.</div>
+      <div class="a2-wrap">
+        <div class="word-bank" id="a2-word-bank"></div>
+        <div class="drop-grid" id="a2-drop-grid"></div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY 3 -->
+    <section class="screen" id="screen-act3">
+      <h2 class="activity-title">❓ Activity 3 — Choose the Correct Command</h2>
+      <p class="mc-progress" id="a3-progress">Question 1 of 12</p>
+      <div class="mc-card">
+        <div class="mc-scenario" id="a3-scenario">Loading...</div>
+        <div class="mc-options" id="a3-options"></div>
+        <div class="mc-feedback" id="a3-feedback"></div>
+        <div class="mc-next-wrap"><button class="btn btn-primary" id="a3-next-btn" type="button" style="display:none;">Next ➜</button></div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY 4 -->
+    <section class="screen" id="screen-act4">
+      <h2 class="activity-title">⏱️ Activity 4 — Speed Challenge</h2>
+      <p class="activity-desc">Click the correct object as fast as you can! Correct = +5, wrong = −2.</p>
+      <div id="a4-intro" class="center">
+        <p class="activity-desc">You'll have 60 seconds. Ready?</p>
+        <button class="btn btn-amber btn-lg" id="a4-start-btn" type="button">⚡ Start Speed Round</button>
+      </div>
+      <div id="a4-game" style="display:none;">
+        <div class="speed-hud">
+          <span class="speed-pill timer" id="a4-timer">⏱️ 60s</span>
+          <span class="speed-pill" id="a4-score">⭐ Round: 0</span>
+          <span class="speed-pill" id="a4-remaining">📋 Left: 20</span>
+        </div>
+        <div class="speed-command" id="a4-command">Get ready...</div>
+        <div class="monitor">
+          <div class="screen-glass">
+            <div class="app-window-mock">
+              <div class="titlebar-mock"><span class="dots"><span></span><span></span><span></span></span> MyEssay.docx</div>
+              <div class="menubar-mock">
+                <button class="target menu-mock-btn" data-target="menu" id="a4-menu" aria-label="pull-down menu">File ▾</button>
+                <span>Edit</span><span>View</span><span>Help</span>
+              </div>
+              <div class="toolbar-mock target" data-target="toolbar" id="a4-toolbar" role="button" tabindex="0" aria-label="tool bar">
+                <span class="tbtn">B</span><span class="tbtn">I</span><span class="tbtn">U</span><span class="tbtn">💾</span>
+              </div>
+              <div class="body-mock">
+                <div class="document-mock target" data-target="document" id="a4-document" role="button" tabindex="0" aria-label="document">
+                  <div class="text-line"></div>
+                  <button class="target text-line highlight-mock" data-target="highlight" id="a4-highlight" aria-label="highlighted text" style="display:block;"></button>
+                  <div class="text-line short"></div>
+                  <button class="target cursor-mock" data-target="cursor" id="a4-cursor" aria-label="cursor"><span class="cursor-shape"></span></button>
+                  <button class="target icon-mock" data-target="icon" id="a4-icon" aria-label="icon">📁</button>
+                </div>
+                <div class="target scrollbar-mock" data-target="scrollbar" id="a4-scrollbar" role="button" tabindex="0" aria-label="scroll bar">
+                  <div class="scrollbar-thumb"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="a4-result" class="speed-result-overlay" style="display:none;">
+        <h2 class="activity-title">⏰ Time's Up!</h2>
+        <p class="activity-desc" id="a4-result-text"></p>
+        <button class="btn btn-primary btn-lg" id="a4-continue-btn" type="button">Continue ➜</button>
+      </div>
+    </section>
+
+    <!-- FINAL CHALLENGE -->
+    <section class="screen" id="screen-act5">
+      <h2 class="activity-title">🏁 Final Challenge — Complete the Task</h2>
+      <p class="activity-desc">Do these five actions in the correct order.</p>
+      <div class="final-steps" id="final-steps"></div>
+      <div id="final-game-wrap">
+        <p class="final-instruction" id="final-instruction">Step 1: Open the file</p>
+        <div class="final-desktop">
+          <button class="final-file-icon target" id="final-file-icon" aria-label="Open a file: MyEssay.docx">
+            <span class="fi-emoji">📄</span>MyEssay.docx
+          </button>
+          <div class="final-doc-window" id="final-doc-window" style="display:none;">
+            <div class="final-doc-toolbar">
+              <button id="final-copy-btn" type="button">📑 Copy</button>
+              <button id="final-paste-btn" type="button">📋 Paste</button>
+              <button id="final-save-btn" type="button">💾 Save</button>
+            </div>
+            <div class="final-doc-body" id="final-doc-body">
+              <div class="final-text-line" id="final-text-line">My favorite computer command is copy and paste.</div>
+              <div class="text-line" style="background:#e5e9f3;"></div>
+              <div class="text-line short" style="background:#e5e9f3;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="final-congrats" class="final-congrats" style="display:none;">
+        <div style="font-size:60px;">🎉🏆🎉</div>
+        <h2 style="font-family:var(--font-display); font-size:24px;">Fantastic work! Task complete!</h2>
+        <p>You opened, selected, copied, pasted, and saved — just like a computer pro!</p>
+        <button class="btn btn-green btn-lg" id="final-continue-btn" type="button">See My Results ➜</button>
+      </div>
+    </section>
+
+    <!-- END SCREEN -->
+    <section class="screen" id="screen-end">
+      <div class="end-screen">
+        <span class="trophy">🏆</span>
+        <h2 class="end-title">Computer Expert!</h2>
+        <div class="end-stats">
+          <div class="end-stat-card"><div class="num" id="end-score">0</div><div class="lbl">FINAL SCORE</div></div>
+          <div class="end-stat-card"><div class="num" id="end-percent">0%</div><div class="lbl">CORRECT</div></div>
+        </div>
+        <div class="stars" id="end-stars">⭐</div>
+        <div class="star-msg" id="end-msg">Keep Practicing</div>
+        <button class="btn btn-primary btn-lg" id="play-again-btn" type="button">🔁 Play Again</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ AUDIO ============ */
+  var audioCtx = null;
+  function getCtx(){
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function playTone(freq,dur,type,vol,delay){
+    var ctx = getCtx();
+    if(!ctx) return;
+    type = type || 'sine'; vol = vol===undefined?0.2:vol; delay = delay||0;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    var t0 = ctx.currentTime + delay;
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(vol, t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0+dur+0.05);
+  }
+  function playCorrect(){
+    playTone(523.25,0.13,'sine',0.25,0);
+    playTone(659.25,0.13,'sine',0.25,0.09);
+    playTone(880.00,0.18,'sine',0.25,0.18);
+  }
+  function playIncorrect(){
+    playTone(220,0.22,'sawtooth',0.18,0);
+    playTone(160,0.28,'sawtooth',0.18,0.13);
+  }
+  function playClick(){ playTone(700,0.05,'square',0.08,0); }
+  function playNoiseBurst(ctx, dur, freq){
+    var bufferSize = Math.floor(ctx.sampleRate*dur);
+    var buffer = ctx.createBuffer(1,bufferSize,ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for(var i=0;i<bufferSize;i++){ data[i] = Math.random()*2-1; }
+    var noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    var bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = freq;
+    var gain = ctx.createGain();
+    var t0 = ctx.currentTime;
+    gain.gain.setValueAtTime(0.28, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+    noise.connect(bp).connect(gain).connect(ctx.destination);
+    noise.start(t0);
+    noise.stop(t0+dur);
+  }
+  function playApplause(){
+    var ctx = getCtx();
+    if(!ctx) return;
+    for(var i=0;i<20;i++){
+      (function(){
+        var d = 0.06+Math.random()*0.06;
+        var f = 900+Math.random()*2200;
+        setTimeout(function(){ playNoiseBurst(ctx,d,f); }, Math.random()*1300);
+      })();
+    }
+    setTimeout(function(){
+      playTone(523.25,0.9,'triangle',0.16,0);
+      playTone(659.25,0.9,'triangle',0.16,0.05);
+      playTone(783.99,1.0,'triangle',0.16,0.1);
+    }, 1100);
+  }
+
+  /* ============ SPEECH ============ */
+  var canSpeak = 'speechSynthesis' in window;
+  function speak(text){
+    if(!canSpeak) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85;
+      u.pitch = 1.0;
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u);
+    }catch(e){ /* ignore */ }
+  }
+
+  /* ============ CONFETTI ============ */
+  var confettiCanvas = document.getElementById('confetti-canvas');
+  var cctx = confettiCanvas.getContext('2d');
+  var confettiParticles = [];
+  var confettiRunning = false;
+  function resizeCanvas(){
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  var CONFETTI_COLORS = ['#2563eb','#1fa452','#f6a609','#e0413a','#7c5cf0','#fde878','#93c5fd'];
+  function fireConfetti(){
+    var count = 140;
+    for(var i=0;i<count;i++){
+      confettiParticles.push({
+        x: Math.random()*confettiCanvas.width,
+        y: -20 - Math.random()*confettiCanvas.height*0.4,
+        w: 6+Math.random()*6,
+        h: 8+Math.random()*8,
+        color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+        vy: 2+Math.random()*3,
+        vx: -1.5+Math.random()*3,
+        rot: Math.random()*360,
+        vrot: -8+Math.random()*16
+      });
+    }
+    if(!confettiRunning){
+      confettiRunning = true;
+      requestAnimationFrame(confettiLoop);
+      setTimeout(function(){ confettiRunning=false; },3200);
+    }
+  }
+  function confettiLoop(){
+    cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    for(var i=confettiParticles.length-1;i>=0;i--){
+      var p = confettiParticles[i];
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      if(p.y > confettiCanvas.height+30) confettiParticles.splice(i,1);
+    }
+    confettiParticles.forEach(function(p){
+      cctx.save();
+      cctx.translate(p.x,p.y);
+      cctx.rotate(p.rot*Math.PI/180);
+      cctx.fillStyle = p.color;
+      cctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      cctx.restore();
+    });
+    if(confettiParticles.length>0){
+      requestAnimationFrame(confettiLoop);
+    } else {
+      confettiRunning = false;
+    }
+  }
+
+  /* ============ HELPERS ============ */
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+    }
+    return a;
+  }
+  function el(id){ return document.getElementById(id); }
+  function showScreen(id){
+    var screens = document.querySelectorAll('.screen');
+    screens.forEach(function(s){ s.classList.remove('active'); });
+    el(id).classList.add('active');
+  }
+
+  /* ============ GLOBAL STATE ============ */
+  var state = {
+    score: 0,
+    totalCorrect: 0,
+    totalQuestions: 0
+  };
+  function addScore(n){
+    state.score += n;
+    if(state.score < 0) state.score = 0;
+    el('score-pill').textContent = '⭐ Score: '+state.score;
+  }
+  function addAccuracy(correct){
+    state.totalQuestions++;
+    if(correct) state.totalCorrect++;
+  }
+
+  var STAGE_WEIGHT = 20; // 5 stages * 20 = 100
+  function setProgress(stageIndex, fraction, label){
+    var pct = (stageIndex*STAGE_WEIGHT) + (fraction*STAGE_WEIGHT);
+    if(pct>100) pct=100;
+    el('progress-fill').style.width = pct+'%';
+    el('progress-label').textContent = label;
+  }
+
+  /* ============ VOCAB DATA ============ */
+  var VOCAB = [
+    {id:'menu',       text:'a pull-down menu',        icon:'menu'},
+    {id:'toolbar',    text:'the tool bar',             icon:'toolbar'},
+    {id:'cursor',     text:'the cursor',               icon:'cursor'},
+    {id:'scrollbar',  text:'the scroll bar',           icon:'scrollbar'},
+    {id:'open',       text:'open a file',              icon:'📂'},
+    {id:'save',       text:'save a file',              icon:'💾'},
+    {id:'print',      text:'print a file',             icon:'🖨️'},
+    {id:'cut',        text:'cut text',                 icon:'✂️'},
+    {id:'copy',       text:'copy text',                icon:'📑'},
+    {id:'paste',      text:'paste text',               icon:'📋'},
+    {id:'clickicon',  text:'click on an icon',         icon:'🖱️'},
+    {id:'highlight',  text:'select/highlight text',    icon:'highlight'},
+    {id:'scrollup',   text:'scroll up',                icon:'⬆️'},
+    {id:'scrolldown', text:'scroll down',              icon:'⬇️'}
+  ];
+  function miniIconHTML(type){
+    switch(type){
+      case 'menu':
+        return '<div class="mini mini-menu"><div class="mini-menu-bar"></div><div class="mini-menu-list"><span></span><span></span><span></span></div></div>';
+      case 'toolbar':
+        return '<div class="mini mini-toolbar"><span></span><span></span><span></span><span></span></div>';
+      case 'cursor':
+        return '<div class="mini mini-cursor"><span class="cursor-shape"></span></div>';
+      case 'scrollbar':
+        return '<div class="mini mini-scrollbar"><div class="mini-scrollbar-thumb"></div></div>';
+      case 'highlight':
+        return '<div class="mini mini-highlight"><span></span></div>';
+      default:
+        return '<span class="mini-emoji">'+type+'</span>';
+    }
+  }
+
+  /* ============ ACTIVITY 1: LISTEN AND FIND ============ */
+  var A1_ITEMS = [
+    {id:'menu',      phrase:'Click on the pull-down menu.'},
+    {id:'toolbar',   phrase:'Click on the tool bar.'},
+    {id:'cursor',    phrase:'Click on the cursor.'},
+    {id:'scrollbar', phrase:'Click on the scroll bar.'},
+    {id:'highlight', phrase:'Click on the highlighted text.'},
+    {id:'icon',      phrase:'Click on the icon.'},
+    {id:'document',  phrase:'Click on the document.'}
+  ];
+  var a1Queue = [];
+  var a1Index = 0;
+  var a1Answered = false;
+
+  function initAct1(){
+    a1Queue = shuffle(A1_ITEMS);
+    a1Index = 0;
+    a1Answered = false;
+    var targets = document.querySelectorAll('#screen-act1 .target');
+    targets.forEach(function(t){
+      t.classList.remove('target-correct-locked','target-wrong-flash','flash-correct','flash-incorrect');
+      t.disabled = false;
+    });
+    loadA1Item();
+  }
+  function loadA1Item(){
+    if(a1Index >= a1Queue.length){
+      finishAct1();
+      return;
+    }
+    a1Answered = false;
+    var item = a1Queue[a1Index];
+    el('a1-progress-text').textContent = 'Item '+(a1Index+1)+' of '+a1Queue.length;
+    el('a1-instruction').textContent = 'Press "Listen" and click the matching object.';
+    setProgress(0, a1Index/a1Queue.length, 'Activity 1 of 5 — Listen and Find');
+    var targets = document.querySelectorAll('#screen-act1 .target');
+    targets.forEach(function(t){
+      t.classList.remove('flash-correct','flash-incorrect');
+    });
+  }
+  el('a1-listen-btn').addEventListener('click', function(){
+    if(a1Index >= a1Queue.length) return;
+    var item = a1Queue[a1Index];
+    speak(item.phrase);
+    el('a1-instruction').textContent = canSpeak ? '🔊 "'+item.phrase+'"' : 'Audio not supported — read: "'+item.phrase+'"';
+  });
+  document.querySelectorAll('#screen-act1 .target').forEach(function(t){
+    t.addEventListener('click', function(){ handleAct1Click(t); });
+    t.addEventListener('keydown', function(e){
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); handleAct1Click(t); }
+    });
+  });
+  function handleAct1Click(t){
+    if(a1Index >= a1Queue.length) return;
+    var item = a1Queue[a1Index];
+    var clicked = t.getAttribute('data-target');
+    var isCorrect = (clicked === item.id);
+    if(!a1Answered){
+      a1Answered = true;
+      addAccuracy(isCorrect);
+      if(isCorrect) addScore(10);
+    }
+    if(isCorrect){
+      playCorrect();
+      t.classList.add('flash-correct');
+      t.classList.add('target-correct-locked');
+      t.disabled = true;
+      setTimeout(function(){
+        a1Index++;
+        loadA1Item();
+      }, 650);
+    } else {
+      playIncorrect();
+      t.classList.remove('flash-correct');
+      t.classList.add('flash-incorrect');
+      setTimeout(function(){ t.classList.remove('flash-incorrect'); },500);
+    }
+  }
+  function finishAct1(){
+    setProgress(1,0,'Activity 1 complete! Moving to Activity 2...');
+    setTimeout(function(){
+      goToActivity2();
+    }, 700);
+  }
+
+  /* ============ ACTIVITY 2: DRAG AND DROP ============ */
+  var a2Matched = {}; // id -> true
+  var a2FirstAttempt = {}; // id -> true once scored
+  var a2SelectedChip = null;
+
+  function initAct2(){
+    a2Matched = {};
+    a2FirstAttempt = {};
+    a2SelectedChip = null;
+    var bank = el('a2-word-bank');
+    var grid = el('a2-drop-grid');
+    bank.innerHTML = '';
+    grid.innerHTML = '';
+
+    var chipOrder = shuffle(VOCAB);
+    chipOrder.forEach(function(v){
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'word-chip';
+      chip.textContent = v.text;
+      chip.setAttribute('data-id', v.id);
+      chip.setAttribute('draggable','true');
+      bank.appendChild(chip);
+      attachChipEvents(chip);
+    });
+
+    var targetOrder = shuffle(VOCAB);
+    targetOrder.forEach(function(v){
+      var slot = document.createElement('div');
+      slot.className = 'drop-slot';
+      slot.setAttribute('data-id', v.id);
+      slot.setAttribute('tabindex','0');
+      slot.setAttribute('role','button');
+      slot.setAttribute('aria-label','Drop target');
+      slot.innerHTML = '<div class="slot-icon">'+miniIconHTML(v.icon)+'</div><div class="slot-label">&nbsp;</div>';
+      grid.appendChild(slot);
+      attachSlotEvents(slot);
+    });
+
+    setProgress(1,0,'Activity 2 of 5 — Drag and Drop (0 / '+VOCAB.length+')');
+  }
+
+  function attachChipEvents(chip){
+    chip.addEventListener('click', function(){
+      if(chip.classList.contains('used')) return;
+      if(a2SelectedChip === chip){
+        chip.classList.remove('selected');
+        a2SelectedChip = null;
+        return;
+      }
+      document.querySelectorAll('.word-chip.selected').forEach(function(c){ c.classList.remove('selected'); });
+      chip.classList.add('selected');
+      a2SelectedChip = chip;
+      playClick();
+    });
+    chip.addEventListener('dragstart', function(e){
+      if(chip.classList.contains('used')){ e.preventDefault(); return; }
+      e.dataTransfer.setData('text/plain', chip.getAttribute('data-id'));
+      chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', function(){
+      chip.classList.remove('dragging');
+    });
+  }
+
+  function attachSlotEvents(slot){
+    slot.addEventListener('dragover', function(e){
+      if(slot.classList.contains('filled')) return;
+      e.preventDefault();
+      slot.classList.add('over');
+    });
+    slot.addEventListener('dragleave', function(){
+      slot.classList.remove('over');
+    });
+    slot.addEventListener('drop', function(e){
+      e.preventDefault();
+      slot.classList.remove('over');
+      if(slot.classList.contains('filled')) return;
+      var chipId = e.dataTransfer.getData('text/plain');
+      var chip = document.querySelector('.word-chip[data-id="'+chipId+'"]');
+      if(chip) attemptMatch(chip, slot);
+    });
+    slot.addEventListener('click', function(){
+      if(slot.classList.contains('filled')) return;
+      if(a2SelectedChip){
+        attemptMatch(a2SelectedChip, slot);
+      }
+    });
+    slot.addEventListener('keydown', function(e){
+      if((e.key==='Enter' || e.key===' ') && a2SelectedChip){
+        e.preventDefault();
+        attemptMatch(a2SelectedChip, slot);
+      }
+    });
+  }
+
+  function attemptMatch(chip, slot){
+    var chipId = chip.getAttribute('data-id');
+    var slotId = slot.getAttribute('data-id');
+    var isCorrect = (chipId === slotId);
+    var firstTime = !a2FirstAttempt[chipId];
+    if(firstTime){
+      a2FirstAttempt[chipId] = true;
+      addAccuracy(isCorrect);
+      if(isCorrect) addScore(10);
+    }
+    if(isCorrect){
+      playCorrect();
+      slot.classList.add('filled');
+      var label = slot.querySelector('.slot-label');
+      label.textContent = chip.textContent;
+      chip.classList.add('used');
+      chip.classList.remove('selected');
+      a2Matched[chipId] = true;
+      a2SelectedChip = null;
+      var matchedCount = Object.keys(a2Matched).length;
+      setProgress(1, matchedCount/VOCAB.length, 'Activity 2 of 5 — Drag and Drop ('+matchedCount+' / '+VOCAB.length+')');
+      if(matchedCount === VOCAB.length){
+        setTimeout(function(){ goToActivity3(); }, 800);
+      }
+    } else {
+      playIncorrect();
+      slot.classList.add('wrong-shake');
+      chip.classList.remove('selected');
+      a2SelectedChip = null;
+      setTimeout(function(){ slot.classList.remove('wrong-shake'); },500);
+    }
+  }
+
+  /* ============ ACTIVITY 3: MULTIPLE CHOICE ============ */
+  var A3_QUESTIONS = [
+    {scenario:"I finished my homework and don't want to lose it.", options:["Save a file","Print a file","Scroll down"], answer:"Save a file"},
+    {scenario:"I want to move text to another place.", options:["Copy text","Cut text","Scroll up"], answer:"Cut text"},
+    {scenario:"I need a paper copy of my essay for my teacher.", options:["Print a file","Open a file","Paste text"], answer:"Print a file"},
+    {scenario:"I want to see more information below on the page.", options:["Scroll up","Scroll down","Click on an icon"], answer:"Scroll down"},
+    {scenario:"I want to see the menu options at the top of the screen.", options:["Open a file","Use the pull-down menu","Save a file"], answer:"Use the pull-down menu"},
+    {scenario:"I need to move my mouse to point at something on the screen.", options:["The cursor","The scroll bar","The tool bar"], answer:"The cursor"},
+    {scenario:"I want to start working on a document I already made.", options:["Open a file","Print a file","Cut text"], answer:"Open a file"},
+    {scenario:"I copied some text, now I want to put it in a new document.", options:["Paste text","Copy text","Cut text"], answer:"Paste text"},
+    {scenario:"I want to mark a sentence so I can copy it.", options:["Select/highlight text","Scroll down","Click on an icon"], answer:"Select/highlight text"},
+    {scenario:"I want to duplicate this sentence without removing the original.", options:["Copy text","Cut text","Save a file"], answer:"Copy text"},
+    {scenario:"I want to open a program by clicking its small picture on the desktop.", options:["Click on an icon","Click on the cursor","Use the tool bar"], answer:"Click on an icon"},
+    {scenario:"I want to find the buttons for bold, italic, and underline.", options:["The tool bar","The scroll bar","The pull-down menu"], answer:"The tool bar"}
+  ];
+  var a3Questions = [];
+  var a3Index = 0;
+
+  function initAct3(){
+    a3Questions = shuffle(A3_QUESTIONS);
+    a3Index = 0;
+    loadA3Question();
+  }
+  function loadA3Question(){
+    if(a3Index >= a3Questions.length){
+      setProgress(2,0,'Activity 3 complete! Moving to Activity 4...');
+      setTimeout(function(){ goToActivity4(); }, 500);
+      return;
+    }
+    var q = a3Questions[a3Index];
+    el('a3-progress').textContent = 'Question '+(a3Index+1)+' of '+a3Questions.length;
+    el('a3-scenario').textContent = '"'+q.scenario+'"';
+    setProgress(2, a3Index/a3Questions.length, 'Activity 3 of 5 — Choose the Correct Command');
+    var optsWrap = el('a3-options');
+    optsWrap.innerHTML = '';
+    el('a3-feedback').textContent = '';
+    el('a3-feedback').className = 'mc-feedback';
+    el('a3-next-btn').style.display = 'none';
+    var shuffledOpts = shuffle(q.options);
+    shuffledOpts.forEach(function(optText){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mc-option';
+      btn.textContent = optText;
+      btn.addEventListener('click', function(){ handleA3Answer(btn, optText, q.answer); });
+      optsWrap.appendChild(btn);
+    });
+  }
+  function handleA3Answer(btn, chosen, correctAnswer){
+    var allBtns = document.querySelectorAll('#a3-options .mc-option');
+    allBtns.forEach(function(b){ b.disabled = true; });
+    var isCorrect = (chosen === correctAnswer);
+    addAccuracy(isCorrect);
+    if(isCorrect){
+      addScore(10);
+      playCorrect();
+      btn.classList.add('correct');
+      el('a3-feedback').textContent = '✅ Correct! "'+correctAnswer+'" is right.';
+      el('a3-feedback').className = 'mc-feedback correct';
+    } else {
+      playIncorrect();
+      btn.classList.add('incorrect');
+      allBtns.forEach(function(b){
+        if(b.textContent === correctAnswer) b.classList.add('correct');
+      });
+      el('a3-feedback').textContent = '❌ Not quite. The correct answer is "'+correctAnswer+'".';
+      el('a3-feedback').className = 'mc-feedback incorrect';
+    }
+    el('a3-next-btn').style.display = 'inline-block';
+  }
+  el('a3-next-btn').addEventListener('click', function(){
+    a3Index++;
+    loadA3Question();
+  });
+
+  /* ============ ACTIVITY 4: SPEED CHALLENGE ============ */
+  var A4_COMMANDS = [
+    {id:'menu',      text:'Find the pull-down menu!'},
+    {id:'toolbar',   text:'Click the tool bar!'},
+    {id:'cursor',    text:'Click the cursor!'},
+    {id:'scrollbar', text:'Click the scroll bar!'},
+    {id:'highlight', text:'Highlight the text!'},
+    {id:'icon',      text:'Click on an icon!'},
+    {id:'document',  text:'Click on the document!'}
+  ];
+  var A4_TOTAL_ROUNDS = 20;
+  var a4Rounds = [];
+  var a4RoundIndex = 0;
+  var a4Score = 0;
+  var a4TimeLeft = 60;
+  var a4Timer = null;
+  var a4RoundAnswered = false;
+
+  function buildA4Rounds(){
+    var rounds = [];
+    while(rounds.length < A4_TOTAL_ROUNDS){
+      rounds = rounds.concat(shuffle(A4_COMMANDS));
+    }
+    return rounds.slice(0, A4_TOTAL_ROUNDS);
+  }
+
+  el('a4-start-btn').addEventListener('click', function(){
+    el('a4-intro').style.display = 'none';
+    el('a4-result').style.display = 'none';
+    el('a4-game').style.display = 'block';
+    startAct4();
+  });
+
+  function startAct4(){
+    a4Rounds = buildA4Rounds();
+    a4RoundIndex = 0;
+    a4Score = 0;
+    a4TimeLeft = 60;
+    el('a4-score').textContent = '⭐ Round: 0';
+    el('a4-timer').textContent = '⏱️ 60s';
+    updateA4Remaining();
+    setProgress(3,0,'Activity 4 of 5 — Speed Challenge');
+    var targets = document.querySelectorAll('#screen-act4 .target');
+    targets.forEach(function(t){
+      t.classList.remove('target-correct-locked','target-wrong-flash','flash-correct','flash-incorrect');
+      t.onclick = null;
+    });
+    targets.forEach(function(t){
+      t.addEventListener('click', a4HandleClick);
+      t.addEventListener('keydown', function(e){
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); a4HandleClick.call(t,e); }
+      });
+    });
+    clearInterval(a4Timer);
+    a4Timer = setInterval(function(){
+      a4TimeLeft--;
+      el('a4-timer').textContent = '⏱️ '+a4TimeLeft+'s';
+      if(a4TimeLeft <= 0){
+        endAct4();
+      }
+    }, 1000);
+    loadA4Round();
+  }
+  function updateA4Remaining(){
+    var remaining = A4_TOTAL_ROUNDS - a4RoundIndex;
+    el('a4-remaining').textContent = '📋 Left: '+remaining;
+  }
+  function loadA4Round(){
+    if(a4RoundIndex >= a4Rounds.length){
+      endAct4();
+      return;
+    }
+    a4RoundAnswered = false;
+    var round = a4Rounds[a4RoundIndex];
+    el('a4-command').textContent = round.text;
+    updateA4Remaining();
+  }
+  function a4HandleClick(e){
+    if(a4TimeLeft <= 0 || a4RoundAnswered) return;
+    if(a4RoundIndex >= a4Rounds.length) return;
+    a4RoundAnswered = true;
+    var t = this;
+    var round = a4Rounds[a4RoundIndex];
+    var clicked = t.getAttribute('data-target');
+    var isCorrect = (clicked === round.id);
+    addAccuracy(isCorrect);
+    if(isCorrect){
+      a4Score += 5;
+      addScore(5);
+      playCorrect();
+      t.classList.add('flash-correct');
+    } else {
+      a4Score -= 2;
+      addScore(-2);
+      playIncorrect();
+      t.classList.add('flash-incorrect');
+    }
+    el('a4-score').textContent = '⭐ Round: '+a4Score;
+    setTimeout(function(){
+      t.classList.remove('flash-correct','flash-incorrect');
+      a4RoundIndex++;
+      loadA4Round();
+    }, 350);
+  }
+  function endAct4(){
+    clearInterval(a4Timer);
+    el('a4-game').style.display = 'none';
+    el('a4-result').style.display = 'block';
+    el('a4-result-text').textContent = 'You scored '+a4Score+' points in the speed round by answering '+a4RoundIndex+' commands!';
+    setProgress(4,0,'Activity 4 complete!');
+  }
+  el('a4-continue-btn').addEventListener('click', function(){
+    goToActivity5();
+  });
+
+  /* ============ FINAL CHALLENGE ============ */
+  var FINAL_STEPS = [
+    {label:'1. Open the file'},
+    {label:'2. Select the text'},
+    {label:'3. Copy the text'},
+    {label:'4. Paste the text'},
+    {label:'5. Save the file'}
+  ];
+  var finalStepIndex = 0;
+
+  function initAct5(){
+    finalStepIndex = 0;
+    el('final-doc-window').style.display = 'none';
+    el('final-file-icon').style.display = 'inline-block';
+    el('final-congrats').style.display = 'none';
+    el('final-game-wrap').style.display = 'block';
+    var line = el('final-text-line');
+    line.classList.remove('selected');
+    renderFinalSteps();
+    setProgress(4,0.1,'Final Challenge — Complete the Task in order');
+  }
+  function renderFinalSteps(){
+    var wrap = el('final-steps');
+    wrap.innerHTML = '';
+    FINAL_STEPS.forEach(function(s, i){
+      var dot = document.createElement('span');
+      dot.className = 'step-dot';
+      if(i < finalStepIndex) dot.className += ' done';
+      else if(i === finalStepIndex) dot.className += ' active';
+      dot.textContent = s.label;
+      wrap.appendChild(dot);
+    });
+    if(finalStepIndex < FINAL_STEPS.length){
+      el('final-instruction').textContent = 'Step '+(finalStepIndex+1)+': '+FINAL_STEPS[finalStepIndex].label.replace(/^\d+\.\s*/, '');
+    }
+  }
+  function finalCorrectStep(elm){
+    playCorrect();
+    elm.classList.add('flash-correct');
+    setTimeout(function(){ elm.classList.remove('flash-correct'); },500);
+    finalStepIndex++;
+    renderFinalSteps();
+    if(finalStepIndex >= FINAL_STEPS.length){
+      finishFinalChallenge();
+    }
+  }
+  function finalWrongStep(elm){
+    playIncorrect();
+    elm.classList.add('flash-incorrect');
+    setTimeout(function(){ elm.classList.remove('flash-incorrect'); },500);
+  }
+  function finishFinalChallenge(){
+    setTimeout(function(){
+      el('final-game-wrap').style.display = 'none';
+      el('final-congrats').style.display = 'block';
+      addScore(50);
+      fireConfetti();
+      playApplause();
+    }, 400);
+  }
+
+  el('final-file-icon').addEventListener('click', function(){
+    if(finalStepIndex === 0){
+      finalCorrectStep(this);
+      el('final-doc-window').style.display = 'block';
+      this.style.display = 'none';
+    } else {
+      finalWrongStep(this);
+    }
+  });
+  el('final-text-line').addEventListener('click', function(){
+    if(finalStepIndex === 1){
+      this.classList.add('selected');
+      finalCorrectStep(this);
+    } else {
+      finalWrongStep(this);
+    }
+  });
+  el('final-copy-btn').addEventListener('click', function(){
+    if(finalStepIndex === 2){
+      finalCorrectStep(this);
+    } else {
+      finalWrongStep(this);
+    }
+  });
+  el('final-paste-btn').addEventListener('click', function(){
+    if(finalStepIndex === 3){
+      finalCorrectStep(this);
+      var body = el('final-doc-body');
+      var copy = el('final-text-line').cloneNode(true);
+      copy.removeAttribute('id');
+      copy.style.background = '#e4faed';
+      body.appendChild(copy);
+    } else {
+      finalWrongStep(this);
+    }
+  });
+  el('final-save-btn').addEventListener('click', function(){
+    if(finalStepIndex === 4){
+      finalCorrectStep(this);
+    } else {
+      finalWrongStep(this);
+    }
+  });
+  el('final-continue-btn').addEventListener('click', function(){
+    goToEndScreen();
+  });
+
+  /* ============ NAVIGATION ============ */
+  function goToActivity1(){ showScreen('screen-act1'); initAct1(); }
+  function goToActivity2(){ showScreen('screen-act2'); initAct2(); }
+  function goToActivity3(){ showScreen('screen-act3'); initAct3(); }
+  function goToActivity4(){
+    showScreen('screen-act4');
+    el('a4-intro').style.display = 'block';
+    el('a4-game').style.display = 'none';
+    el('a4-result').style.display = 'none';
+    setProgress(3,0,'Activity 4 of 5 — Speed Challenge');
+  }
+  function goToActivity5(){ showScreen('screen-act5'); initAct5(); }
+  function goToEndScreen(){
+    showScreen('screen-end');
+    setProgress(5,0,'Challenge complete! 🎉');
+    var pct = state.totalQuestions>0 ? Math.round((state.totalCorrect/state.totalQuestions)*100) : 0;
+    el('end-score').textContent = state.score;
+    el('end-percent').textContent = pct+'%';
+    var stars, msg;
+    if(pct >= 85){ stars = '⭐⭐⭐'; msg = 'Excellent!'; }
+    else if(pct >= 60){ stars = '⭐⭐'; msg = 'Great Job!'; }
+    else { stars = '⭐'; msg = 'Keep Practicing!'; }
+    el('end-stars').textContent = stars;
+    el('end-msg').textContent = msg;
+    fireConfetti();
+  }
+
+  el('start-btn').addEventListener('click', function(){
+    getCtx();
+    goToActivity1();
+  });
+  el('restart-btn').addEventListener('click', function(){
+    if(confirm('Restart the whole challenge? Your progress will be lost.')){
+      window.location.reload();
+    }
+  });
+  el('play-again-btn').addEventListener('click', function(){
+    window.location.reload();
+  });
+
+  /* init */
+  setProgress(0,0,'Get ready to begin!');
+})();
+</script>
+</body>
+</html>
