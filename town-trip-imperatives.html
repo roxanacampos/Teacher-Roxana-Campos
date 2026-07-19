@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Town Trip — Imperatives Practice</title>
+<style>
+/* ---------- TOKENS ---------- */
+:root{
+  --sky:#eaf6ff; --card:#ffffff; --border:#dbe9f5;
+  --navy:#1c2b3a; --ink:#4a5b6c;
+  --go:#2fae66; --goD:#1f8f52;
+  --coral:#ff6b5b; --coralD:#e2503f;
+  --blue:#4fb0e8; --blueD:#2f8fc9;
+  --sun:#ffc93c; --sunD:#f4a300;
+  --radius:18px;
+  --shadow:0 10px 25px rgba(28,43,58,.15);
+  --font-d:'Trebuchet MS','Segoe UI',Verdana,sans-serif;
+  --font-b:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-m:'Courier New',monospace;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; min-height:100vh; font-family:var(--font-b); color:var(--navy);
+  background:linear-gradient(180deg,var(--sky) 0%, #f5fbff 60%, #eafaf1 100%);
+}
+@media (prefers-reduced-motion:reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+button{font-family:inherit;}
+:focus-visible{outline:3px solid var(--blueD); outline-offset:3px; border-radius:6px;}
+
+header{
+  position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:12px 18px; background:rgba(255,255,255,.8); backdrop-filter:blur(6px);
+  border-bottom:2px solid var(--border);
+}
+header h1{margin:0; font-family:var(--font-d); font-size:clamp(16px,3vw,21px);}
+.progress-wrap{flex:1; max-width:360px; margin:0 18px;}
+.progress-track{height:12px; background:#e2eef7; border-radius:999px; overflow:hidden;}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--sun),var(--go)); border-radius:999px; transition:width .4s ease; width:0%;}
+.progress-text{font-family:var(--font-m); font-size:11px; color:var(--ink); text-align:center; margin-top:3px;}
+.score-badge{
+  font-family:var(--font-m); font-weight:700; background:var(--navy); color:#fff;
+  padding:8px 14px; border-radius:999px; display:flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.score-badge svg{width:16px; height:16px;}
+
+main{max-width:640px; margin:0 auto; padding:26px 16px 60px;}
+.screen{animation:fadeUp .45s ease both;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);}}
+
+.eyebrow{
+  display:inline-block; font-family:var(--font-m); font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--blueD); background:#e7f5ff; border:1px solid #cfe9fb; padding:4px 12px; border-radius:999px; margin-bottom:10px;
+}
+h2{font-family:var(--font-d); font-size:clamp(21px,4vw,27px); margin:0 0 6px;}
+.lead{color:var(--ink); margin:0 0 20px; font-size:14.5px;}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px 20px; text-align:center;}
+
+.scene{width:min(100%,240px); margin:0 auto 6px;}
+.scene svg{width:100%; height:auto; display:block;}
+
+.choices{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:18px;}
+.choice-btn{
+  min-width:170px; background:#fff; border:2.5px solid var(--border); border-radius:14px;
+  padding:14px 18px; font-family:var(--font-d); font-size:16.5px; font-weight:700; color:var(--navy);
+  cursor:pointer; transition:transform .15s, border-color .15s;
+}
+.choice-btn:hover{border-color:var(--blue); transform:translateY(-2px);}
+.choice-btn.correct{background:#e6faed; border-color:var(--go); color:var(--goD); animation:pop .4s ease;}
+.choice-btn.incorrect{background:#fff0ee; border-color:var(--coral); color:var(--coralD); animation:shake .45s ease;}
+@keyframes pop{0%{transform:scale(1);}40%{transform:scale(1.07);}100%{transform:scale(1);}}
+@keyframes shake{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-8px);}40%,60%{transform:translateX(8px);}}
+
+.feedback{
+  margin:16px auto 0; max-width:380px; padding:11px 16px; border-radius:12px;
+  font-family:var(--font-d); font-weight:700; font-size:16px; animation:slideDown .3s ease both;
+}
+.feedback.good{background:#e6faed; color:var(--goD); border:2px solid var(--go);}
+.feedback.bad{background:#fff0ee; color:var(--coralD); border:2px solid var(--coral);}
+@keyframes slideDown{from{opacity:0; transform:translateY(-8px);}to{opacity:1; transform:translateY(0);}}
+
+.btn{
+  border:none; cursor:pointer; font-weight:700; border-radius:999px; padding:13px 28px; font-size:16px;
+  box-shadow:0 4px 10px rgba(28,43,58,.12); transition:transform .15s ease;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn-go{background:linear-gradient(180deg,var(--go),var(--goD)); color:#fff;}
+
+.results{text-align:center;}
+.stars{font-size:40px; letter-spacing:6px; margin:6px 0;}
+.score-big{font-family:var(--font-m); font-size:42px; font-weight:700; margin:6px 0;}
+.results-msg{font-family:var(--font-d); font-size:20px; color:var(--goD); margin-bottom:18px;}
+
+#confettiLayer{position:fixed; inset:0; pointer-events:none; z-index:100; overflow:hidden;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Town Trip 🚕</h1>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Question 1 of 10</div>
+  </div>
+  <div class="score-badge">
+    <svg viewBox="0 0 24 24" fill="#ffc93c"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.9L5.8 21l1.6-7-5.4-4.7 7.1-.6z"/></svg>
+    <span id="scoreCount">0</span>
+  </div>
+</header>
+
+<main id="main"></main>
+<div id="confettiLayer" aria-hidden="true"></div>
+<div id="srLive" class="sr-only" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- ICONS (original flat illustrations) ---------------- */
+const C = {navy:'#1c2b3a', wall:'#eef3f7', wallD:'#d7e2ea', dark:'#33415c', coral:'#ff6b5b', sun:'#ffc93c', skin:'#f4c39a', blue:'#4fb0e8'};
+function svg(inner,vb){ vb=vb||100; return '<svg viewBox="0 0 '+vb+' '+vb+'" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">'+inner+'</svg>'; }
+
+const BUILD = {
+  restaurant: svg('<rect x="6" y="40" width="88" height="52" fill="'+C.wallD+'"/><rect x="18" y="16" width="64" height="26" rx="4" fill="'+C.dark+'"/><rect x="30" y="8" width="40" height="14" rx="3" fill="'+C.dark+'"/><text x="50" y="30" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle" font-family="Arial">RESTAURANT</text><rect x="40" y="60" width="20" height="32" fill="'+C.dark+'"/><circle cx="56" cy="76" r="1.6" fill="#fff"/>', ),
+  bank: svg('<rect x="6" y="44" width="88" height="48" fill="'+C.wallD+'"/><polygon points="50,10 92,40 8,40" fill="'+C.dark+'"/><rect x="8" y="40" width="84" height="8" fill="'+C.dark+'"/><rect x="30" y="18" width="40" height="14" rx="3" fill="'+C.dark+'"/><text x="50" y="29" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle" font-family="Arial">BANK</text>'+['26','44','62'].map(function(x){return '<rect x="'+x+'" y="50" width="8" height="34" fill="'+C.dark+'"/>';}).join(''), ),
+  pharmacy: svg('<rect x="6" y="40" width="88" height="52" fill="'+C.wallD+'"/><rect x="18" y="16" width="64" height="26" rx="4" fill="'+C.dark+'"/><rect x="30" y="8" width="40" height="14" rx="3" fill="'+C.dark+'"/><text x="50" y="30" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle" font-family="Arial">PHARMACY</text><rect x="42" y="20" width="16" height="16" fill="'+C.coral+'" opacity="0"/><rect x="38" y="60" width="24" height="32" fill="'+C.dark+'"/>', ),
+  supermarket: svg('<rect x="6" y="42" width="88" height="50" fill="'+C.wallD+'"/><path d="M6,42 L20,20 L80,20 L94,42 Z" fill="'+C.dark+'"/><rect x="30" y="60" width="16" height="32" fill="'+C.dark+'"/><rect x="54" y="60" width="16" height="32" fill="'+C.dark+'"/>', ),
+  library: svg('<rect x="6" y="44" width="88" height="48" fill="'+C.wallD+'"/><polygon points="50,10 92,40 8,40" fill="'+C.dark+'"/><rect x="8" y="40" width="84" height="8" fill="'+C.dark+'"/><rect x="30" y="18" width="40" height="14" rx="3" fill="'+C.dark+'"/><text x="50" y="29" font-size="7.5" font-weight="bold" fill="#fff" text-anchor="middle" font-family="Arial">BOOKS</text>'+['26','44','62'].map(function(x){return '<rect x="'+x+'" y="50" width="8" height="34" fill="'+C.dark+'"/>';}).join(''), ),
+  school: svg('<rect x="6" y="44" width="88" height="48" fill="'+C.wallD+'"/><polygon points="50,12 92,44 8,44" fill="'+C.dark+'"/><rect x="46" y="2" width="4" height="12" fill="'+C.dark+'"/><polygon points="50,3 66,7 50,11" fill="'+C.coral+'"/><rect x="38" y="60" width="24" height="32" fill="'+C.dark+'"/>', )
+};
+
+const MOVE = {
+  taxi: svg('<rect x="8" y="46" width="84" height="26" rx="10" fill="'+C.dark+'"/><rect x="24" y="28" width="48" height="24" rx="8" fill="'+C.dark+'"/><rect x="30" y="33" width="16" height="14" rx="2" fill="#fff" opacity="0.85"/><rect x="52" y="33" width="16" height="14" rx="2" fill="#fff" opacity="0.85"/><rect x="20" y="34" width="14" height="8" fill="'+C.dark+'"/><text x="50" y="64" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle" font-family="Arial">TAXI</text><circle cx="28" cy="74" r="10" fill="'+C.navy+'"/><circle cx="72" cy="74" r="10" fill="'+C.navy+'"/><circle cx="50" cy="20" r="8" fill="'+C.skin+'"/><rect x="42" y="27" width="16" height="10" fill="'+C.blue+'"/>' ),
+  bus: svg('<rect x="6" y="26" width="88" height="46" rx="8" fill="'+C.dark+'"/><rect x="14" y="34" width="16" height="14" rx="2" fill="#fff" opacity="0.85"/><rect x="34" y="34" width="16" height="14" rx="2" fill="#fff" opacity="0.85"/><rect x="54" y="34" width="16" height="14" rx="2" fill="#fff" opacity="0.85"/><rect x="74" y="34" width="12" height="14" rx="2" fill="#fff" opacity="0.85"/><circle cx="26" cy="78" r="9" fill="'+C.navy+'"/><circle cx="74" cy="78" r="9" fill="'+C.navy+'"/><circle cx="22" cy="40" r="6" fill="'+C.skin+'"/><circle cx="42" cy="40" r="6" fill="'+C.blue+'"/>' ),
+  car: svg('<rect x="10" y="46" width="80" height="24" rx="10" fill="'+C.dark+'"/><rect x="26" y="28" width="46" height="22" rx="8" fill="'+C.dark+'"/><rect x="31" y="33" width="16" height="13" rx="2" fill="#fff" opacity="0.85"/><rect x="51" y="33" width="16" height="13" rx="2" fill="#fff" opacity="0.85"/><circle cx="28" cy="72" r="10" fill="'+C.navy+'"/><circle cx="72" cy="72" r="10" fill="'+C.navy+'"/><circle cx="49" cy="38" r="6" fill="'+C.skin+'"/>' ),
+  walk: svg('<circle cx="50" cy="18" r="9" fill="'+C.blue+'"/><path d="M50 27 v22" stroke="'+C.dark+'" stroke-width="9" stroke-linecap="round"/><path d="M50 31 L34 24" stroke="'+C.dark+'" stroke-width="7" stroke-linecap="round"/><path d="M50 31 L67 40" stroke="'+C.dark+'" stroke-width="7" stroke-linecap="round"/><path d="M50 49 L35 78" stroke="'+C.dark+'" stroke-width="8" stroke-linecap="round"/><path d="M50 49 L65 74" stroke="'+C.dark+'" stroke-width="8" stroke-linecap="round"/>' )
+};
+
+const NO_SIGN = '<circle cx="50" cy="50" r="34" fill="'+C.coral+'" fill-opacity="0.92" stroke="#fff" stroke-width="4"/><rect x="16" y="45" width="68" height="10" rx="4" fill="#fff" transform="rotate(-38 50 50)"/>';
+
+function scene(buildKey, moveKey, negative){
+  return '<div class="scene">'+svg(
+    '<g transform="translate(0,4) scale(0.86)">'+ BUILD[buildKey].replace(/<svg[^>]*>|<\/svg>/g,'') +'</g>'+
+    '<g transform="translate(48,44) scale(0.42)">'+ MOVE[moveKey].replace(/<svg[^>]*>|<\/svg>/g,'') +'</g>'+
+    (negative ? '<g transform="translate(48,44) scale(0.5)">'+NO_SIGN+'</g>' : '')
+  )+'</div>';
+}
+
+/* ---------------- AUDIO ---------------- */
+let ctx=null;
+function getCtx(){ if(!ctx){ try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ ctx=null; } } return ctx; }
+function beep(freq,start,dur,type,vol){
+  const c=getCtx(); if(!c) return;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type||'sine'; o.frequency.setValueAtTime(freq,c.currentTime+start);
+  g.gain.setValueAtTime(0,c.currentTime+start);
+  g.gain.linearRampToValueAtTime(vol||0.2,c.currentTime+start+0.02);
+  g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+start+dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(c.currentTime+start); o.stop(c.currentTime+start+dur+0.05);
+}
+function playCorrect(){ beep(523.25,0,.14,'sine',.22); beep(659.25,.12,.14,'sine',.22); beep(783.99,.24,.22,'sine',.24); }
+function playIncorrect(){ beep(180,0,.22,'square',.12); beep(140,.12,.26,'square',.10); }
+function playCelebration(){ [523.25,587.33,659.25,698.46,783.99,880,987.77,1046.5].forEach(function(f,i){ beep(f,i*0.09,.2,'triangle',.16); }); }
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  try{ window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.rate=0.85; u.lang='en-US'; window.speechSynthesis.speak(u); }catch(e){}
+  const live=document.getElementById('srLive'); if(live) live.textContent=text;
+}
+
+/* ---------------- DATA ---------------- */
+const DATA = [
+  {build:'restaurant', move:'taxi', neg:false, a:'Take a taxi.', b:"Don't take a taxi.", correct:'a'},
+  {build:'bank', move:'bus', neg:false, a:'Take the bus.', b:"Don't take the bus.", correct:'a'},
+  {build:'restaurant', move:'taxi', neg:true, a:'Take a taxi.', b:"Don't take a taxi.", correct:'b'},
+  {build:'supermarket', move:'car', neg:false, a:'Drive to the supermarket.', b:"Don't drive to the supermarket.", correct:'a'},
+  {build:'bank', move:'walk', neg:false, a:'Walk to the bank.', b:"Don't walk to the bank.", correct:'a'},
+  {build:'pharmacy', move:'walk', neg:true, a:'Walk to the pharmacy.', b:"Don't walk to the pharmacy.", correct:'b'},
+  {build:'pharmacy', move:'car', neg:false, a:'Drive to the pharmacy.', b:"Don't drive to the pharmacy.", correct:'a'},
+  {build:'bank', move:'bus', neg:true, a:'Take the bus.', b:"Don't take the bus.", correct:'b'},
+  {build:'library', move:'walk', neg:false, a:'Walk to the library.', b:"Don't walk to the library.", correct:'a'},
+  {build:'school', move:'car', neg:true, a:'Drive to school.', b:"Don't drive to school.", correct:'b'}
+];
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+const GOOD=['⭐ Excellent!','🎉 Great job!','👏 Nice!','✨ Well done!'];
+const BAD=['Try again!','Listen carefully.','Almost!'];
+
+/* ---------------- STATE ---------------- */
+let order = [];
+let idx = 0;
+let score = 0;
+
+function updateHeader(){
+  document.getElementById('scoreCount').textContent = score;
+  document.getElementById('progressFill').style.width = (100*idx/DATA.length)+'%';
+  document.getElementById('progressText').textContent = 'Question '+Math.min(idx+1,DATA.length)+' of '+DATA.length;
+}
+
+function start(){
+  order = shuffle(DATA.map(function(_,i){return i;}));
+  idx = 0; score = 0;
+  paintQuestion();
+}
+
+function paintQuestion(){
+  updateHeader();
+  const q = DATA[order[idx]];
+  const main = document.getElementById('main');
+  main.innerHTML =
+    '<section class="screen">'+
+      '<div class="eyebrow">Right or Wrong?</div>'+
+      '<h2>Look at the picture</h2>'+
+      '<p class="lead">Choose the sentence that matches what you see.</p>'+
+      '<div class="card">'+
+        scene(q.build, q.move, q.neg)+
+        '<div class="choices">'+
+          '<button class="choice-btn" data-ans="a">'+q.a+'</button>'+
+          '<button class="choice-btn" data-ans="b">'+q.b+'</button>'+
+        '</div>'+
+        '<div id="fbHost"></div>'+
+      '</div>'+
+    '</section>';
+
+  let answered = false;
+  main.querySelectorAll('.choice-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(answered) return; answered = true;
+      const good = btn.getAttribute('data-ans') === q.correct;
+      main.querySelectorAll('.choice-btn').forEach(function(b){
+        if(b.getAttribute('data-ans')===q.correct) b.classList.add('correct');
+        else if(b===btn) b.classList.add('incorrect');
+      });
+      if(good){ playCorrect(); score++; speak(q.correct==='a'?q.a:q.b); }
+      else { playIncorrect(); speak(q.correct==='a'?q.a:q.b); }
+      const fb = document.getElementById('fbHost');
+      const div = document.createElement('div');
+      div.className = 'feedback ' + (good?'good':'bad');
+      div.textContent = good ? GOOD[Math.floor(Math.random()*GOOD.length)] : BAD[Math.floor(Math.random()*BAD.length)];
+      fb.appendChild(div);
+      updateHeader();
+      setTimeout(function(){
+        idx++;
+        if(idx < order.length){ paintQuestion(); }
+        else { idx = order.length; updateHeader(); showResults(); }
+      }, 1400);
+    });
+  });
+}
+
+function showResults(){
+  const main = document.getElementById('main');
+  const pct = Math.round(100*score/DATA.length);
+  const stars = pct>=90?5:pct>=75?4:pct>=55?3:pct>=35?2:1;
+  const starRow = '★'.repeat(stars) + '☆'.repeat(5-stars);
+  const msg = pct>=70 ? 'Excellent! You know these sentences well!' : 'Keep practicing — you are learning fast!';
+  main.innerHTML =
+    '<section class="screen results">'+
+      '<div class="eyebrow">All done!</div>'+
+      '<h2>Great work! 🎉</h2>'+
+      '<div class="card">'+
+        '<div class="stars">'+starRow+'</div>'+
+        '<div class="score-big">'+score+' / '+DATA.length+'</div>'+
+        '<div class="results-msg">'+msg+'</div>'+
+        '<button class="btn btn-go" id="againBtn">🔁 Play Again</button>'+
+      '</div>'+
+    '</section>';
+  playCelebration();
+  confetti();
+  document.getElementById('againBtn').addEventListener('click', start);
+}
+
+function confetti(){
+  const layer = document.getElementById('confettiLayer');
+  layer.innerHTML='';
+  const colors=['#ffc93c','#ff6b5b','#4fb0e8','#2fae66'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');
+    const size=6+Math.random()*7, left=Math.random()*100, delay=Math.random()*0.6, dur=2.2+Math.random()*1.6, rot=Math.random()*360;
+    el.style.cssText='position:absolute; top:-20px; left:'+left+'vw; width:'+size+'px; height:'+(size*0.5)+'px; background:'+colors[Math.floor(Math.random()*colors.length)]+'; opacity:.95; transform:rotate('+rot+'deg); border-radius:2px; animation:confettiFall '+dur+'s ease-in '+delay+'s forwards;';
+    layer.appendChild(el);
+  }
+  if(!document.getElementById('confettiKF')){
+    const st=document.createElement('style'); st.id='confettiKF';
+    st.textContent='@keyframes confettiFall{to{transform:translateY(105vh) rotate(560deg); opacity:.15;}}';
+    document.head.appendChild(st);
+  }
+  setTimeout(function(){ layer.innerHTML=''; }, 4800);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  start();
+  document.body.addEventListener('click', function(){ getCtx(); }, {once:true});
+});
+
+})();
+</script>
+</body>
+</html>
