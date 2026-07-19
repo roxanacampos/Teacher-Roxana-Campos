@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Places Around Town Bingo Card</title>
+<style>
+  :root{
+    --sky:#3EC6E0;
+    --sky-dark:#1FA6C4;
+    --sun:#FFC94D;
+    --coral:#FF6B6B;
+    --grass:#06D6A0;
+    --purple:#9B6BF2;
+    --navy:#173A5E;
+    --cream:#FFFBF0;
+    --card:#FFFFFF;
+    --radius:18px;
+    --shadow: 0 8px 20px rgba(23,58,94,0.15);
+    --shadow-lg: 0 14px 34px rgba(23,58,94,0.22);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:-apple-system, "Segoe UI", "Segoe UI Rounded", Verdana, Tahoma, sans-serif;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255,201,77,0.35), transparent 40%),
+      radial-gradient(circle at 90% 15%, rgba(155,107,242,0.28), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(6,214,160,0.22), transparent 45%),
+      var(--cream);
+    color:var(--navy);
+    padding:16px;
+  }
+
+  .wrap{max-width:640px;margin:0 auto;}
+
+  header{
+    background:linear-gradient(120deg, var(--sky), var(--purple));
+    border-radius:24px;
+    padding:22px 24px;
+    box-shadow:var(--shadow-lg);
+    text-align:center;
+    color:white;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  header::before, header::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.14);
+  }
+  header::before{width:160px;height:160px;top:-70px;left:-50px;}
+  header::after{width:120px;height:120px;bottom:-60px;right:-30px;}
+  header h1{
+    margin:0 0 4px;
+    font-size:clamp(1.4rem, 4vw, 2.1rem);
+    letter-spacing:0.5px;
+    text-shadow:0 3px 0 rgba(0,0,0,0.12);
+  }
+  header p{
+    margin:0;
+    font-size:clamp(0.9rem, 2vw, 1.05rem);
+    opacity:0.95;
+    font-weight:600;
+  }
+
+  .panel{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px;
+  }
+
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:center;
+    margin-bottom:16px;
+  }
+
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    outline-offset:3px;
+  }
+
+  .btn{
+    font-size:clamp(0.95rem, 2vw, 1.15rem);
+    font-weight:800;
+    padding:14px 22px;
+    border-radius:50px;
+    color:white;
+    box-shadow:var(--shadow);
+    transition:transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    min-height:52px;
+  }
+  .btn:hover{transform:translateY(-3px);filter:brightness(1.06);box-shadow:var(--shadow-lg);}
+  .btn:active{transform:translateY(0);}
+  .btn:focus-visible{outline:3px solid var(--navy);}
+
+  .btn-new{background:linear-gradient(120deg, var(--purple), #b48cff);}
+  .btn-bingo{
+    background:linear-gradient(120deg, var(--grass), #05b389);
+    width:100%;
+    font-size:clamp(1.1rem, 2.4vw, 1.4rem);
+    padding:16px;
+  }
+
+  .grid-title{
+    text-align:center;
+    font-weight:800;
+    margin:0 0 12px;
+    font-size:1.1rem;
+  }
+  .bingo-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:8px;
+  }
+  .cell{
+    position:relative;
+    aspect-ratio:1/1;
+    background:linear-gradient(160deg,#ffffff,#f2f6ff);
+    border:2px solid #e3e8f5;
+    border-radius:14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:4px;
+    cursor:pointer;
+    transition:transform 0.15s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .cell:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .cell:focus-visible{outline:3px solid var(--navy);}
+  .cell .c-emoji{font-size:clamp(1.2rem, 5vw, 1.8rem);}
+  .cell .c-word{
+    font-size:clamp(0.58rem, 2.4vw, 0.82rem);
+    font-weight:700;
+    text-transform:capitalize;
+    line-height:1.1;
+    margin-top:2px;
+  }
+  .cell.free{
+    background:linear-gradient(160deg, var(--sun), #ffdf8c);
+    border-color:var(--sun);
+    font-weight:900;
+  }
+  .cell.marked{
+    background:linear-gradient(160deg, var(--grass), #04c294);
+    border-color:#04a37b;
+    color:white;
+    animation:pop 0.25s ease;
+  }
+  .cell.marked .c-word{color:white;}
+  @keyframes pop{
+    0%{transform:scale(0.85);}
+    60%{transform:scale(1.08);}
+    100%{transform:scale(1);}
+  }
+  .cell.win-highlight{
+    box-shadow:0 0 0 4px var(--coral), var(--shadow-lg);
+  }
+
+  .bingo-btn-wrap{margin-top:16px;}
+
+  .result-msg{
+    text-align:center;
+    font-weight:800;
+    font-size:1.05rem;
+    margin-top:12px;
+    min-height:1.4em;
+  }
+  .result-msg.win{color:#05a37b;}
+  .result-msg.tryagain{color:#e07b1d;}
+
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(23,58,94,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:16px;
+  }
+  .overlay.show{display:flex;}
+  .celebrate-card{
+    background:var(--cream);
+    border-radius:26px;
+    padding:32px 26px;
+    text-align:center;
+    box-shadow:var(--shadow-lg);
+    max-width:380px;
+    width:100%;
+    animation:pop 0.35s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .celebrate-card h2{
+    margin:0 0 6px;
+    font-size:2.4rem;
+    background:linear-gradient(120deg, var(--coral), var(--purple), var(--sky));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .celebrate-card p{margin:0;font-weight:700;color:var(--navy);}
+  .close-btn{
+    margin-top:18px;
+    background:linear-gradient(120deg, var(--sky), var(--sky-dark));
+    color:white;
+    border-radius:50px;
+    padding:12px 26px;
+    font-weight:800;
+    font-size:1rem;
+  }
+  .confetti{
+    position:absolute;
+    width:8px;height:14px;
+    top:-20px;
+    opacity:0.9;
+    border-radius:2px;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    to{transform:translateY(420px) rotate(540deg); opacity:0;}
+  }
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:0.8rem;
+    color:#8a8fa3;
+    font-weight:600;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>🏙️ Places Around Town Bingo</h1>
+    <p>Listen for the place and mark it on your card!</p>
+  </header>
+
+  <div class="panel">
+    <div class="controls">
+      <button class="btn btn-new" id="newCardBtn">🔄 New Bingo Card</button>
+    </div>
+
+    <p class="grid-title">🗺️ Your Bingo Card — click a square to mark it!</p>
+    <div class="bingo-grid" id="bingoGrid" role="grid" aria-label="Bingo card"></div>
+
+    <div class="bingo-btn-wrap">
+      <button class="btn btn-bingo" id="bingoBtn">🏆 BINGO!</button>
+    </div>
+    <div class="result-msg" id="resultMsg"></div>
+  </div>
+
+  <footer>Practice your Places Around Town vocabulary — have fun! 🎉</footer>
+</div>
+
+<!-- Celebration overlay -->
+<div class="overlay" id="overlay">
+  <div class="celebrate-card" id="celebrateCard">
+    <h2>BINGO!</h2>
+    <p id="celebrateText">Great job! You found a winning line!</p>
+    <button class="close-btn" id="closeOverlayBtn">Keep Playing</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   VOCABULARY DATA
+   Each entry: word and emoji, used to build the bingo card
+========================================================= */
+const VOCAB = [
+  { word: "bank", emoji: "🏦" },
+  { word: "bakery", emoji: "🥐" },
+  { word: "supermarket", emoji: "🛒" },
+  { word: "hospital", emoji: "🏥" },
+  { word: "pharmacy", emoji: "💊" },
+  { word: "school", emoji: "🏫" },
+  { word: "library", emoji: "📚" },
+  { word: "restaurant", emoji: "🍽️" },
+  { word: "café", emoji: "☕" },
+  { word: "park", emoji: "🌳" },
+  { word: "bus station", emoji: "🚌" },
+  { word: "train station", emoji: "🚆" },
+  { word: "airport", emoji: "✈️" },
+  { word: "post office", emoji: "📮" },
+  { word: "police station", emoji: "🚓" },
+  { word: "fire station", emoji: "🚒" },
+  { word: "hotel", emoji: "🏨" },
+  { word: "museum", emoji: "🖼️" },
+  { word: "cinema", emoji: "🎬" },
+  { word: "zoo", emoji: "🦁" },
+  { word: "shopping mall", emoji: "🛍️" },
+  { word: "bookstore", emoji: "📖" },
+  { word: "toy store", emoji: "🧸" },
+  { word: "clothing store", emoji: "👕" },
+  { word: "gas station", emoji: "⛽" },
+  { word: "gym", emoji: "🏋️" },
+  { word: "beach", emoji: "🏖️" },
+  { word: "church", emoji: "⛪" },
+  { word: "market", emoji: "🧺" },
+  { word: "playground", emoji: "🛝" }
+];
+
+/* =========================================================
+   STATE
+========================================================= */
+let cardWords = [];        // 24 words currently on the bingo card (+ FREE center)
+let markedSet = new Set(); // indices (0-24) of marked cells
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+function shuffle(arr) {
+  // Fisher-Yates shuffle, returns a new shuffled array
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* =========================================================
+   SOUND EFFECTS (Web Audio API — no external files)
+========================================================= */
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+function playTone(freq, duration, type, delay = 0, volume = 0.18) {
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.value = volume;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const startTime = ctx.currentTime + delay;
+  gain.gain.setValueAtTime(volume, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.02);
+}
+
+function playMarkSound() {
+  playTone(520, 0.08, "sine", 0);
+}
+
+function playWinSound() {
+  // little ascending arpeggio
+  const notes = [523.25, 659.25, 783.99, 1046.5];
+  notes.forEach((f, i) => playTone(f, 0.22, "triangle", i * 0.14, 0.2));
+}
+
+function playTryAgainSound() {
+  playTone(220, 0.28, "sawtooth", 0, 0.12);
+}
+
+/* =========================================================
+   BINGO CARD GENERATION
+========================================================= */
+function generateCard() {
+  const shuffled = shuffle(VOCAB).slice(0, 24); // 24 words + 1 FREE = 25 cells
+  cardWords = [];
+  let vIndex = 0;
+  for (let i = 0; i < 25; i++) {
+    if (i === 12) {
+      cardWords.push({ word: "FREE", emoji: "⭐", free: true });
+    } else {
+      cardWords.push(shuffled[vIndex]);
+      vIndex++;
+    }
+  }
+  markedSet = new Set([12]); // center is always free/marked
+  renderCard();
+  clearResultMessage();
+}
+
+function renderCard() {
+  const grid = document.getElementById("bingoGrid");
+  grid.innerHTML = "";
+  cardWords.forEach((item, idx) => {
+    const cell = document.createElement("div");
+    cell.className = "cell" + (item.free ? " free" : "") + (markedSet.has(idx) ? " marked" : "");
+    cell.setAttribute("tabindex", "0");
+    cell.setAttribute("role", "gridcell");
+    cell.setAttribute("aria-label", item.free ? "Free space" : item.word);
+    cell.dataset.index = idx;
+
+    const emojiEl = document.createElement("div");
+    emojiEl.className = "c-emoji";
+    emojiEl.textContent = item.emoji;
+
+    const wordEl = document.createElement("div");
+    wordEl.className = "c-word";
+    wordEl.textContent = item.free ? "FREE" : item.word;
+
+    cell.appendChild(emojiEl);
+    cell.appendChild(wordEl);
+
+    cell.addEventListener("click", () => toggleCell(idx));
+    cell.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleCell(idx);
+      }
+    });
+
+    grid.appendChild(cell);
+  });
+}
+
+function toggleCell(idx) {
+  if (cardWords[idx].free) return; // FREE space can't be unmarked
+  const cellEl = document.querySelector(`.cell[data-index="${idx}"]`);
+  if (markedSet.has(idx)) {
+    markedSet.delete(idx);
+    cellEl.classList.remove("marked");
+  } else {
+    markedSet.add(idx);
+    cellEl.classList.add("marked");
+    playMarkSound();
+  }
+}
+
+/* =========================================================
+   BINGO WIN CHECK
+========================================================= */
+function checkBingo() {
+  const lines = [];
+
+  // 5 rows
+  for (let r = 0; r < 5; r++) {
+    lines.push([0,1,2,3,4].map(c => r * 5 + c));
+  }
+  // 5 columns
+  for (let c = 0; c < 5; c++) {
+    lines.push([0,1,2,3,4].map(r => r * 5 + c));
+  }
+  // 2 diagonals
+  lines.push([0,6,12,18,24]);
+  lines.push([4,8,12,16,20]);
+
+  const winningLine = lines.find(line => line.every(idx => markedSet.has(idx)));
+
+  clearHighlights();
+
+  if (winningLine) {
+    winningLine.forEach(idx => {
+      const cellEl = document.querySelector(`.cell[data-index="${idx}"]`);
+      if (cellEl) cellEl.classList.add("win-highlight");
+    });
+    showResult(true);
+    launchCelebration();
+    playWinSound();
+  } else {
+    showResult(false);
+    playTryAgainSound();
+  }
+}
+
+function clearHighlights() {
+  document.querySelectorAll(".cell.win-highlight").forEach(c => c.classList.remove("win-highlight"));
+}
+
+const ENCOURAGEMENTS = ["Keep going!", "Almost there!", "Try again!", "You can do it!", "So close!"];
+
+function showResult(won) {
+  const msgEl = document.getElementById("resultMsg");
+  if (won) {
+    msgEl.textContent = "🎉 BINGO! You found a winning line!";
+    msgEl.className = "result-msg win";
+  } else {
+    const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
+    msgEl.textContent = `🙂 ${msg}`;
+    msgEl.className = "result-msg tryagain";
+  }
+}
+
+function clearResultMessage() {
+  const msgEl = document.getElementById("resultMsg");
+  msgEl.textContent = "";
+  msgEl.className = "result-msg";
+  clearHighlights();
+}
+
+/* =========================================================
+   CELEBRATION OVERLAY + CONFETTI
+========================================================= */
+function launchCelebration() {
+  const overlay = document.getElementById("overlay");
+  overlay.classList.add("show");
+  spawnConfetti();
+}
+
+function spawnConfetti() {
+  const card = document.getElementById("celebrateCard");
+  // Remove old confetti pieces first
+  card.querySelectorAll(".confetti").forEach(el => el.remove());
+
+  const colors = ["#FF6B6B", "#FFC94D", "#06D6A0", "#3EC6E0", "#9B6BF2"];
+  const pieceCount = 40;
+
+  for (let i = 0; i < pieceCount; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti";
+    piece.style.left = Math.random() * 100 + "%";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (1.2 + Math.random() * 1.2) + "s";
+    piece.style.animationDelay = (Math.random() * 0.4) + "s";
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    card.appendChild(piece);
+  }
+}
+
+document.getElementById("closeOverlayBtn").addEventListener("click", () => {
+  document.getElementById("overlay").classList.remove("show");
+});
+
+/* =========================================================
+   EVENT WIRING
+========================================================= */
+document.getElementById("newCardBtn").addEventListener("click", generateCard);
+document.getElementById("bingoBtn").addEventListener("click", checkBingo);
+
+/* =========================================================
+   INITIALIZE GAME
+========================================================= */
+generateCard();
+</script>
+</body>
+</html>
