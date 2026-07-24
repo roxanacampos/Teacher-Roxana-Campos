@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Many Uses of WOULD - Interactive Grammar Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --primary-dark: #3730A3;
+            --secondary: #0EA5E9;
+            --accent: #F59E0B;
+            --accent-light: #FEF3C7;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --error: #EF4444;
+            --error-light: #FEE2E2;
+            --bg-grad-1: #6366F1;
+            --bg-grad-2: #8B5CF6;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #D946EF 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 780px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(90deg, #1E1B4B 0%, #312E81 100%);
+            color: white;
+            padding: 28px 32px;
+            text-align: center;
+            position: relative;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, #38BDF8, #A855F7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #C7D2FE;
+            font-weight: 500;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background: #E2E8F0;
+            width: 100%;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0EA5E9, #6366F1, #A855F7);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quiz-body {
+            padding: 32px;
+        }
+
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .category-badge {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #C7D2FE;
+        }
+
+        .score-counter {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: #F1F5F9;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .score-counter span {
+            color: var(--primary);
+        }
+
+        .question-title {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #0F172A;
+            margin-bottom: 24px;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option-btn {
+            background: #F8FAFC;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .option-btn.correct {
+            background: var(--success-light) !important;
+            border-color: var(--success) !important;
+            color: #065F46 !important;
+            font-weight: 700;
+        }
+
+        .option-btn.incorrect {
+            background: var(--error-light) !important;
+            border-color: var(--error) !important;
+            color: #991B1B !important;
+            font-weight: 700;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .feedback-card {
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.5;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-card.correct-bg {
+            background: #ECFDF5;
+            border-left: 5px solid var(--success);
+            color: #065F46;
+        }
+
+        .feedback-card.incorrect-bg {
+            background: #FEF2F2;
+            border-left: 5px solid var(--error);
+            color: #991B1B;
+        }
+
+        .feedback-card strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--primary), var(--bg-grad-2));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Results Screen */
+        .results-card {
+            text-align: center;
+            padding: 20px 10px;
+            display: none;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light), #E0E7FF);
+            border: 6px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px auto;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
+        }
+
+        .score-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .results-card h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 12px;
+        }
+
+        .results-card p {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 32px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .icon-symbol {
+            font-size: 18px;
+        }
+
+        @media (max-width: 640px) {
+            .quiz-body { padding: 20px; }
+            .header { padding: 20px; }
+            .question-title { font-size: 18px; }
+            .option-btn { font-size: 15px; padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h1>✨ The Many Uses of "WOULD"</h1>
+        <p>A2–B1 Interactive English Grammar Quiz</p>
+    </div>
+    
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Active Question View -->
+    <div class="quiz-body" id="quiz-view">
+        <div class="quiz-stats">
+            <span class="category-badge" id="category-badge">🏷️ Category</span>
+            <span class="score-counter">Score: <span id="score-val">0</span>/<span id="total-val">10</span></span>
+        </div>
+
+        <div class="question-title" id="question-text">
+            Loading question...
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Dynamic Options -->
+        </div>
+
+        <div class="feedback-card" id="feedback-card">
+            <strong id="feedback-title">Correct!</strong>
+            <span id="feedback-text">Explanation goes here.</span>
+        </div>
+
+        <div class="actions">
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
+        </div>
+    </div>
+
+    <!-- Results View -->
+    <div class="quiz-body results-card" id="results-view">
+        <div class="score-circle">
+            <span class="score-number" id="final-score">0</span>
+            <span class="score-label">OUT OF 10</span>
+        </div>
+        <h2 id="result-heading">Awesome Job! 🎉</h2>
+        <p id="result-message">You have a great understanding of how to use "WOULD" in English speaking!</p>
+        <button class="restart-btn" onclick="restartQuiz()">Try Again ↺</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            category: "Polite Requests",
+            question: "1. '___ you mind opening the window? It's warm in here.'",
+            options: ["Would", "Do", "Will", "Are"],
+            correct: 0,
+            explanation: "We use 'Would you mind + V-ing?' to make polite requests in English."
+        },
+        {
+            category: "Preferences",
+            question: "2. 'I'm feeling tired. I ___ stay home tonight than go to the party.'",
+            options: ["would rather", "would like", "would to", "would prefer to"],
+            correct: 0,
+            explanation: "We use 'would rather + base verb' to express a personal preference."
+        },
+        {
+            category: "Imaginary Situations",
+            question: "3. 'If I won a million dollars, I ___ travel all around the world.'",
+            options: ["would", "will", "bought", "would to"],
+            correct: 0,
+            explanation: "Second Conditional: If + Past Simple, WOULD + base verb (imaginary present/future)."
+        },
+        {
+            category: "Future in the Past",
+            question: "4. 'She promised that she ___ call me as soon as she arrived.'",
+            options: ["would", "will", "is going to", "can"],
+            correct: 0,
+            explanation: "'Would' is used as the past tense of 'will' when reporting future events from a past point of view."
+        },
+        {
+            category: "Past Habits",
+            question: "5. 'When we were kids, we ___ build treehouses every summer.'",
+            options: ["would", "will", "are used to", "would to"],
+            correct: 0,
+            explanation: "'Would' can describe repeated actions or habits in the past (similar to 'used to')."
+        },
+        {
+            category: "Common Mistakes",
+            question: "6. Which of the following sentences is GRAMMATICALLY CORRECT?",
+            options: [
+                "I would like a cup of coffee, please.",
+                "I would can help you with your homework.",
+                "If I will have money, I would buy a car.",
+                "I would rather to stay at home."
+            ],
+            correct: 0,
+            explanation: "Never place modal verbs together ('would can' is incorrect) and don't use 'to' after 'would rather'."
+        },
+        {
+            category: "Contractions",
+            question: "7. What does 'd mean in this sentence? <br><em>'She told me she'd be late.'</em>",
+            options: ["Would", "Had", "Did", "Should"],
+            correct: 0,
+            explanation: "'She'd be' = 'She would be'. (If followed by a past participle like 'left', 'd means 'had')."
+        },
+        {
+            category: "Offers & Invitations",
+            question: "8. '___ you like another slice of pizza?'",
+            options: ["Would", "Do", "Are", "Can"],
+            correct: 0,
+            explanation: "'Would you like...?' is the standard polite formula for offering food, drinks, or invitations."
+        },
+        {
+            category: "Polite Requests",
+            question: "9. Choose the correct polite form:",
+            options: [
+                "Would you mind helping me with this box?",
+                "Would you mind to help me with this box?",
+                "Would you mind help me with this box?",
+                "Would you to help me with this box?"
+            ],
+            correct: 0,
+            explanation: "'Would you mind...' is ALWAYS followed by a gerund (-ing form)."
+        },
+        {
+            category: "Past Habits vs Used To",
+            question: "10. 'My grandfather ___ live in London.' (Be careful!)",
+            options: ["used to", "would", "would to", "was used to"],
+            correct: 0,
+            explanation: "We use 'used to' (NOT 'would') for past STATES/STATIVE verbs (live, be, have, know)."
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    const quizView = document.getElementById("quiz-view");
+    const resultsView = document.getElementById("results-view");
+    const questionEl = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const categoryBadge = document.getElementById("category-badge");
+    const scoreVal = document.getElementById("score-val");
+    const totalVal = document.getElementById("total-val");
+    const progressBar = document.getElementById("progress-bar");
+    const feedbackCard = document.getElementById("feedback-card");
+    const feedbackTitle = document.getElementById("feedback-title");
+    const feedbackText = document.getElementById("feedback-text");
+    const nextBtn = document.getElementById("next-btn");
+
+    totalVal.textContent = questions.length;
+
+    function loadQuestion() {
+        answered = false;
+        const q = questions[currentQuestion];
+        
+        // Progress & Headers
+        categoryBadge.innerHTML = `🏷️ ${q.category}`;
+        questionEl.innerHTML = q.question;
+        scoreVal.textContent = score;
+        
+        const progressPercent = ((currentQuestion) / questions.length) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+
+        // Clear previous state
+        optionsContainer.innerHTML = "";
+        feedbackCard.style.display = "none";
+        nextBtn.style.display = "none";
+
+        // Render options
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerHTML = `<span>${opt}</span><span class="icon-symbol"></span>`;
+            btn.onclick = () => selectOption(index);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(index) {
+        if (answered) return;
+        answered = true;
+
+        const q = questions[currentQuestion];
+        const buttons = optionsContainer.getElementsByClassName("option-btn");
+
+        if (index === q.correct) {
+            score++;
+            scoreVal.textContent = score;
+            buttons[index].classList.add("correct");
+            buttons[index].querySelector(".icon-symbol").textContent = "✓";
+            
+            feedbackCard.className = "feedback-card correct-bg";
+            feedbackTitle.textContent = "🎉 Excellent!";
+        } else {
+            buttons[index].classList.add("incorrect");
+            buttons[index].querySelector(".icon-symbol").textContent = "✗";
+            
+            // Highlight correct one
+            buttons[q.correct].classList.add("correct");
+            buttons[q.correct].querySelector(".icon-symbol").textContent = "✓";
+
+            feedbackCard.className = "feedback-card incorrect-bg";
+            feedbackTitle.textContent = "💡 Grammar Tip:";
+        }
+
+        // Disable all buttons
+        for (let btn of buttons) {
+            btn.disabled = true;
+        }
+
+        feedbackText.innerHTML = q.explanation;
+        feedbackCard.style.display = "block";
+        
+        if (currentQuestion < questions.length - 1) {
+            nextBtn.textContent = "Next Question ➔";
+        } else {
+            nextBtn.textContent = "See Final Results 🏆";
+        }
+        nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        progressBar.style.width = "100%";
+        quizView.style.display = "none";
+        resultsView.style.display = "block";
+
+        document.getElementById("final-score").textContent = score;
+
+        const resultHeading = document.getElementById("result-heading");
+        const resultMessage = document.getElementById("result-message");
+
+        if (score === 10) {
+            resultHeading.textContent = "🏆 Perfect Score!";
+            resultMessage.textContent = "Outstanding! You are a master of using 'WOULD' in English!";
+        } else if (score >= 7) {
+            resultHeading.textContent = "🌟 Great Job!";
+            resultMessage.textContent = "You have a solid understanding of 'WOULD'. Keep practicing your speaking!";
+        } else {
+            resultHeading.textContent = "📚 Good Effort!";
+            resultMessage.textContent = "Review the 6 uses of 'WOULD' on the lesson slides and try again!";
+        }
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        resultsView.style.display = "none";
+        quizView.style.display = "block";
+        loadQuestion();
+    }
+
+    // Initialize first question
+    loadQuestion();
+</script>
+
+</body>
+</html>
