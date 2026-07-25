@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Clothing Store Challenge</title>
+<style>
+  :root{
+    --pink:#FF6FA5;
+    --pink-dark:#E5487F;
+    --purple:#7B5EA7;
+    --purple-dark:#5B3F8C;
+    --mint:#2AC9B8;
+    --yellow:#FFC94A;
+    --blue:#4EA8DE;
+    --coral:#FF6B6B;
+    --ink:#2D1B4E;
+    --ink-soft:#5B4B7A;
+    --paper:#FFFFFF;
+    --bg-a:#FFE7F1;
+    --bg-b:#E7F3FF;
+    --bg-c:#FFF6DC;
+    --radius-lg:28px;
+    --radius-md:18px;
+    --radius-sm:12px;
+    --shadow-soft:0 10px 30px rgba(45,27,78,0.14);
+    --shadow-pop:0 6px 0 rgba(45,27,78,0.18);
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Trebuchet MS','Segoe UI Rounded','Segoe UI',Verdana,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 10% 15%, rgba(255,111,165,0.25), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(78,168,222,0.25), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(255,201,74,0.25), transparent 45%),
+      linear-gradient(160deg, var(--bg-a) 0%, var(--bg-b) 55%, var(--bg-c) 100%);
+    min-height:100%;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  h1,h2,h3{margin:0;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+  /* ===== Floating background icons ===== */
+  .floating-icons{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .floating-icons span{
+    position:absolute;top:110%;font-size:2rem;opacity:0.28;
+    animation:floatUp linear infinite;
+  }
+  @keyframes floatUp{
+    0%{transform:translateY(0) rotate(0deg);}
+    100%{transform:translateY(-130vh) rotate(25deg);}
+  }
+
+  /* ===== Top bar ===== */
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;flex-wrap:wrap;
+    padding:10px 16px;
+    background:linear-gradient(120deg, var(--purple), var(--purple-dark));
+    box-shadow:0 4px 18px rgba(45,27,78,0.25);
+    border-bottom:4px solid var(--pink);
+  }
+  .topbar::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:-8px;height:8px;
+    background-image:radial-gradient(circle at 8px 0, transparent 8px, var(--pink) 8.5px);
+    background-size:16px 16px;
+    background-repeat:repeat-x;
+  }
+  .topbar-left,.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .progress-pill{
+    background:rgba(255,255,255,0.16);color:#fff;font-weight:700;
+    padding:8px 14px;border-radius:999px;font-size:0.85rem;letter-spacing:0.3px;
+    border:1.5px solid rgba(255,255,255,0.35);
+  }
+  .stat-chip{
+    background:#fff;color:var(--purple-dark);font-weight:800;
+    padding:7px 12px;border-radius:999px;font-size:0.85rem;
+    box-shadow:var(--shadow-pop);display:inline-flex;align-items:center;gap:4px;
+    transition:transform .15s ease;
+  }
+  .stat-chip.bump{animation:bump .35s ease;}
+  @keyframes bump{0%{transform:scale(1);}40%{transform:scale(1.25);}100%{transform:scale(1);}}
+  .icon-btn{
+    width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;
+    background:#fff;color:var(--purple-dark);font-size:1.1rem;font-weight:800;
+    display:inline-flex;align-items:center;justify-content:center;gap:2px;
+    box-shadow:var(--shadow-pop);transition:transform .12s ease;
+  }
+  .icon-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(45,27,78,0.18);}
+  .icon-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  #hintBtn{width:auto;padding:0 12px;}
+  #hintCount{font-size:0.75rem;background:var(--coral);color:#fff;border-radius:50%;
+    width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;}
+
+  /* ===== App layout ===== */
+  #app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:20px 16px 60px;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== Home screen ===== */
+  .home-hero{
+    text-align:center;padding:38px 20px 30px;
+    background:var(--paper);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-soft);
+    position:relative;overflow:hidden;
+    border:3px solid #fff;
+  }
+  .home-hero::before{
+    content:"";position:absolute;top:-60px;left:-60px;width:180px;height:180px;
+    background:radial-gradient(circle, var(--yellow), transparent 70%);opacity:0.7;
+  }
+  .home-hero::after{
+    content:"";position:absolute;bottom:-70px;right:-70px;width:220px;height:220px;
+    background:radial-gradient(circle, var(--mint), transparent 70%);opacity:0.6;
+  }
+  .home-title{
+    font-size:clamp(1.8rem,6vw,2.6rem);font-weight:900;color:var(--purple-dark);
+    text-shadow:3px 3px 0 rgba(255,111,165,0.35);
+    letter-spacing:0.5px;position:relative;z-index:1;
+    animation:signBounce 2.4s ease-in-out infinite;
+  }
+  @keyframes signBounce{0%,100%{transform:translateY(0) rotate(-0.5deg);}50%{transform:translateY(-6px) rotate(0.5deg);}}
+  .home-sub{
+    margin-top:10px;font-size:1.05rem;color:var(--ink-soft);font-weight:600;position:relative;z-index:1;
+  }
+  .home-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:28px;position:relative;z-index:1;}
+
+  .btn{
+    border:none;cursor:pointer;font-weight:800;font-size:1rem;
+    padding:14px 26px;border-radius:999px;color:#fff;
+    box-shadow:var(--shadow-pop);transition:transform .12s ease, box-shadow .12s ease;
+    letter-spacing:0.3px;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(45,27,78,0.18);}
+  .btn-primary{background:linear-gradient(120deg, var(--pink), var(--pink-dark));}
+  .btn-secondary{background:linear-gradient(120deg, var(--blue), #3b82c4);}
+  .btn-outline{background:#fff;color:var(--purple-dark);border:2.5px solid var(--purple);box-shadow:0 6px 0 rgba(123,94,167,0.25);}
+  .btn-ghost{background:transparent;color:var(--purple-dark);box-shadow:none;text-decoration:underline;padding:8px 10px;}
+  .btn-lg{padding:17px 34px;font-size:1.1rem;}
+
+  .home-preview{
+    margin-top:24px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1;
+  }
+  .preview-chip{background:var(--bg-c);border-radius:14px;padding:8px 14px;font-weight:700;color:var(--ink-soft);font-size:0.85rem;}
+
+  .home-gallery{display:flex;justify-content:center;gap:14px;margin-top:26px;flex-wrap:wrap;position:relative;z-index:1;}
+  .home-gallery .mini-icon{width:56px;height:56px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.15));animation:sway 3s ease-in-out infinite;}
+  .home-gallery .mini-icon:nth-child(2n){animation-delay:.4s;}
+  .home-gallery .mini-icon:nth-child(3n){animation-delay:.8s;}
+  @keyframes sway{0%,100%{transform:rotate(-4deg);}50%{transform:rotate(4deg);}}
+
+  /* ===== Generic game card ===== */
+  .game-card{
+    background:var(--paper);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-soft);padding:22px 20px 28px;border:3px solid #fff;
+    position:relative;
+  }
+  .game-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .game-title{font-size:1.3rem;font-weight:900;color:var(--purple-dark);}
+  .game-instructions{color:var(--ink-soft);font-weight:600;margin-bottom:16px;font-size:0.95rem;}
+  .round-counter{font-weight:700;color:var(--ink-soft);font-size:0.85rem;background:var(--bg-c);padding:5px 12px;border-radius:999px;}
+
+  /* progress dots for 6 games */
+  .game-dots{display:flex;gap:6px;justify-content:center;margin:14px 0 6px;}
+  .game-dots span{width:10px;height:10px;border-radius:50%;background:rgba(123,94,167,0.25);}
+  .game-dots span.done{background:var(--mint);}
+  .game-dots span.now{background:var(--pink);transform:scale(1.3);}
+
+  /* ===== Memory game ===== */
+  .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media (max-width:520px){.memory-grid{grid-template-columns:repeat(3,1fr);}}
+  .mem-card{
+    aspect-ratio:1/1;perspective:800px;cursor:pointer;
+  }
+  .mem-card-inner{
+    width:100%;height:100%;position:relative;transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .mem-card.flipped .mem-card-inner{transform:rotateY(180deg);}
+  .mem-card.matched .mem-card-inner{transform:rotateY(180deg);}
+  .mem-face{
+    position:absolute;inset:0;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    backface-visibility:hidden;box-shadow:0 4px 10px rgba(45,27,78,0.15);
+    padding:6px;text-align:center;
+  }
+  .mem-front{background:linear-gradient(135deg,var(--purple),var(--purple-dark));font-size:1.6rem;color:#fff;}
+  .mem-back{background:#fff;transform:rotateY(180deg);border:2px solid var(--bg-c);flex-direction:column;gap:4px;}
+  .mem-back svg{width:60%;height:60%;}
+  .mem-back .mem-word{font-weight:800;color:var(--purple-dark);font-size:0.8rem;}
+  .mem-card.matched .mem-back{background:#E8FBF5;border-color:var(--mint);}
+
+  /* ===== Drag label game ===== */
+  .dragzone-wrap{display:flex;flex-direction:column;align-items:center;gap:20px;}
+  .drop-target{
+    width:150px;height:150px;border-radius:24px;border:4px dashed var(--purple);
+    display:flex;align-items:center;justify-content:center;background:var(--bg-c);
+    position:relative;transition:background .2s ease, border-color .2s ease;
+  }
+  .drop-target.over{background:#FFF0D9;border-color:var(--yellow);}
+  .drop-target.correct{border-style:solid;border-color:var(--mint);background:#E8FBF5;}
+  .drop-target svg{width:75%;height:75%;}
+  .chips-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:480px;}
+  .drag-chip{
+    touch-action:none;user-select:none;cursor:grab;
+    background:linear-gradient(120deg,#fff,#fdf6ff);
+    border:2.5px solid var(--purple);color:var(--purple-dark);
+    font-weight:800;padding:12px 18px;border-radius:999px;
+    box-shadow:var(--shadow-pop);font-size:0.95rem;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .drag-chip.dragging{cursor:grabbing;box-shadow:0 14px 24px rgba(45,27,78,0.25);z-index:5;}
+  .drag-chip.placed{opacity:0;pointer-events:none;}
+  .drag-chip.wrong-shake{animation:shake .4s ease;}
+
+  /* ===== Dress the customer ===== */
+  .customer-wrap{text-align:center;}
+  .customer-face{font-size:4rem;transition:transform .3s ease;display:inline-block;}
+  .speech-bubble{
+    background:#fff;border:2.5px solid var(--purple);border-radius:18px;
+    padding:14px 18px;display:inline-block;margin:14px auto;font-weight:700;
+    color:var(--purple-dark);position:relative;max-width:340px;font-size:1.05rem;
+  }
+  .option-section{margin-top:18px;}
+  .option-label{font-weight:800;color:var(--ink-soft);margin-bottom:8px;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.6px;}
+  .swatch-row,.icon-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .swatch-btn{
+    width:52px;height:52px;border-radius:50%;border:3px solid #fff;
+    box-shadow:0 3px 8px rgba(45,27,78,0.25);cursor:pointer;transition:transform .15s ease;
+  }
+  .swatch-btn.selected{outline:3px solid var(--purple);outline-offset:2px;transform:scale(1.1);}
+  .swatch-btn.correct-flash{animation:pop .5s ease;outline:3px solid var(--mint);}
+  .swatch-btn.wrong-flash{animation:shake .4s ease;outline:3px solid var(--coral);}
+  .icon-choice{
+    width:70px;height:70px;border-radius:16px;border:2.5px solid var(--bg-c);
+    background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow-pop);transition:transform .15s ease;
+  }
+  .icon-choice svg{width:70%;height:70%;}
+  .icon-choice.selected{border-color:var(--purple);transform:scale(1.08);}
+  .icon-choice.correct-flash{animation:pop .5s ease;border-color:var(--mint);}
+  .icon-choice.wrong-flash{animation:shake .4s ease;border-color:var(--coral);}
+
+  /* ===== Opposite / MCQ generic ===== */
+  .prompt-card{
+    text-align:center;background:linear-gradient(135deg,var(--bg-c),#fff);
+    border-radius:20px;padding:26px;font-size:2rem;font-weight:900;color:var(--purple-dark);
+    margin-bottom:20px;border:2px dashed var(--purple);
+  }
+  .mcq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:420px){.mcq-grid{grid-template-columns:1fr;}}
+  .mcq-btn{
+    background:#fff;border:2.5px solid var(--bg-c);border-radius:16px;
+    padding:16px;font-weight:800;font-size:1.05rem;color:var(--ink);
+    cursor:pointer;box-shadow:var(--shadow-pop);transition:transform .12s ease;
+  }
+  .mcq-btn:hover{transform:translateY(-2px);}
+  .mcq-btn.correct{background:#E8FBF5;border-color:var(--mint);color:#0d7a63;}
+  .mcq-btn.wrong{background:#FFEDEE;border-color:var(--coral);color:#b3313a;animation:shake .4s ease;}
+  .mcq-btn.disabled-opt{opacity:0.35;pointer-events:none;}
+
+  /* ===== Size challenge ===== */
+  .size-tag-wrap{display:flex;justify-content:center;margin-bottom:10px;}
+  .size-tag{
+    width:120px;height:80px;background:#fff;border:3px solid var(--purple);border-radius:14px;
+    display:flex;align-items:center;justify-content:center;position:relative;box-shadow:var(--shadow-pop);
+    transform:rotate(-3deg);
+  }
+  .size-tag::before{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+    width:14px;height:14px;border-radius:50%;background:var(--bg-a);border:3px solid var(--purple);}
+  .size-tag-text{font-size:1.6rem;font-weight:900;color:var(--purple-dark);}
+  .size-sentence{text-align:center;font-size:1.15rem;font-weight:700;color:var(--ink);margin:16px 0;}
+  .size-sentence .blank{display:inline-block;min-width:90px;border-bottom:3px dotted var(--purple);color:var(--pink-dark);}
+
+  /* ===== Speed round ===== */
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .timer-bar-bg{flex:1;height:16px;background:var(--bg-c);border-radius:999px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,0.08);}
+  .timer-bar-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--yellow),var(--coral));width:100%;transition:width 1s linear;}
+  .timer-num{font-weight:900;color:var(--purple-dark);font-size:1.1rem;min-width:44px;text-align:right;}
+  .speed-visual{display:flex;justify-content:center;margin:10px 0;}
+  .speed-visual svg{width:110px;height:110px;}
+  .speed-visual .swatch-big{width:100px;height:100px;border-radius:20px;box-shadow:var(--shadow-pop);}
+  .speed-question-text{text-align:center;font-weight:800;font-size:1.15rem;color:var(--purple-dark);margin-bottom:14px;}
+
+  /* ===== Interstitial ===== */
+  .interstitial{text-align:center;padding:20px;}
+  .interstitial .big-emoji{font-size:3.4rem;animation:pop .6s ease;}
+  .interstitial h2{font-size:1.6rem;color:var(--purple-dark);margin:10px 0 4px;}
+  .interstitial p{color:var(--ink-soft);font-weight:700;}
+  .mini-stats{display:flex;justify-content:center;gap:18px;margin:18px 0;flex-wrap:wrap;}
+  .mini-stat{background:var(--bg-c);padding:10px 18px;border-radius:14px;font-weight:800;color:var(--ink);}
+
+  /* ===== Results screen ===== */
+  .results-card{background:var(--paper);border-radius:var(--radius-lg);box-shadow:var(--shadow-soft);
+    padding:34px 22px;text-align:center;border:3px solid #fff;}
+  .results-stars{font-size:2.4rem;margin-bottom:6px;}
+  .results-score{font-size:2.6rem;font-weight:900;color:var(--purple-dark);}
+  .results-sub{color:var(--ink-soft);font-weight:700;margin-top:4px;}
+  .results-grid{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:22px 0;}
+  .results-metric{background:var(--bg-c);border-radius:16px;padding:14px 20px;min-width:120px;}
+  .results-metric .num{font-size:1.5rem;font-weight:900;color:var(--purple-dark);}
+  .results-metric .lbl{font-size:0.8rem;color:var(--ink-soft);font-weight:700;text-transform:uppercase;}
+  .results-message{font-size:1.2rem;font-weight:800;color:var(--pink-dark);margin:14px 0;}
+  .badge-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:20px 0;}
+  .badge{
+    background:linear-gradient(150deg,#fff,var(--bg-c));border:2.5px solid var(--yellow);
+    border-radius:16px;padding:14px 16px;width:120px;box-shadow:var(--shadow-pop);
+    animation:pop .5s ease;
+  }
+  .badge .badge-emoji{font-size:1.8rem;}
+  .badge .badge-name{font-size:0.75rem;font-weight:800;color:var(--ink-soft);margin-top:6px;}
+  .no-badges{color:var(--ink-soft);font-weight:600;font-style:italic;}
+
+  /* ===== Toast ===== */
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,120%);
+    background:var(--ink);color:#fff;font-weight:800;padding:12px 22px;border-radius:999px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.3);z-index:50;transition:transform .35s cubic-bezier(.2,.9,.3,1.2);
+    font-size:0.95rem;white-space:nowrap;
+  }
+  .toast.show{transform:translate(-50%,0);}
+
+  /* ===== Modal ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(45,27,78,0.55);z-index:60;
+    display:none;align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal-box{
+    background:#fff;border-radius:24px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;
+    padding:26px 24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  .modal-box h2{color:var(--purple-dark);font-size:1.4rem;margin-bottom:12px;}
+  .modal-box ol{padding-left:20px;color:var(--ink);line-height:1.7;font-weight:600;}
+  .modal-box li{margin-bottom:10px;}
+  .modal-close{margin-top:16px;width:100%;}
+
+  /* ===== Confetti ===== */
+  .confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden;}
+  .confetti-piece{
+    position:absolute;width:10px;height:14px;border-radius:2px;
+    animation-name:confettiFall;animation-timing-function:ease-in;animation-fill-mode:forwards;
+  }
+  @keyframes confettiFall{
+    0%{transform:translate(0,0) rotate(0deg);opacity:1;}
+    100%{transform:translate(var(--dx),420px) rotate(var(--dr));opacity:0;}
+  }
+
+  /* ===== Shared animations ===== */
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-6px);}
+    80%{transform:translateX(6px);}
+  }
+  @keyframes pop{
+    0%{transform:scale(1);}
+    40%{transform:scale(1.18);}
+    100%{transform:scale(1);}
+  }
+
+  footer.credit{text-align:center;color:var(--ink-soft);font-weight:600;font-size:0.78rem;margin-top:26px;opacity:0.7;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
+  }
+
+  :focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+<div class="floating-icons" id="floatingIcons" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="progress-pill" id="progressPill">Ready to shop!</span>
+  </div>
+  <div class="topbar-right">
+    <span class="stat-chip" id="starChip">⭐ 0</span>
+    <span class="stat-chip" id="scoreChip">🛍️ 0</span>
+    <button class="icon-btn" id="hintBtn" type="button" title="Use a hint">💡<span id="hintCount">3</span></button>
+    <button class="icon-btn" id="muteBtn" type="button" title="Mute sounds">🔊</button>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- HOME SCREEN -->
+  <section class="screen active" id="homeScreen">
+    <div class="home-hero">
+      <h1 class="home-title">🛍️ Clothing Store Challenge</h1>
+      <p class="home-sub">Six fun mini-games to shop your way through A1 clothing vocabulary!</p>
+      <div class="home-gallery" id="homeGallery"></div>
+      <div class="home-actions">
+        <button class="btn btn-primary btn-lg" id="startBtn" type="button">▶️ Start Game</button>
+        <button class="btn btn-outline btn-lg" id="instructionsBtn" type="button">📖 Instructions</button>
+      </div>
+      <div class="home-preview">
+        <span class="preview-chip" id="homeProgressChip">Progress: Game 0 of 6</span>
+        <span class="preview-chip" id="homeStarsChip">⭐ Stars: 0</span>
+        <span class="preview-chip" id="homeScoreChip">🛍️ Score: 0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section class="screen" id="gameScreen">
+    <div class="game-dots" id="gameDots"></div>
+    <div id="gameArea"></div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section class="screen" id="resultsScreen">
+    <div class="results-card">
+      <div class="results-stars" id="resultsStars">⭐⭐⭐</div>
+      <h2>Final Results</h2>
+      <div class="results-score" id="resultsScore">0</div>
+      <div class="results-sub">Total Score</div>
+      <div class="results-grid">
+        <div class="results-metric"><div class="num" id="resultAccuracy">0%</div><div class="lbl">Accuracy</div></div>
+        <div class="results-metric"><div class="num" id="resultTime">0:00</div><div class="lbl">Time Used</div></div>
+      </div>
+      <div class="results-message" id="resultsMessage">Great job!</div>
+      <h3 style="color:var(--purple-dark);margin-bottom:6px;">Badges Earned</h3>
+      <div class="badge-grid" id="badgeGrid"></div>
+      <button class="btn btn-primary btn-lg" id="playAgainBtn" type="button">🔁 Play Again</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="credit">Clothing Store Challenge · A1 Vocabulary Review</footer>
+
+<!-- INSTRUCTIONS MODAL -->
+<div class="modal-overlay" id="instructionsModal">
+  <div class="modal-box">
+    <h2>📖 How to Play</h2>
+    <ol>
+      <li><strong>Shopping Bag Memory</strong> — Flip cards to match each picture with its word.</li>
+      <li><strong>Drag the Label</strong> — Drag the correct word onto the picture of clothing.</li>
+      <li><strong>Dress the Customer</strong> — Listen to what the customer needs, then click the correct color and the correct clothing item.</li>
+      <li><strong>Opposite Challenge</strong> — Choose the word that means the opposite.</li>
+      <li><strong>Size Challenge</strong> — Read the size tag and choose the correct size.</li>
+      <li><strong>Shopping Speed Round</strong> — Answer as many quick questions as you can in 60 seconds!</li>
+    </ol>
+    <p style="color:var(--ink-soft);font-weight:700;">💡 You have 3 hints for the whole game. 🔊 Use the mute button to turn sounds on or off.</p>
+    <button class="btn btn-outline modal-close" id="closeInstructions" type="button">Got it!</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   DATA
+========================================================= */
+const CLOTHES = [
+  {id:'shirt',   word:'shirt',   article:'a',  color:'#4EA8DE'},
+  {id:'sweater', word:'sweater', article:'a',  color:'#E07A5F'},
+  {id:'tie',     word:'tie',     article:'a',  color:'#3D405B'},
+  {id:'jacket',  word:'jacket',  article:'a',  color:'#2AC9B8'},
+  {id:'skirt',   word:'skirt',   article:'a',  color:'#F2CC8F'},
+  {id:'shoes',   word:'shoes',   article:'',   color:'#7B5EA7'},
+  {id:'dress',   word:'dress',   article:'a',  color:'#FF6FA5'},
+  {id:'suit',    word:'suit',    article:'a',  color:'#264653'},
+  {id:'blouse',  word:'blouse',  article:'a',  color:'#FFC94A'},
+  {id:'pants',   word:'pants',   article:'',   color:'#4361EE'}
+];
+const COLORS = [
+  {id:'white',  hex:'#FFFFFF', border:true},
+  {id:'black',  hex:'#2B2B2B'},
+  {id:'red',    hex:'#E63946'},
+  {id:'orange', hex:'#F4845F'},
+  {id:'yellow', hex:'#FFC94A'},
+  {id:'green',  hex:'#2A9D8F'},
+  {id:'blue',   hex:'#4361EE'},
+  {id:'purple', hex:'#7B2CBF'},
+  {id:'gray',   hex:'#8D99AE'},
+  {id:'brown',  hex:'#8B5E3C'}
+];
+const SIZES = ['small','medium','large','extra large'];
+const SIZE_ABBR = {small:'S', medium:'M', large:'L', 'extra large':'XL'};
+const OPPOSITES = [
+  ['new','old'],['dirty','clean'],['loose','tight'],['cheap','expensive'],['long','short']
+];
+const CUSTOMER_REQUESTS = [
+  {color:'blue',   clothingId:'pants'},
+  {color:'black',  clothingId:'shoes'},
+  {color:'white',  clothingId:'shirt'},
+  {color:'green',  clothingId:'sweater'},
+  {color:'orange', clothingId:'dress'},
+  {color:'yellow', clothingId:'skirt'}
+];
+const CUSTOMER_FACES = ['🧑','👩','👨','🧕','👱‍♀️','🧔','👩‍🦰','👨‍🦱'];
+const ENCOURAGE = ['Excellent!','Great job!',"You're improving!",'Fantastic!','Keep going!','Amazing!'];
+
+function clothingById(id){ return CLOTHES.find(c=>c.id===id); }
+function colorById(id){ return COLORS.find(c=>c.id===id); }
+function article(item){ return item.article ? item.article+' '+item.word : item.word; }
+function aOrAn(word){ return /^[aeiou]/i.test(word) ? 'an' : 'a'; }
+function isPluralItem(item){ return item.article===''; }
+function demoWord(item){ return isPluralItem(item) ? 'these' : 'this'; }
+function beVerb(item){ return isPluralItem(item) ? 'are' : 'is'; }
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pickN(arr, n){ return shuffle(arr).slice(0,n); }
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html!==undefined) e.innerHTML = html;
+  return e;
+}
+function fmtTime(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+
+/* =========================================================
+   SVG CLOTHING ICONS
+========================================================= */
+function svgWrap(inner){
+  return '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">'+inner+'</svg>';
+}
+function garmentSVG(id, hexColor){
+  const hex = hexColor || '#8D6FE0';
+  const s = '#2D1B4E';
+  const base = 'M30 20 L45 10 L60 22 L75 10 L90 20 L102 38 L86 46 L82 108 L38 108 L34 46 L18 38 Z';
+  switch(id){
+    case 'shirt':
+      return svgWrap('<path d="'+base+'" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M45 10 L60 30 L75 10" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>');
+    case 'blouse':
+      return svgWrap('<path d="'+base+'" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M45 10 L60 26 L75 10" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>' +
+        '<circle cx="60" cy="30" r="5" fill="#fff" stroke="'+s+'" stroke-width="2"/>' +
+        '<path d="M52 26 L60 30 L68 26" fill="none" stroke="'+s+'" stroke-width="2"/>');
+    case 'sweater':
+      return svgWrap('<path d="'+base+'" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M45 10 L60 24 L75 10" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>' +
+        '<line x1="40" y1="98" x2="80" y2="98" stroke="'+s+'" stroke-width="2"/>' +
+        '<line x1="40" y1="103" x2="80" y2="103" stroke="'+s+'" stroke-width="2"/>');
+    case 'jacket':
+      return svgWrap('<path d="'+base+'" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<line x1="60" y1="18" x2="60" y2="108" stroke="'+s+'" stroke-width="3"/>' +
+        '<path d="M45 10 L58 24" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>' +
+        '<path d="M75 10 L62 24" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>' +
+        '<circle cx="50" cy="70" r="2.5" fill="'+s+'"/><circle cx="50" cy="85" r="2.5" fill="'+s+'"/>');
+    case 'suit':
+      return svgWrap('<path d="'+base+'" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<line x1="60" y1="18" x2="60" y2="108" stroke="'+s+'" stroke-width="3"/>' +
+        '<path d="M45 10 L58 24" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>' +
+        '<path d="M75 10 L62 24" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>' +
+        '<polygon points="60,20 55,32 60,42 65,32" fill="#E63946" stroke="'+s+'" stroke-width="2"/>' +
+        '<polygon points="56,42 64,42 70,90 60,98 50,90" fill="#E63946" stroke="'+s+'" stroke-width="2"/>');
+    case 'tie':
+      return svgWrap('<polygon points="60,15 51,28 60,38 69,28" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<polygon points="53,38 67,38 76,100 60,110 44,100" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>');
+    case 'skirt':
+      return svgWrap('<rect x="35" y="12" width="50" height="14" rx="6" fill="'+hex+'" stroke="'+s+'" stroke-width="3"/>' +
+        '<path d="M35 26 L85 26 L104 105 L16 105 Z" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>');
+    case 'shoes':
+      return svgWrap('<path d="M8 92 Q8 72 28 70 L52 70 Q62 70 62 82 L62 96 Q62 102 52 102 L14 102 Q6 102 8 92 Z" fill="'+hex+'" stroke="'+s+'" stroke-width="3"/>' +
+        '<path d="M58 92 Q58 72 78 70 L102 70 Q112 70 112 82 L112 96 Q112 102 102 102 L64 102 Q56 102 58 92 Z" fill="'+hex+'" stroke="'+s+'" stroke-width="3"/>');
+    case 'dress':
+      return svgWrap('<path d="M33 15 L45 8 L60 20 L75 8 L87 15 L94 32 L80 40 L96 108 L24 108 L40 40 L26 32 Z" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M45 10 L60 26 L75 10" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round"/>');
+    case 'pants':
+      return svgWrap('<path d="M26 12 H94 V34 L83 108 H63 L60 50 L57 108 H37 L26 34 Z" fill="'+hex+'" stroke="'+s+'" stroke-width="3" stroke-linejoin="round"/>');
+    default:
+      return svgWrap('<circle cx="60" cy="60" r="40" fill="'+hex+'" stroke="'+s+'" stroke-width="3"/>');
+  }
+}
+
+/* =========================================================
+   AUDIO
+========================================================= */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+  }
+  if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+  return audioCtx;
+}
+function beep(freq, dur, type, delay, vol){
+  if(state.muted) return;
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  const t0 = ctx.currentTime + (delay||0);
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(vol||0.2, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + (dur||0.15));
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + (dur||0.15) + 0.03);
+}
+function sfxCorrect(){ beep(660,0.12,'triangle',0,0.22); beep(880,0.16,'triangle',0.11,0.22); }
+function sfxWrong(){ beep(190,0.28,'sawtooth',0,0.16); }
+function sfxClick(){ beep(440,0.06,'square',0,0.08); }
+function sfxWin(){ [523,659,784,1047].forEach((f,i)=>beep(f,0.2,'triangle',i*0.14,0.22)); }
+function sfxMatch(){ beep(784,0.1,'triangle',0,0.2); beep(988,0.18,'triangle',0.1,0.2); }
+
+/* =========================================================
+   STATE
+========================================================= */
+const state = {
+  score:0,
+  stars:0,
+  hints:3,
+  muted:false,
+  currentGame:0, // 0 = home, 1-6 = game screens
+  gamesTotal:6,
+  results:[], // {correct,total}
+  startTime:null,
+  hintHandler:null
+};
+
+/* =========================================================
+   DOM REFS
+========================================================= */
+const homeScreen = document.getElementById('homeScreen');
+const gameScreen = document.getElementById('gameScreen');
+const resultsScreen = document.getElementById('resultsScreen');
+const gameArea = document.getElementById('gameArea');
+const gameDots = document.getElementById('gameDots');
+const progressPill = document.getElementById('progressPill');
+const starChip = document.getElementById('starChip');
+const scoreChip = document.getElementById('scoreChip');
+const hintBtn = document.getElementById('hintBtn');
+const hintCountEl = document.getElementById('hintCount');
+const muteBtn = document.getElementById('muteBtn');
+const toastEl = document.getElementById('toast');
+const confettiLayer = document.getElementById('confettiLayer');
+const homeProgressChip = document.getElementById('homeProgressChip');
+const homeStarsChip = document.getElementById('homeStarsChip');
+const homeScoreChip = document.getElementById('homeScoreChip');
+
+/* =========================================================
+   HEADER / TOAST / CONFETTI / FLOATING ICONS
+========================================================= */
+function bump(node){ node.classList.remove('bump'); void node.offsetWidth; node.classList.add('bump'); }
+
+function updateHeader(){
+  starChip.textContent = '⭐ ' + state.stars;
+  scoreChip.textContent = '🛍️ ' + state.score;
+  hintCountEl.textContent = state.hints;
+  hintBtn.disabled = state.hints<=0 || !state.hintHandler;
+  progressPill.textContent = state.currentGame===0 ? 'Ready to shop!' : ('Game ' + state.currentGame + ' of ' + state.gamesTotal);
+  homeProgressChip.textContent = 'Progress: Game ' + state.currentGame + ' of ' + state.gamesTotal;
+  homeStarsChip.textContent = '⭐ Stars: ' + state.stars;
+  homeScoreChip.textContent = '🛍️ Score: ' + state.score;
+  renderDots();
+}
+function addScore(pts, starsGained){
+  state.score += pts;
+  state.stars += (starsGained||0);
+  bump(scoreChip); bump(starChip);
+  updateHeader();
+}
+function renderDots(){
+  gameDots.innerHTML = '';
+  for(let i=1;i<=state.gamesTotal;i++){
+    const d = document.createElement('span');
+    if(i < state.currentGame) d.classList.add('done');
+    else if(i === state.currentGame) d.classList.add('now');
+    gameDots.appendChild(d);
+  }
+}
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>toastEl.classList.remove('show'), 1400);
+}
+function randomEncourage(){ return ENCOURAGE[rand(0,ENCOURAGE.length-1)]; }
+
+function confettiBurst(x,y,count){
+  const colors = ['#FF6FA5','#FFC94A','#4EA8DE','#2AC9B8','#7B5EA7','#FF6B6B'];
+  for(let i=0;i<(count||26);i++){
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = x+'px';
+    p.style.top = y+'px';
+    p.style.background = colors[rand(0,colors.length-1)];
+    p.style.setProperty('--dx', rand(-160,160)+'px');
+    p.style.setProperty('--dr', rand(180,720)+'deg');
+    p.style.animationDuration = rand(900,1600)+'ms';
+    confettiLayer.appendChild(p);
+    setTimeout(()=>p.remove(), 1700);
+  }
+}
+function confettiCenterBurst(){
+  confettiBurst(window.innerWidth/2, window.innerHeight/3, 40);
+}
+
+function initFloatingIcons(){
+  const layer = document.getElementById('floatingIcons');
+  const emojis = ['👕','👖','👗','👔','🧥','👟','🧦','👚'];
+  for(let i=0;i<10;i++){
+    const s = document.createElement('span');
+    s.textContent = emojis[rand(0,emojis.length-1)];
+    s.style.left = rand(0,96)+'%';
+    s.style.animationDuration = rand(14,26)+'s';
+    s.style.animationDelay = rand(0,20)+'s';
+    s.style.fontSize = rand(18,34)+'px';
+    layer.appendChild(s);
+  }
+}
+function initHomeGallery(){
+  const gal = document.getElementById('homeGallery');
+  pickN(CLOTHES,6).forEach(c=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'mini-icon';
+    wrap.innerHTML = garmentSVG(c.id, c.color);
+    gal.appendChild(wrap);
+  });
+}
+
+/* =========================================================
+   SCREEN NAVIGATION
+========================================================= */
+function showScreen(name){
+  [homeScreen, gameScreen, resultsScreen].forEach(s=>s.classList.remove('active'));
+  if(name==='home') homeScreen.classList.add('active');
+  if(name==='game') gameScreen.classList.add('active');
+  if(name==='results') resultsScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* =========================================================
+   HINT SYSTEM
+========================================================= */
+function useHint(){
+  if(state.hints<=0 || !state.hintHandler) return;
+  state.hints--;
+  sfxClick();
+  updateHeader();
+  state.hintHandler();
+}
+
+/* =========================================================
+   GAME FLOW CONTROL
+========================================================= */
+const GAME_TITLES = {
+  1:{name:'Shopping Bag Memory', emoji:'🛍️'},
+  2:{name:'Drag the Label', emoji:'🏷️'},
+  3:{name:'Dress the Customer', emoji:'🧍'},
+  4:{name:'Opposite Challenge', emoji:'🔄'},
+  5:{name:'Size Challenge', emoji:'📏'},
+  6:{name:'Shopping Speed Round', emoji:'⚡'}
+};
+
+function startGame(){
+  state.score=0; state.stars=0; state.hints=3; state.results=[]; state.currentGame=0;
+  state.startTime = Date.now();
+  updateHeader();
+  showScreen('game');
+  loadGame(1);
+}
+
+function loadGame(n){
+  state.currentGame = n;
+  state.hintHandler = null;
+  updateHeader();
+  gameArea.innerHTML = '';
+  sfxClick();
+  if(n===1) initGame1();
+  else if(n===2) initGame2();
+  else if(n===3) initGame3();
+  else if(n===4) initGame4();
+  else if(n===5) initGame5();
+  else if(n===6) initGame6();
+}
+
+function finishGame(gameNum, correct, total){
+  state.results[gameNum-1] = {correct:correct, total:total};
+  state.hintHandler = null;
+  updateHeader();
+  const pct = total>0 ? Math.round((correct/total)*100) : 100;
+  sfxWin();
+  confettiCenterBurst();
+  const card = el('div','game-card interstitial');
+  card.innerHTML =
+    '<div class="big-emoji">🎉</div>' +
+    '<h2>' + GAME_TITLES[gameNum].emoji + ' ' + GAME_TITLES[gameNum].name + ' Complete!</h2>' +
+    '<p>' + randomEncourage() + '</p>' +
+    '<div class="mini-stats">' +
+      '<div class="mini-stat">✅ ' + correct + '/' + total + ' correct</div>' +
+      '<div class="mini-stat">🎯 ' + pct + '% accuracy</div>' +
+      '<div class="mini-stat">🛍️ Score: ' + state.score + '</div>' +
+    '</div>';
+  const btn = el('button','btn btn-primary btn-lg', gameNum<6 ? 'Next Game ▶️' : 'See Results 🏁');
+  btn.type='button';
+  btn.addEventListener('click', ()=>{
+    sfxClick();
+    if(gameNum<6) loadGame(gameNum+1);
+    else showResults();
+  });
+  card.appendChild(btn);
+  gameArea.innerHTML = '';
+  gameArea.appendChild(card);
+}
+
+function gameHeader(gameNum, instructions, roundLabel){
+  const wrap = el('div','game-header');
+  wrap.innerHTML =
+    '<div><div class="game-title">' + GAME_TITLES[gameNum].emoji + ' Game ' + gameNum + ': ' + GAME_TITLES[gameNum].name + '</div>' +
+    '<div class="game-instructions">' + instructions + '</div></div>' +
+    (roundLabel ? '<div class="round-counter">' + roundLabel + '</div>' : '');
+  return wrap;
+}
+
+/* =========================================================
+   GAME 1 — SHOPPING BAG MEMORY
+========================================================= */
+function initGame1(){
+  const items = pickN(CLOTHES, 6);
+  let cardsData = [];
+  items.forEach(it=>{
+    cardsData.push({pairId:it.id, type:'pic', item:it});
+    cardsData.push({pairId:it.id, type:'word', item:it});
+  });
+  cardsData = shuffle(cardsData);
+
+  const card = el('div','game-card');
+  card.appendChild(gameHeader(1, 'Flip two cards to match each picture with its word.'));
+  const grid = el('div','memory-grid');
+  card.appendChild(grid);
+  gameArea.appendChild(card);
+
+  let flipped = [];
+  let matches = 0;
+  let attempts = 0;
+  let lock = false;
+
+  cardsData.forEach((data, idx)=>{
+    const cardEl = el('div','mem-card');
+    cardEl.dataset.idx = idx;
+    const inner = el('div','mem-card-inner');
+    const front = el('div','mem-face mem-front', String(idx+1));
+    const back = el('div','mem-face mem-back');
+    if(data.type==='pic'){
+      back.innerHTML = garmentSVG(data.item.id, data.item.color);
+    } else {
+      back.innerHTML = '<span class="mem-word">' + article(data.item) + '</span>';
+    }
+    inner.appendChild(front); inner.appendChild(back);
+    cardEl.appendChild(inner);
+    grid.appendChild(cardEl);
+
+    cardEl.addEventListener('click', ()=>{
+      if(lock || cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+      sfxClick();
+      cardEl.classList.add('flipped');
+      flipped.push({el:cardEl, data:data});
+      if(flipped.length===2){
+        attempts++;
+        lock = true;
+        const [a,b] = flipped;
+        if(a.data.pairId === b.data.pairId && a.data.type !== b.data.type){
+          setTimeout(()=>{
+            a.el.classList.add('matched'); b.el.classList.add('matched');
+            matches++;
+            sfxMatch();
+            const r = a.el.getBoundingClientRect();
+            confettiBurst(r.left+r.width/2, r.top+r.height/2, 14);
+            showToast('✔ Nice! ⭐⭐ +10 points');
+            addScore(10, 2);
+            flipped = [];
+            lock = false;
+            if(matches===items.length){
+              setTimeout(()=>finishGame(1, matches, items.length), 500);
+            }
+          }, 450);
+        } else {
+          setTimeout(()=>{
+            a.el.classList.remove('flipped'); b.el.classList.remove('flipped');
+            flipped = [];
+            lock = false;
+          }, 800);
+        }
+      }
+    });
+  });
+
+  state.hintHandler = function(){
+    const unmatched = Array.from(grid.children).filter(c=>!c.classList.contains('matched') && !c.classList.contains('flipped'));
+    if(unmatched.length===0) return;
+    const c = unmatched[rand(0,unmatched.length-1)];
+    c.classList.add('flipped');
+    setTimeout(()=>{ if(!c.classList.contains('matched')) c.classList.remove('flipped'); }, 900);
+    showToast('💡 Hint: peeking at a card!');
+  };
+}
+
+/* =========================================================
+   GAME 2 — DRAG THE LABEL
+========================================================= */
+function initGame2(){
+  const rounds = pickN(CLOTHES, 6);
+  let idx = 0;
+  let correctCount = 0;
+
+  const card = el('div','game-card');
+  gameArea.appendChild(card);
+
+  function renderRound(){
+    card.innerHTML = '';
+    card.appendChild(gameHeader(2, 'Drag the correct word onto the picture.', 'Item ' + (idx+1) + ' of ' + rounds.length));
+    const target = rounds[idx];
+    const distractors = pickN(CLOTHES.filter(c=>c.id!==target.id), 3);
+    const options = shuffle([target, ...distractors]);
+
+    const wrap = el('div','dragzone-wrap');
+    const drop = el('div','drop-target');
+    drop.innerHTML = garmentSVG(target.id, target.color);
+    wrap.appendChild(drop);
+    const chipsRow = el('div','chips-row');
+    wrap.appendChild(chipsRow);
+    card.appendChild(wrap);
+
+    let solved = false;
+
+    options.forEach(opt=>{
+      const chip = el('div','drag-chip', article(opt));
+      chip.dataset.id = opt.id;
+      chip.setAttribute('tabindex','0');
+      chipsRow.appendChild(chip);
+      attachDrag(chip, drop, opt.id===target.id, onDropResult);
+      chip.addEventListener('keydown', (e)=>{
+        if((e.key==='Enter' || e.key===' ') && !solved){
+          e.preventDefault();
+          onDropResult(opt.id===target.id, chip);
+        }
+      });
+    });
+
+    function onDropResult(isCorrect, chip){
+      if(solved) return;
+      if(isCorrect){
+        solved = true;
+        sfxCorrect();
+        drop.classList.add('correct');
+        chip.classList.add('placed');
+        const r = drop.getBoundingClientRect();
+        confettiBurst(r.left+r.width/2, r.top+r.height/2, 18);
+        showToast(randomEncourage() + ' +10 points');
+        addScore(10,1);
+        correctCount++;
+        setTimeout(nextRound, 900);
+      } else {
+        sfxWrong();
+        chip.classList.add('wrong-shake');
+        setTimeout(()=>chip.classList.remove('wrong-shake'), 400);
+      }
+    }
+
+    state.hintHandler = function(){
+      const chips = Array.from(chipsRow.children);
+      const wrongChips = chips.filter(c=>c.dataset.id!==target.id && !c.classList.contains('placed'));
+      if(wrongChips.length){
+        const c = wrongChips[0];
+        c.style.opacity='0.25';
+        c.style.pointerEvents='none';
+        showToast('💡 Hint: that label is not the one!');
+      }
+    };
+  }
+
+  function nextRound(){
+    idx++;
+    if(idx>=rounds.length){
+      finishGame(2, correctCount, rounds.length);
+    } else {
+      renderRound();
+    }
+  }
+
+  renderRound();
+}
+
+function attachDrag(chip, dropTarget, isCorrect, callback){
+  let startX=0, startY=0, origLeft=0, origTop=0, dragging=false;
+  chip.style.position = 'relative';
+
+  function pointerDown(e){
+    if(chip.classList.contains('placed')) return;
+    dragging = true;
+    chip.classList.add('dragging');
+    const evt = e.touches ? e.touches[0] : e;
+    startX = evt.clientX; startY = evt.clientY;
+    origLeft = 0; origTop = 0;
+    chip.style.zIndex = 10;
+    document.addEventListener('mousemove', pointerMove);
+    document.addEventListener('mouseup', pointerUp);
+    document.addEventListener('touchmove', pointerMove, {passive:false});
+    document.addEventListener('touchend', pointerUp);
+    e.preventDefault();
+  }
+  function pointerMove(e){
+    if(!dragging) return;
+    const evt = e.touches ? e.touches[0] : e;
+    const dx = evt.clientX - startX;
+    const dy = evt.clientY - startY;
+    chip.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    const dropRect = dropTarget.getBoundingClientRect();
+    const overIt = evt.clientX>dropRect.left && evt.clientX<dropRect.right && evt.clientY>dropRect.top && evt.clientY<dropRect.bottom;
+    dropTarget.classList.toggle('over', overIt);
+    if(e.cancelable) e.preventDefault();
+  }
+  function pointerUp(e){
+    if(!dragging) return;
+    dragging = false;
+    chip.classList.remove('dragging');
+    document.removeEventListener('mousemove', pointerMove);
+    document.removeEventListener('mouseup', pointerUp);
+    document.removeEventListener('touchmove', pointerMove);
+    document.removeEventListener('touchend', pointerUp);
+    const evt = e.changedTouches ? e.changedTouches[0] : e;
+    const dropRect = dropTarget.getBoundingClientRect();
+    const overIt = evt.clientX>dropRect.left && evt.clientX<dropRect.right && evt.clientY>dropRect.top && evt.clientY<dropRect.bottom;
+    dropTarget.classList.remove('over');
+    if(overIt){
+      callback(isCorrect, chip);
+      if(!isCorrect){
+        chip.style.transform = 'translate(0,0)';
+        chip.style.zIndex = '';
+      }
+    } else {
+      chip.style.transform = 'translate(0,0)';
+      chip.style.zIndex = '';
+    }
+  }
+  chip.addEventListener('mousedown', pointerDown);
+  chip.addEventListener('touchstart', pointerDown, {passive:false});
+}
+
+/* =========================================================
+   GAME 3 — DRESS THE CUSTOMER
+========================================================= */
+function initGame3(){
+  const rounds = shuffle(CUSTOMER_REQUESTS);
+  let idx = 0;
+  let firstTryCorrect = 0;
+
+  const card = el('div','game-card');
+  gameArea.appendChild(card);
+
+  function renderRound(){
+    card.innerHTML = '';
+    card.appendChild(gameHeader(3, 'Click the correct color, then click the correct clothing item.', 'Customer ' + (idx+1) + ' of ' + rounds.length));
+    const req = rounds[idx];
+    const clothingItem = clothingById(req.clothingId);
+    const colorItem = colorById(req.color);
+    let usedFirstTry = true;
+    let selColor = null, selCloth = null;
+
+    const custWrap = el('div','customer-wrap');
+    const face = el('div','customer-face', CUSTOMER_FACES[rand(0,CUSTOMER_FACES.length-1)]);
+    custWrap.appendChild(face);
+    const bubble = el('div','speech-bubble','"I need ' + (clothingItem.article? aOrAn(req.color)+' ':'') + req.color + ' ' + clothingItem.word + '."');
+    custWrap.appendChild(bubble);
+    card.appendChild(custWrap);
+
+    const colorSection = el('div','option-section');
+    colorSection.appendChild(el('div','option-label','1. Choose the color'));
+    const swatchRow = el('div','swatch-row');
+    colorSection.appendChild(swatchRow);
+    card.appendChild(colorSection);
+
+    const clothSection = el('div','option-section');
+    clothSection.appendChild(el('div','option-label','2. Choose the clothing'));
+    const iconRow = el('div','icon-row');
+    clothSection.appendChild(iconRow);
+    card.appendChild(clothSection);
+
+    const colorOpts = shuffle([colorItem, ...pickN(COLORS.filter(c=>c.id!==colorItem.id),5)]);
+    const clothOpts = shuffle([clothingItem, ...pickN(CLOTHES.filter(c=>c.id!==clothingItem.id),5)]);
+
+    colorOpts.forEach(c=>{
+      const b = el('button','swatch-btn');
+      b.type='button';
+      b.style.background = c.hex;
+      if(c.border) b.style.border = '3px solid #ccc';
+      b.setAttribute('aria-label', c.id);
+      b.title = c.id;
+      swatchRow.appendChild(b);
+      b.addEventListener('click', ()=>{
+        sfxClick();
+        Array.from(swatchRow.children).forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        selColor = c.id;
+        checkPair(b, null);
+      });
+    });
+    clothOpts.forEach(c=>{
+      const b = el('button','icon-choice');
+      b.type='button';
+      b.innerHTML = garmentSVG(c.id, '#B9A8DE');
+      b.setAttribute('aria-label', c.word);
+      b.title = c.word;
+      iconRow.appendChild(b);
+      b.addEventListener('click', ()=>{
+        sfxClick();
+        Array.from(iconRow.children).forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        selCloth = c.id;
+        checkPair(null, b);
+      });
+    });
+
+    function checkPair(colorBtnClicked, clothBtnClicked){
+      if(selColor===null || selCloth===null) return;
+      const colorBtn = swatchRow.querySelector('.selected');
+      const clothBtn = iconRow.querySelector('.selected');
+      if(selColor===req.color && selCloth===req.clothingId){
+        if(colorBtn) colorBtn.classList.add('correct-flash');
+        if(clothBtn) clothBtn.classList.add('correct-flash');
+        face.textContent = '😄';
+        sfxCorrect();
+        const r = custWrap.getBoundingClientRect();
+        confettiBurst(r.left+r.width/2, r.top, 22);
+        showToast(randomEncourage() + ' +10 points');
+        addScore(10,1);
+        if(usedFirstTry) firstTryCorrect++;
+        Array.from(swatchRow.children).forEach(b=>b.disabled=true);
+        Array.from(iconRow.children).forEach(b=>b.disabled=true);
+        setTimeout(nextRound, 1000);
+      } else {
+        usedFirstTry = false;
+        sfxWrong();
+        if(selColor!==req.color && colorBtn){ colorBtn.classList.add('wrong-flash'); setTimeout(()=>colorBtn.classList.remove('wrong-flash'),400); }
+        if(selCloth!==req.clothingId && clothBtn){ clothBtn.classList.add('wrong-flash'); setTimeout(()=>clothBtn.classList.remove('wrong-flash'),400); }
+      }
+    }
+
+    state.hintHandler = function(){
+      face.textContent = '🤔';
+      showToast('💡 Hint: they need the color "' + req.color + '"!');
+      setTimeout(()=>{ if(face.textContent==='🤔') face.textContent = CUSTOMER_FACES[0]; }, 1200);
+    };
+  }
+
+  function nextRound(){
+    idx++;
+    if(idx>=rounds.length){
+      finishGame(3, firstTryCorrect, rounds.length);
+    } else {
+      renderRound();
+    }
+  }
+
+  renderRound();
+}
+
+/* =========================================================
+   GAME 4 — OPPOSITE CHALLENGE
+========================================================= */
+function initGame4(){
+  let rounds = [];
+  OPPOSITES.forEach(pair=>{
+    rounds.push({prompt:pair[0], answer:pair[1]});
+    rounds.push({prompt:pair[1], answer:pair[0]});
+  });
+  rounds = shuffle(rounds);
+  const allWords = OPPOSITES.flat();
+  let idx = 0;
+  let firstTryCorrect = 0;
+
+  const card = el('div','game-card');
+  gameArea.appendChild(card);
+
+  function renderRound(){
+    card.innerHTML = '';
+    card.appendChild(gameHeader(4, 'Choose the word that means the opposite.', 'Word ' + (idx+1) + ' of ' + rounds.length));
+    const round = rounds[idx];
+    let usedFirstTry = true;
+    let solved = false;
+
+    card.appendChild(el('div','prompt-card', round.prompt));
+    const distractors = pickN(allWords.filter(w=>w!==round.answer && w!==round.prompt), 3);
+    const options = shuffle([round.answer, ...distractors]);
+    const grid = el('div','mcq-grid');
+    card.appendChild(grid);
+
+    options.forEach(opt=>{
+      const b = el('button','mcq-btn', opt);
+      b.type='button';
+      grid.appendChild(b);
+      b.addEventListener('click', ()=>{
+        if(solved) return;
+        if(opt===round.answer){
+          solved = true;
+          sfxCorrect();
+          b.classList.add('correct');
+          showToast(randomEncourage() + ' +10 points');
+          addScore(10,1);
+          if(usedFirstTry) firstTryCorrect++;
+          Array.from(grid.children).forEach(x=>x.classList.add('disabled-opt'));
+          const r = b.getBoundingClientRect();
+          confettiBurst(r.left+r.width/2, r.top, 14);
+          setTimeout(nextRound, 800);
+        } else {
+          usedFirstTry = false;
+          sfxWrong();
+          b.classList.add('wrong');
+          b.classList.add('disabled-opt');
+          setTimeout(()=>b.classList.remove('wrong'), 400);
+        }
+      });
+    });
+
+    state.hintHandler = function(){
+      const wrongBtns = Array.from(grid.children).filter(b=>b.textContent!==round.answer && !b.classList.contains('disabled-opt'));
+      if(wrongBtns.length){
+        wrongBtns[0].classList.add('disabled-opt');
+        showToast('💡 Hint: one wrong answer removed!');
+      }
+    };
+  }
+
+  function nextRound(){
+    idx++;
+    if(idx>=rounds.length){
+      finishGame(4, firstTryCorrect, rounds.length);
+    } else {
+      renderRound();
+    }
+  }
+
+  renderRound();
+}
+
+/* =========================================================
+   GAME 5 — SIZE CHALLENGE
+========================================================= */
+function initGame5(){
+  const totalRounds = 8;
+  let rounds = [];
+  for(let i=0;i<totalRounds;i++){
+    rounds.push({
+      clothing: CLOTHES[rand(0,CLOTHES.length-1)],
+      size: SIZES[rand(0,SIZES.length-1)],
+      format: i%2===0 ? 'A' : 'B'
+    });
+  }
+  let idx = 0;
+  let firstTryCorrect = 0;
+
+  const card = el('div','game-card');
+  gameArea.appendChild(card);
+
+  function renderRound(){
+    card.innerHTML = '';
+    card.appendChild(gameHeader(5, 'Read the size tag and choose the correct size.', 'Tag ' + (idx+1) + ' of ' + rounds.length));
+    const round = rounds[idx];
+    let usedFirstTry = true;
+    let solved = false;
+
+    const tagWrap = el('div','size-tag-wrap');
+    const tag = el('div','size-tag');
+    tag.innerHTML = '<span class="size-tag-text">' + SIZE_ABBR[round.size] + '</span>';
+    tagWrap.appendChild(tag);
+    card.appendChild(tagWrap);
+
+    if(round.format==='A'){
+      card.appendChild(el('div','speed-question-text','What size ' + beVerb(round.clothing) + ' ' + demoWord(round.clothing) + ' ' + round.clothing.word + '?'));
+    } else {
+      card.appendChild(el('div','size-sentence', demoWord(round.clothing).charAt(0).toUpperCase()+demoWord(round.clothing).slice(1) + ' ' + round.clothing.word + ' ' + beVerb(round.clothing) + ' <span class="blank">__________</span>.'));
+    }
+
+    const distractors = pickN(SIZES.filter(s=>s!==round.size), 3);
+    const options = shuffle([round.size, ...distractors]);
+    const grid = el('div','mcq-grid');
+    card.appendChild(grid);
+
+    options.forEach(opt=>{
+      const b = el('button','mcq-btn', opt);
+      b.type='button';
+      grid.appendChild(b);
+      b.addEventListener('click', ()=>{
+        if(solved) return;
+        if(opt===round.size){
+          solved = true;
+          sfxCorrect();
+          b.classList.add('correct');
+          showToast(randomEncourage() + ' +10 points');
+          addScore(10,1);
+          if(usedFirstTry) firstTryCorrect++;
+          Array.from(grid.children).forEach(x=>x.classList.add('disabled-opt'));
+          const r = b.getBoundingClientRect();
+          confettiBurst(r.left+r.width/2, r.top, 14);
+          setTimeout(nextRound, 800);
+        } else {
+          usedFirstTry = false;
+          sfxWrong();
+          b.classList.add('wrong');
+          b.classList.add('disabled-opt');
+          setTimeout(()=>b.classList.remove('wrong'), 400);
+        }
+      });
+    });
+
+    state.hintHandler = function(){
+      const wrongBtns = Array.from(grid.children).filter(b=>b.textContent!==round.size && !b.classList.contains('disabled-opt'));
+      if(wrongBtns.length){
+        wrongBtns[0].classList.add('disabled-opt');
+        showToast('💡 Hint: one wrong size removed!');
+      }
+    };
+  }
+
+  function nextRound(){
+    idx++;
+    if(idx>=rounds.length){
+      finishGame(5, firstTryCorrect, rounds.length);
+    } else {
+      renderRound();
+    }
+  }
+
+  renderRound();
+}
+
+/* =========================================================
+   GAME 6 — SHOPPING SPEED ROUND
+========================================================= */
+function initGame6(){
+  let timeLeft = 60;
+  let correct = 0, total = 0;
+  let timerInt = null;
+  let ended = false;
+
+  const card = el('div','game-card');
+  card.appendChild(gameHeader(6, 'Answer as many questions as you can before time runs out!'));
+  const timerWrap = el('div','timer-wrap');
+  const barBg = el('div','timer-bar-bg');
+  const barFill = el('div','timer-bar-fill');
+  barBg.appendChild(barFill);
+  const timerNum = el('div','timer-num','60s');
+  timerWrap.appendChild(barBg);
+  timerWrap.appendChild(timerNum);
+  card.appendChild(timerWrap);
+  const qArea = el('div');
+  card.appendChild(qArea);
+  gameArea.appendChild(card);
+
+  function buildQuestion(){
+    const type = ['identify','opposite','color','size'][rand(0,3)];
+    if(type==='identify'){
+      const target = CLOTHES[rand(0,CLOTHES.length-1)];
+      const opts = shuffle([target, ...pickN(CLOTHES.filter(c=>c.id!==target.id),3)]);
+      return {
+        render:function(container){
+          container.appendChild(el('div','speed-question-text','What is this?'));
+          const v = el('div','speed-visual');
+          v.innerHTML = garmentSVG(target.id, target.color);
+          container.appendChild(v);
+          const grid = el('div','mcq-grid');
+          opts.forEach(o=>{
+            const b = el('button','mcq-btn', article(o));
+            b.type='button';
+            b.addEventListener('click', ()=>answer(o.id===target.id, b));
+            grid.appendChild(b);
+          });
+          container.appendChild(grid);
+        }
+      };
+    }
+    if(type==='opposite'){
+      const pair = OPPOSITES[rand(0,OPPOSITES.length-1)];
+      const flip = Math.random()<0.5;
+      const prompt = flip ? pair[0] : pair[1];
+      const answerWord = flip ? pair[1] : pair[0];
+      const allWords = OPPOSITES.flat();
+      const opts = shuffle([answerWord, ...pickN(allWords.filter(w=>w!==answerWord && w!==prompt),3)]);
+      return {
+        render:function(container){
+          container.appendChild(el('div','speed-question-text','Choose the opposite of "' + prompt + '"'));
+          const grid = el('div','mcq-grid');
+          opts.forEach(o=>{
+            const b = el('button','mcq-btn', o);
+            b.type='button';
+            b.addEventListener('click', ()=>answer(o===answerWord, b));
+            grid.appendChild(b);
+          });
+          container.appendChild(grid);
+        }
+      };
+    }
+    if(type==='color'){
+      const target = COLORS[rand(0,COLORS.length-1)];
+      const opts = shuffle([target, ...pickN(COLORS.filter(c=>c.id!==target.id),3)]);
+      return {
+        render:function(container){
+          container.appendChild(el('div','speed-question-text','Select the correct color: "' + target.id + '"'));
+          const row = el('div','swatch-row');
+          opts.forEach(o=>{
+            const b = el('button','swatch-btn');
+            b.type='button';
+            b.style.background = o.hex;
+            if(o.border) b.style.border='3px solid #ccc';
+            b.addEventListener('click', ()=>answer(o.id===target.id, b));
+            row.appendChild(b);
+          });
+          container.appendChild(row);
+        }
+      };
+    }
+    // size
+    const size = SIZES[rand(0,SIZES.length-1)];
+    const opts = shuffle([size, ...pickN(SIZES.filter(s=>s!==size),3)]);
+    return {
+      render:function(container){
+        const tagWrap = el('div','size-tag-wrap');
+        const tag = el('div','size-tag');
+        tag.innerHTML = '<span class="size-tag-text">' + SIZE_ABBR[size] + '</span>';
+        tagWrap.appendChild(tag);
+        container.appendChild(tagWrap);
+        container.appendChild(el('div','speed-question-text','Choose the correct size'));
+        const grid = el('div','mcq-grid');
+        opts.forEach(o=>{
+          const b = el('button','mcq-btn', o);
+          b.type='button';
+          b.addEventListener('click', ()=>answer(o===size, b));
+          grid.appendChild(b);
+        });
+        container.appendChild(grid);
+      }
+    };
+  }
+
+  function answer(isCorrect, btnEl){
+    if(ended) return;
+    total++;
+    if(isCorrect){
+      correct++;
+      sfxCorrect();
+      addScore(15,1);
+      showToast(randomEncourage());
+      if(btnEl){
+        const r = btnEl.getBoundingClientRect();
+        confettiBurst(r.left+r.width/2, r.top, 10);
+      }
+    } else {
+      sfxWrong();
+    }
+    nextQuestion();
+  }
+
+  function nextQuestion(){
+    if(ended) return;
+    qArea.innerHTML = '';
+    const q = buildQuestion();
+    q.render(qArea);
+  }
+
+  state.hintHandler = function(){
+    const btns = qArea.querySelectorAll('.mcq-btn');
+    if(btns.length>2){
+      showToast('💡 Hint used! (speed round: think fast!)');
+    }
+  };
+
+  timerNum.textContent = timeLeft + 's';
+  timerInt = setInterval(()=>{
+    timeLeft--;
+    timerNum.textContent = timeLeft + 's';
+    barFill.style.width = (timeLeft/60*100) + '%';
+    if(timeLeft<=0){
+      clearInterval(timerInt);
+      ended = true;
+      finishGame(6, correct, total || 1);
+    }
+  }, 1000);
+
+  nextQuestion();
+}
+
+/* =========================================================
+   RESULTS SCREEN
+========================================================= */
+const BADGES = [
+  {id:'expert', emoji:'🏆', name:'Fashion Expert'},
+  {id:'clothing', emoji:'👕', name:'Clothing Master'},
+  {id:'color', emoji:'🌈', name:'Color Genius'},
+  {id:'speed', emoji:'⚡', name:'Speed Shopper'},
+  {id:'vocab', emoji:'✨', name:'Vocabulary Star'}
+];
+
+function computeBadges(){
+  const r = state.results;
+  const earned = [];
+  const g1 = r[0]||{correct:0,total:1}, g2 = r[1]||{correct:0,total:1};
+  const g3 = r[2]||{correct:0,total:1}, g4 = r[3]||{correct:0,total:1};
+  const g6 = r[5]||{correct:0,total:1};
+
+  const clothingAcc = ((g1.correct+g2.correct)/(g1.total+g2.total))*100;
+  const colorAcc = (g3.correct/g3.total)*100;
+  const vocabAcc = (g4.correct/g4.total)*100;
+  let totalCorrect=0, totalQ=0;
+  r.forEach(x=>{ if(x){ totalCorrect+=x.correct; totalQ+=x.total; } });
+  const overallAcc = totalQ>0 ? (totalCorrect/totalQ)*100 : 0;
+
+  if(overallAcc>=90) earned.push('expert');
+  if(clothingAcc>=85) earned.push('clothing');
+  if(colorAcc>=85) earned.push('color');
+  if(g6.correct>=12) earned.push('speed');
+  if(vocabAcc>=85) earned.push('vocab');
+
+  return {earned, overallAcc};
+}
+
+function showResults(){
+  const {earned, overallAcc} = computeBadges();
+  const elapsed = Math.round((Date.now()-state.startTime)/1000);
+  const starsFinal = overallAcc>=90 ? 3 : (overallAcc>=70 ? 2 : 1);
+
+  document.getElementById('resultsStars').textContent = '⭐'.repeat(starsFinal) + '☆'.repeat(3-starsFinal);
+  document.getElementById('resultsScore').textContent = state.score;
+  document.getElementById('resultAccuracy').textContent = Math.round(overallAcc) + '%';
+  document.getElementById('resultTime').textContent = fmtTime(elapsed);
+
+  let msg;
+  if(overallAcc>=90) msg = "Amazing! You're a true fashion vocabulary star! ✨";
+  else if(overallAcc>=70) msg = 'Fantastic job shopping through this challenge! 🛍️';
+  else msg = "Great effort! Keep practicing and you'll be a pro shopper! 💪";
+  document.getElementById('resultsMessage').textContent = msg;
+
+  const grid = document.getElementById('badgeGrid');
+  grid.innerHTML = '';
+  if(earned.length===0){
+    grid.appendChild(el('div','no-badges','No badges yet — play again to earn some!'));
+  } else {
+    earned.forEach(id=>{
+      const b = BADGES.find(x=>x.id===id);
+      const box = el('div','badge');
+      box.innerHTML = '<div class="badge-emoji">' + b.emoji + '</div><div class="badge-name">' + b.name + '</div>';
+      grid.appendChild(box);
+    });
+  }
+
+  sfxWin();
+  confettiCenterBurst();
+  showScreen('results');
+  state.currentGame = 0;
+  updateHeader();
+}
+
+/* =========================================================
+   EVENT WIRING
+========================================================= */
+document.getElementById('startBtn').addEventListener('click', ()=>{ sfxClick(); startGame(); });
+document.getElementById('instructionsBtn').addEventListener('click', ()=>{
+  sfxClick();
+  document.getElementById('instructionsModal').classList.add('active');
+});
+document.getElementById('closeInstructions').addEventListener('click', ()=>{
+  sfxClick();
+  document.getElementById('instructionsModal').classList.remove('active');
+});
+document.getElementById('instructionsModal').addEventListener('click', (e)=>{
+  if(e.target.id==='instructionsModal') document.getElementById('instructionsModal').classList.remove('active');
+});
+document.getElementById('playAgainBtn').addEventListener('click', ()=>{
+  sfxClick();
+  showScreen('home');
+  state.currentGame = 0;
+  updateHeader();
+});
+hintBtn.addEventListener('click', useHint);
+muteBtn.addEventListener('click', ()=>{
+  state.muted = !state.muted;
+  muteBtn.textContent = state.muted ? '🔇' : '🔊';
+  if(!state.muted) sfxClick();
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+initFloatingIcons();
+initHomeGallery();
+updateHeader();
+
+})();
+</script>
+</body>
+</html>
