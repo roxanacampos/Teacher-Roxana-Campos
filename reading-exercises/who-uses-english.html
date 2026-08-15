@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who Uses English?</title>
+<style>
+  :root{
+    --teal:#0d9488;
+    --teal-light:#14b8a6;
+    --coral:#f97362;
+    --coral-light:#ff8a75;
+    --purple:#7c6ff0;
+    --purple-light:#9b8fff;
+    --yellow:#fbbf24;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --green:#10b981;
+    --red:#ef4444;
+    --radius:18px;
+    --shadow: 0 8px 24px rgba(31,41,55,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Verdana, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(124,111,240,0.10), transparent 40%),
+      radial-gradient(circle at 90% 20%, rgba(249,115,98,0.10), transparent 40%),
+      var(--bg);
+    color:var(--ink);
+    padding-bottom:60px;
+  }
+  header.top{
+    text-align:center;
+    padding:38px 20px 26px;
+    background:linear-gradient(135deg, var(--teal) 0%, var(--purple) 100%);
+    color:#fff;
+    border-bottom-left-radius:32px;
+    border-bottom-right-radius:32px;
+    box-shadow:var(--shadow);
+  }
+  header.top h1{
+    margin:0 0 8px;
+    font-size:2.1rem;
+    letter-spacing:.5px;
+  }
+  header.top p.subtitle{
+    margin:0 0 14px;
+    font-size:1.1rem;
+    opacity:.95;
+  }
+  header.top p.instruction{
+    display:inline-block;
+    background:rgba(255,255,255,0.18);
+    padding:8px 18px;
+    border-radius:999px;
+    font-size:.95rem;
+    font-weight:600;
+  }
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 18px;
+  }
+  section{
+    margin-top:36px;
+  }
+  h2.section-title{
+    font-size:1.4rem;
+    margin-bottom:4px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  p.section-sub{
+    color:var(--muted);
+    margin-top:0;
+    margin-bottom:18px;
+    font-size:.98rem;
+  }
+
+  /* Reading cards */
+  .reading-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    gap:20px;
+  }
+  .person-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px;
+    border-top:8px solid var(--teal);
+  }
+  .person-card.yuan{border-top-color:var(--coral);}
+  .person-card.marcus{border-top-color:var(--purple);}
+  .person-card h3{
+    margin:0 0 4px;
+    font-size:1.2rem;
+  }
+  .person-tags{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .tag{
+    font-size:.78rem;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#eef2ff;
+    color:var(--purple);
+  }
+  .tag.country{background:#e0f2f1;color:var(--teal);}
+  .tag.job{background:#fff1ee;color:var(--coral);}
+  .person-card p.body-text{
+    font-size:.92rem;
+    line-height:1.55;
+    color:#374151;
+    margin:0;
+  }
+
+  /* Question blocks */
+  .q-block{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:16px 20px;
+    margin-bottom:14px;
+  }
+  .q-text{
+    font-weight:600;
+    margin-bottom:12px;
+    font-size:1.02rem;
+  }
+  .choice-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .choice-btn{
+    border:2px solid #e5e7eb;
+    background:#fafafa;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:.95rem;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--ink);
+    transition:all .15s ease;
+  }
+  .choice-btn:hover{border-color:var(--purple-light);}
+  .choice-btn.correct{background:var(--green);border-color:var(--green);color:#fff;}
+  .choice-btn.incorrect{background:var(--red);border-color:var(--red);color:#fff;}
+  .choice-btn:disabled{cursor:default;opacity:.85;}
+  .feedback{
+    margin-top:10px;
+    font-weight:700;
+    font-size:.95rem;
+    min-height:20px;
+  }
+  .feedback.correct-text{color:var(--green);}
+  .feedback.incorrect-text{color:var(--red);}
+
+  /* True False */
+  .tf-btn.TRUE{background:#e6fff5;}
+  .tf-btn.FALSE{background:#ffecec;}
+
+  /* Matching */
+  .match-wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:640px){
+    .match-wrap{grid-template-columns:1fr;}
+  }
+  .chip-col h4, .name-col h4{
+    margin:0 0 10px;
+    font-size:.95rem;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .fact-chip{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:var(--card);
+    border:2px solid #e5e7eb;
+    border-radius:12px;
+    padding:12px 16px;
+    margin-bottom:10px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .fact-chip.selected{border-color:var(--purple);background:#f3f1ff;}
+  .fact-chip.matched-correct{border-color:var(--green);background:#e9fbf3;color:var(--green);cursor:default;}
+  .fact-chip.matched-wrong-flash{border-color:var(--red);background:#fff0f0;}
+  .name-btn{
+    display:block;
+    width:100%;
+    background:linear-gradient(135deg, var(--teal-light), var(--purple-light));
+    color:#fff;
+    border:none;
+    padding:14px 16px;
+    border-radius:12px;
+    margin-bottom:10px;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  .name-btn:hover{opacity:.9;}
+  .match-hint{
+    font-size:.85rem;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+
+  /* Vocabulary */
+  .vocab-card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:16px 20px;
+    margin-bottom:14px;
+  }
+  .vocab-word{
+    font-weight:800;
+    color:var(--teal);
+    font-size:1.05rem;
+    margin-bottom:10px;
+  }
+  .vocab-options label{
+    display:block;
+    padding:9px 12px;
+    border-radius:10px;
+    background:#fafafa;
+    border:2px solid #eee;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-size:.93rem;
+  }
+  .vocab-options label:hover{border-color:var(--purple-light);}
+  .vocab-options input{margin-right:8px;}
+
+  .big-btn{
+    display:block;
+    margin:20px auto 0;
+    background:linear-gradient(135deg, var(--coral), var(--purple));
+    color:#fff;
+    border:none;
+    padding:14px 34px;
+    border-radius:999px;
+    font-size:1.05rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .big-btn:hover{opacity:.92;}
+
+  /* Score */
+  .score-box{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px;
+    text-align:center;
+  }
+  .score-rows{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px;
+    margin:20px 0;
+  }
+  .score-row{
+    background:#f9fafb;
+    border-radius:12px;
+    padding:14px;
+  }
+  .score-row .label{font-size:.85rem;color:var(--muted);font-weight:600;}
+  .score-row .value{font-size:1.5rem;font-weight:800;color:var(--purple);}
+  .total-row{
+    background:linear-gradient(135deg, var(--teal), var(--purple));
+    color:#fff;
+    border-radius:14px;
+    padding:20px;
+    margin-top:6px;
+  }
+  .total-row .label{color:rgba(255,255,255,0.85);}
+  .total-row .value{color:#fff;font-size:2rem;}
+  #encourage{
+    margin-top:14px;
+    font-size:1.2rem;
+    font-weight:700;
+  }
+  #resetBtn{
+    background:linear-gradient(135deg, var(--red), var(--coral));
+    font-size:1.1rem;
+    padding:16px 40px;
+  }
+
+  .locked-note{
+    font-size:.85rem;
+    color:var(--muted);
+    text-align:center;
+    margin-top:6px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Who Uses English?</h1>
+  <p class="subtitle">Read about three people who use English in different ways.</p>
+  <p class="instruction">📖 Read the profiles and complete the activities.</p>
+</header>
+
+<main>
+
+  <!-- READING -->
+  <section id="reading">
+    <h2 class="section-title">📚 Reading</h2>
+    <p class="section-sub">Read about Leticia, Yuan, and Marcus.</p>
+    <div class="reading-grid">
+
+      <div class="person-card leticia">
+        <h3>Leticia Marques</h3>
+        <div class="person-tags">
+          <span class="tag country">🇧🇷 Brazil</span>
+          <span class="tag job">💼 Financial manager</span>
+        </div>
+        <p class="body-text"><strong>MEET LETICIA MARQUES.</strong> She works as a financial manager for a Swedish automotive company in Curitiba, Brazil, where she was born and raised. She is single and lives with her parents. "I use English every day," Ms. Marques says. "We use it in most of our e-mails and meetings and for calls to Sweden, the U.S., and France." In her free time, she likes to watch DVDs in English. "It's good for my pronunciation," she says.</p>
+      </div>
+
+      <div class="person-card yuan">
+        <h3>Yuan Yong Jing</h3>
+        <div class="person-tags">
+          <span class="tag country">🇨🇳 China</span>
+          <span class="tag job">💼 Manager</span>
+        </div>
+        <p class="body-text"><strong>THIS IS YUAN YONG JING</strong>, his wife, Zheng Yang, and their son, Yuan Bao. They live in Beijing, China. Mr. Yuan, a manager, is originally from Weihai, a small seaside city in Shandong Province. His wife is a teacher, and their son is a middle-school student. "Our company provides tour guides to foreign businesspeople who visit China, so English is very important for my work," he says. At home, Mr. Yuan enjoys watching English-language TV and listening to English-language radio.</p>
+      </div>
+
+      <div class="person-card marcus">
+        <h3>Marcus Stolze</h3>
+        <div class="person-tags">
+          <span class="tag country">🇨🇭 Switzerland</span>
+          <span class="tag job">💼 IT researcher</span>
+        </div>
+        <p class="body-text"><strong>MEET MARCUS STOLZE</strong>, an information technology researcher. Mr. Stolze lives with his wife, Thérèse, and children, Lena and Jan, in Rüti, a small town in Switzerland. Mr. Stolze is originally from Brilon, Germany. Thérèse is an English teacher and speaks four languages. Their children are also multilingual. "At work, we use English a lot because we communicate with people who speak many different languages," he says. "Also, most good books on computing are in English," he adds.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WHO IS IT -->
+  <section id="whoisit">
+    <h2 class="section-title">🔎 Who Is It?</h2>
+    <p class="section-sub">Choose the correct person for each question.</p>
+    <div id="whoisit-container"></div>
+  </section>
+
+  <!-- TRUE FALSE -->
+  <section id="truefalse">
+    <h2 class="section-title">✅ True or False</h2>
+    <p class="section-sub">Click TRUE or FALSE.</p>
+    <div id="tf-container"></div>
+  </section>
+
+  <!-- MATCHING -->
+  <section id="matching">
+    <h2 class="section-title">🧩 Find the Information</h2>
+    <p class="section-sub">Click a fact. Then click the correct name.</p>
+    <p class="match-hint">Example: click "Brazil" 👉 then click "Leticia".</p>
+    <div class="match-wrap">
+      <div class="chip-col">
+        <h4>Facts</h4>
+        <div id="chip-container"></div>
+      </div>
+      <div class="name-col">
+        <h4>Names</h4>
+        <div id="name-container">
+          <button class="name-btn" data-name="Leticia">Leticia</button>
+          <button class="name-btn" data-name="Yuan">Yuan</button>
+          <button class="name-btn" data-name="Marcus">Marcus</button>
+        </div>
+        <div class="feedback" id="match-feedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOCAB -->
+  <section id="vocab">
+    <h2 class="section-title">🧠 Quick Vocabulary</h2>
+    <p class="section-sub">Choose the correct meaning for each word.</p>
+    <div id="vocab-container"></div>
+    <button class="big-btn" id="checkVocabBtn">Check Answers ✔️</button>
+  </section>
+
+  <!-- SCORE -->
+  <section id="score">
+    <h2 class="section-title">🏆 My Score</h2>
+    <div class="score-box">
+      <div class="score-rows">
+        <div class="score-row"><div class="label">Who is it?</div><div class="value" id="score-whoisit">0 / 6</div></div>
+        <div class="score-row"><div class="label">True / False</div><div class="value" id="score-tf">0 / 6</div></div>
+        <div class="score-row"><div class="label">Find the Info</div><div class="value" id="score-match">0 / 6</div></div>
+        <div class="score-row"><div class="label">Vocabulary</div><div class="value" id="score-vocab">0 / 6</div></div>
+      </div>
+      <div class="total-row">
+        <div class="label">TOTAL SCORE</div>
+        <div class="value" id="score-total">0 / 24</div>
+      </div>
+      <div id="encourage"></div>
+      <button class="big-btn" id="resetBtn">🔄 RESET ACTIVITY</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ================= DATA ================= */
+const whoIsItData = [
+  {q:"Who works for an automotive company?", a:"Leticia"},
+  {q:"Who lives in China?", a:"Yuan"},
+  {q:"Who is an IT researcher?", a:"Marcus"},
+  {q:"Who watches English-language TV?", a:"Yuan"},
+  {q:"Who uses English to communicate with people from different countries?", a:"Marcus"},
+  {q:"Who watches DVDs in English?", a:"Leticia"},
+];
+
+const tfData = [
+  {s:"Leticia is from Brazil.", a:true},
+  {s:"Yuan lives in Switzerland.", a:false},
+  {s:"Marcus works in information technology.", a:true},
+  {s:"Yuan watches English-language TV.", a:true},
+  {s:"Leticia uses English every day.", a:true},
+  {s:"Marcus's wife speaks four languages.", a:true},
+];
+
+const matchData = [
+  {fact:"Brazil", name:"Leticia"},
+  {fact:"Financial manager", name:"Leticia"},
+  {fact:"China", name:"Yuan"},
+  {fact:"Manager", name:"Yuan"},
+  {fact:"Switzerland", name:"Marcus"},
+  {fact:"IT researcher", name:"Marcus"},
+];
+
+const vocabData = [
+  {word:"manager", correct:"A person who controls a business or department", options:["A person who controls a business or department","A person who fixes computers","A person who cooks food"]},
+  {word:"company", correct:"A business that sells goods or services", options:["A group of friends","A business that sells goods or services","A type of car"]},
+  {word:"foreign", correct:"From another country", options:["Very old","From another country","Very expensive"]},
+  {word:"guide", correct:"A person who shows tourists around a place", options:["A person who shows tourists around a place","A person who teaches math","A person who drives a taxi"]},
+  {word:"researcher", correct:"A person who studies something to learn new things", options:["A person who sells things","A person who cleans offices","A person who studies something to learn new things"]},
+  {word:"multilingual", correct:"Able to speak many languages", options:["Able to cook many foods","Able to play many sports","Able to speak many languages"]},
+];
+
+/* ================= SCORES ================= */
+let scores = { whoisit:0, tf:0, match:0, vocab:0 };
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ================= WHO IS IT ================= */
+function buildWhoIsIt(){
+  const container = document.getElementById('whoisit-container');
+  container.innerHTML = '';
+  whoIsItData.forEach((item, idx)=>{
+    const block = document.createElement('div');
+    block.className='q-block';
+    block.innerHTML = `
+      <div class="q-text">${idx+1}. ${item.q}</div>
+      <div class="choice-row">
+        <button class="choice-btn" data-choice="Leticia">Leticia</button>
+        <button class="choice-btn" data-choice="Yuan">Yuan</button>
+        <button class="choice-btn" data-choice="Marcus">Marcus</button>
+      </div>
+      <div class="feedback"></div>
+    `;
+    const feedback = block.querySelector('.feedback');
+    block.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const choice = btn.getAttribute('data-choice');
+        const buttons = block.querySelectorAll('.choice-btn');
+        buttons.forEach(b=>b.disabled=true);
+        if(choice === item.a){
+          btn.classList.add('correct');
+          feedback.textContent = "Correct! 🎉";
+          feedback.className='feedback correct-text';
+          scores.whoisit++;
+        } else {
+          btn.classList.add('incorrect');
+          buttons.forEach(b=>{
+            if(b.getAttribute('data-choice')===item.a) b.classList.add('correct');
+          });
+          feedback.textContent = "Try again!";
+          feedback.className='feedback incorrect-text';
+        }
+        updateScoreDisplay();
+      });
+    });
+    container.appendChild(block);
+  });
+}
+
+/* ================= TRUE / FALSE ================= */
+function buildTF(){
+  const container = document.getElementById('tf-container');
+  container.innerHTML = '';
+  tfData.forEach((item, idx)=>{
+    const block = document.createElement('div');
+    block.className='q-block';
+    block.innerHTML = `
+      <div class="q-text">${idx+1}. ${item.s}</div>
+      <div class="choice-row">
+        <button class="choice-btn tf-btn TRUE" data-choice="true">TRUE</button>
+        <button class="choice-btn tf-btn FALSE" data-choice="false">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    `;
+    const feedback = block.querySelector('.feedback');
+    block.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const choice = btn.getAttribute('data-choice') === 'true';
+        const buttons = block.querySelectorAll('.choice-btn');
+        buttons.forEach(b=>b.disabled=true);
+        if(choice === item.a){
+          btn.classList.add('correct');
+          feedback.textContent = "Correct! 🎉";
+          feedback.className='feedback correct-text';
+          scores.tf++;
+        } else {
+          btn.classList.add('incorrect');
+          buttons.forEach(b=>{
+            const bChoice = b.getAttribute('data-choice') === 'true';
+            if(bChoice === item.a) b.classList.add('correct');
+          });
+          feedback.textContent = "Try again!";
+          feedback.className='feedback incorrect-text';
+        }
+        updateScoreDisplay();
+      });
+    });
+    container.appendChild(block);
+  });
+}
+
+/* ================= MATCHING ================= */
+let selectedChip = null;
+
+function buildMatching(){
+  const chipContainer = document.getElementById('chip-container');
+  chipContainer.innerHTML = '';
+  selectedChip = null;
+  const feedback = document.getElementById('match-feedback');
+  feedback.textContent = '';
+
+  const shuffledFacts = shuffle(matchData);
+
+  shuffledFacts.forEach(item=>{
+    const chip = document.createElement('button');
+    chip.className='fact-chip';
+    chip.textContent = item.fact;
+    chip.dataset.fact = item.fact;
+    chip.dataset.name = item.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('matched-correct')) return;
+      document.querySelectorAll('.fact-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedChip = chip;
+      feedback.textContent = 'Now click the correct name.';
+      feedback.className = 'feedback';
+    });
+    chipContainer.appendChild(chip);
+  });
+
+  document.querySelectorAll('.name-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(!selectedChip){
+        feedback.textContent = 'Click a fact first!';
+        feedback.className = 'feedback incorrect-text';
+        return;
+      }
+      const chosenName = btn.getAttribute('data-name');
+      if(selectedChip.dataset.name === chosenName){
+        selectedChip.classList.remove('selected');
+        selectedChip.classList.add('matched-correct');
+        selectedChip.textContent = selectedChip.dataset.fact + " ✅ " + chosenName;
+        feedback.textContent = 'Correct! 🎉';
+        feedback.className = 'feedback correct-text';
+        scores.match++;
+        selectedChip = null;
+      } else {
+        selectedChip.classList.add('matched-wrong-flash');
+        setTimeout(()=>{ selectedChip && selectedChip.classList.remove('matched-wrong-flash'); }, 500);
+        feedback.textContent = 'Try again!';
+        feedback.className = 'feedback incorrect-text';
+      }
+      updateScoreDisplay();
+    };
+  });
+}
+
+/* ================= VOCAB ================= */
+function buildVocab(){
+  const container = document.getElementById('vocab-container');
+  container.innerHTML = '';
+  vocabData.forEach((item, idx)=>{
+    const card = document.createElement('div');
+    card.className='vocab-card';
+    const optionsShuffled = shuffle(item.options);
+    let optionsHTML = '';
+    optionsShuffled.forEach((opt, i)=>{
+      optionsHTML += `
+        <label>
+          <input type="radio" name="vocab-${idx}" value="${opt}">
+          ${opt}
+        </label>
+      `;
+    });
+    card.innerHTML = `
+      <div class="vocab-word">${idx+1}. ${item.word}</div>
+      <div class="vocab-options">${optionsHTML}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+document.getElementById('checkVocabBtn').addEventListener('click', ()=>{
+  let correctCount = 0;
+  vocabData.forEach((item, idx)=>{
+    const selected = document.querySelector(`input[name="vocab-${idx}"]:checked`);
+    const labels = document.querySelectorAll(`input[name="vocab-${idx}"]`);
+    labels.forEach(inp=>{
+      inp.disabled = true;
+      const label = inp.parentElement;
+      if(inp.value === item.correct){
+        label.style.borderColor = 'var(--green)';
+        label.style.background = '#e9fbf3';
+      }
+    });
+    if(selected){
+      if(selected.value === item.correct){
+        correctCount++;
+      } else {
+        selected.parentElement.style.borderColor = 'var(--red)';
+        selected.parentElement.style.background = '#fff0f0';
+      }
+    }
+  });
+  scores.vocab = correctCount;
+  document.getElementById('checkVocabBtn').disabled = true;
+  document.getElementById('checkVocabBtn').textContent = 'Answers Checked ✔️';
+  updateScoreDisplay();
+});
+
+/* ================= SCORE DISPLAY ================= */
+function updateScoreDisplay(){
+  document.getElementById('score-whoisit').textContent = `${scores.whoisit} / 6`;
+  document.getElementById('score-tf').textContent = `${scores.tf} / 6`;
+  document.getElementById('score-match').textContent = `${scores.match} / 6`;
+  document.getElementById('score-vocab').textContent = `${scores.vocab} / 6`;
+  const total = scores.whoisit + scores.tf + scores.match + scores.vocab;
+  document.getElementById('score-total').textContent = `${total} / 24`;
+
+  const encourage = document.getElementById('encourage');
+  if(total === 24){
+    encourage.textContent = 'Excellent! 🌟';
+  } else if(total >= 17){
+    encourage.textContent = 'Great job! 👏';
+  } else if(total > 0){
+    encourage.textContent = 'Good work! Keep practicing! 💪';
+  } else {
+    encourage.textContent = '';
+  }
+}
+
+/* ================= RESET ================= */
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  scores = { whoisit:0, tf:0, match:0, vocab:0 };
+  document.getElementById('checkVocabBtn').disabled = false;
+  document.getElementById('checkVocabBtn').textContent = 'Check Answers ✔️';
+  buildWhoIsIt();
+  buildTF();
+  buildMatching();
+  buildVocab();
+  updateScoreDisplay();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* ================= INIT ================= */
+buildWhoIsIt();
+buildTF();
+buildMatching();
+buildVocab();
+updateScoreDisplay();
+</script>
+
+</body>
+</html>
