@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditionals in Action — B1 English Activity</title>
+<style>
+  :root{
+    --primary:#4f46e5;
+    --primary-dark:#3730a3;
+    --accent:#0d9488;
+    --accent-light:#ccfbf1;
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --border:#e2e6f0;
+    --correct:#15803d;
+    --correct-bg:#dcfce7;
+    --incorrect:#b91c1c;
+    --incorrect-bg:#fee2e2;
+    --radius:16px;
+    --shadow:0 4px 18px rgba(31,41,55,0.08);
+    --shadow-lg:0 12px 32px rgba(31,41,55,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.55;
+  }
+  header.top{
+    background:linear-gradient(120deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color:#fff;
+    padding:36px 20px 28px;
+    text-align:center;
+  }
+  header.top h1{
+    margin:0 0 6px;
+    font-size:clamp(1.5rem, 3vw, 2.1rem);
+    letter-spacing:0.3px;
+  }
+  header.top p{
+    margin:0;
+    opacity:0.9;
+    font-size:1rem;
+  }
+  nav.tabs{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:22px;
+    flex-wrap:wrap;
+  }
+  nav.tabs button{
+    background:rgba(255,255,255,0.14);
+    border:1.5px solid rgba(255,255,255,0.55);
+    color:#fff;
+    padding:10px 22px;
+    border-radius:999px;
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .2s ease;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  nav.tabs button:hover{background:rgba(255,255,255,0.26);}
+  nav.tabs button.active{background:#fff;color:var(--primary-dark);border-color:#fff;}
+
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:26px 18px 60px;
+  }
+  .panel{display:none;}
+  .panel.visible{display:block;animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .step-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:24px 22px;
+    margin-bottom:22px;
+    border:1px solid var(--border);
+  }
+  .step-card h2{
+    margin:0 0 4px;
+    font-size:1.2rem;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--primary-dark);
+  }
+  .step-num{
+    background:var(--primary);
+    color:#fff;
+    width:30px;height:30px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.9rem;flex-shrink:0;
+  }
+  .step-card p.instructions{
+    color:var(--muted);
+    margin:6px 0 18px;
+    font-size:0.96rem;
+  }
+
+  /* Audio players */
+  .audio-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    gap:14px;
+  }
+  .audio-card{
+    background:#f8f9fd;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+  }
+  .audio-card .label{
+    display:flex;align-items:center;gap:8px;
+    font-weight:600;margin-bottom:10px;color:var(--primary-dark);
+  }
+  .audio-card audio{width:100%;}
+  .audio-card small{color:var(--muted);display:block;margin-top:6px;}
+
+  /* Multiple choice */
+  .mc-item{margin-bottom:18px;}
+  .mc-question{font-weight:600;margin-bottom:10px;}
+  .mc-options{display:flex;flex-direction:column;gap:8px;}
+  .mc-option{
+    border:1.5px solid var(--border);
+    background:#fbfbfe;
+    border-radius:10px;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:all .15s ease;
+    font-size:0.96rem;
+  }
+  .mc-option:hover{border-color:var(--primary);background:#f0f0ff;}
+  .mc-option.selected{border-color:var(--primary);background:#e8e7ff;font-weight:600;}
+  .mc-option.correct{border-color:var(--correct);background:var(--correct-bg);color:var(--correct);font-weight:600;}
+  .mc-option.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);color:var(--incorrect);}
+
+  /* Gap fill (If/When) */
+  .gap-item{
+    display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+    padding:12px 14px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;background:#fbfbfe;
+  }
+  .gap-item .sentence{flex:1;min-width:220px;font-size:0.98rem;}
+  .gap-choice-group{display:flex;gap:6px;}
+  .gap-choice{
+    border:1.5px solid var(--border);background:#fff;border-radius:8px;
+    padding:6px 14px;cursor:pointer;font-weight:600;color:var(--text);
+  }
+  .gap-choice.selected{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .gap-choice.correct{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .gap-choice.incorrect{background:var(--incorrect-bg);border-color:var(--incorrect);color:var(--incorrect);}
+
+  /* Classify (fact/future/past) */
+  .classify-item{
+    padding:12px 14px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;background:#fbfbfe;
+  }
+  .classify-item .sentence{font-size:0.98rem;margin-bottom:10px;}
+  .classify-options{display:flex;gap:8px;flex-wrap:wrap;}
+  .classify-btn{
+    border:1.5px solid var(--border);background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:0.9rem;
+  }
+  .classify-btn.selected{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .classify-btn.correct{background:var(--correct-bg);border-color:var(--correct);color:var(--correct);}
+  .classify-btn.incorrect{background:var(--incorrect-bg);border-color:var(--incorrect);color:var(--incorrect);}
+
+  /* Sentence builder */
+  .builder-item{
+    border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;background:#fbfbfe;
+  }
+  .builder-answer{
+    min-height:46px;
+    border:2px dashed var(--border);
+    border-radius:10px;
+    padding:8px;
+    display:flex;flex-wrap:wrap;gap:6px;
+    margin-bottom:10px;
+    background:#fff;
+  }
+  .builder-bank{display:flex;flex-wrap:wrap;gap:6px;}
+  .word-chip{
+    background:var(--primary);color:#fff;padding:6px 12px;border-radius:8px;
+    cursor:pointer;font-size:0.92rem;user-select:none;transition:transform .1s;
+  }
+  .word-chip:hover{transform:translateY(-2px);}
+  .word-chip.bank-chip{background:#e5e7f5;color:var(--primary-dark);}
+  .builder-item.correct{border-color:var(--correct);box-shadow:0 0 0 2px var(--correct-bg) inset;}
+  .builder-item.incorrect{border-color:var(--incorrect);box-shadow:0 0 0 2px var(--incorrect-bg) inset;}
+
+  /* Candidate cards */
+  .candidate-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;
+  }
+  .candidate-card{
+    background:#fbfbfe;border:1.5px solid var(--border);border-radius:12px;
+    padding:16px 10px;text-align:center;cursor:pointer;transition:all .15s ease;
+  }
+  .candidate-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .candidate-card.active{border-color:var(--accent);background:var(--accent-light);}
+  .candidate-card svg{width:44px;height:44px;margin-bottom:8px;}
+  .candidate-card .name{font-weight:700;}
+  .candidate-detail{
+    margin-top:16px;padding:14px 16px;border-radius:10px;background:#f0f0ff;
+    border:1px solid var(--border);display:none;
+  }
+  .candidate-detail.visible{display:block;}
+
+  /* Matching */
+  .match-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:600px){.match-columns{grid-template-columns:1fr;}}
+  .match-col-title{font-weight:700;margin-bottom:10px;color:var(--primary-dark);font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;}
+  .match-btn{
+    display:block;width:100%;text-align:left;
+    border:1.5px solid var(--border);background:#fbfbfe;border-radius:10px;
+    padding:10px 14px;margin-bottom:8px;cursor:pointer;font-size:0.94rem;
+  }
+  .match-btn.selected{border-color:var(--primary);background:#e8e7ff;font-weight:600;}
+  .match-btn.paired{border-color:var(--accent);background:var(--accent-light);}
+  .match-btn.correct{border-color:var(--correct);background:var(--correct-bg);}
+  .match-btn.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+  .match-btn.disabled{opacity:0.55;cursor:default;}
+
+  /* Detective */
+  .detective-item{
+    border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:#fbfbfe;
+  }
+  .detective-sentence{font-weight:600;margin-bottom:12px;}
+  .detective-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px;}
+  .detective-row label{font-size:0.88rem;color:var(--muted);min-width:110px;}
+  select.det-select{
+    flex:1;min-width:200px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;background:#fff;
+  }
+  select.det-select.correct{border-color:var(--correct);background:var(--correct-bg);}
+  select.det-select.incorrect{border-color:var(--incorrect);background:var(--incorrect-bg);}
+
+  /* Production */
+  textarea.promise-box{
+    width:100%;min-height:80px;border-radius:10px;border:1.5px solid var(--border);
+    padding:12px;font-family:inherit;font-size:0.96rem;resize:vertical;
+  }
+  .promise-topics{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .topic-pill{
+    border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font-size:0.9rem;
+  }
+  .topic-pill.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .reminder-box{
+    margin-top:12px;padding:12px 14px;background:#fff7e6;border:1px solid #f5d68c;border-radius:10px;
+    font-size:0.92rem;color:#7a5b00;display:none;
+  }
+  .reminder-box.visible{display:block;}
+
+  /* Buttons */
+  .action-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+  .btn{
+    border:none;border-radius:10px;padding:12px 22px;font-size:0.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-secondary{background:#fff;color:var(--primary);border:1.5px solid var(--primary);}
+  .btn-secondary:hover{background:#f0f0ff;}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-accent:hover{background:#0b7a70;}
+
+  .result-box{
+    margin-top:18px;padding:16px 18px;border-radius:12px;background:#f0f0ff;border:1px solid var(--border);
+    display:none;
+  }
+  .result-box.visible{display:block;animation:fadeIn .3s ease;}
+  .result-box .score-line{font-size:1.15rem;font-weight:700;color:var(--primary-dark);margin-bottom:4px;}
+  .result-box .feedback{color:var(--muted);}
+
+  section.final{
+    background:linear-gradient(120deg,#111827,#1f2937);
+    color:#fff;border-radius:var(--radius);padding:30px 24px;margin-top:10px;text-align:center;
+    box-shadow:var(--shadow-lg);
+  }
+  section.final h2{margin-top:0;}
+  .final-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:20px 0;
+  }
+  .final-stat{background:rgba(255,255,255,0.08);border-radius:12px;padding:16px;}
+  .final-stat .num{font-size:1.8rem;font-weight:800;}
+  .final-stat .lbl{font-size:0.82rem;opacity:0.8;text-transform:uppercase;letter-spacing:0.5px;}
+  .final-feedback{font-size:1.05rem;margin-top:10px;}
+  .placeholder-msg{color:rgba(255,255,255,0.75);font-size:0.95rem;}
+
+  .icon{width:20px;height:20px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Conditionals in Action</h1>
+  <p>Zero &amp; First Conditional — Listening and Reading practice (B1)</p>
+  <nav class="tabs">
+    <button id="tab-listening" class="active" onclick="showTab('listening')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-8h3z"/><path d="M3 19a2 2 0 0 0 2 2h1v-8H3z"/></svg>
+      Listening
+    </button>
+    <button id="tab-reading" onclick="showTab('reading')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Reading
+    </button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ======================= LISTENING PANEL ======================= -->
+<section id="panel-listening" class="panel visible">
+
+  <div class="step-card">
+    <h2><span class="step-num">1</span> Listen</h2>
+    <p class="instructions">🎧 Listen carefully to the audios your teacher plays in class. Pay attention to how the speakers use <strong>if / when + present simple, present simple</strong> to talk about facts, routines, and cause and effect. You can also use the players below if you'd like to listen again on your own.</p>
+    <div class="audio-grid" id="audioGrid"></div>
+    <p class="instructions" style="margin-top:16px;margin-bottom:0;">Now complete the activities below based on what you heard.</p>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">2</span> Choose the correct idea</h2>
+    <p class="instructions">Select the best answer based on what you heard.</p>
+    <div id="mcContainer"></div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">3</span> Complete the pattern</h2>
+    <p class="instructions">Choose <strong>IF</strong> or <strong>WHEN</strong> to complete each sentence.</p>
+    <div id="gapContainer"></div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">4</span> Zero Conditional check</h2>
+    <p class="instructions">Decide what each sentence expresses.</p>
+    <div id="classifyContainer"></div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">5</span> Build the sentence</h2>
+    <p class="instructions">Click the words in the correct order to build a Zero Conditional sentence. Click a word in your answer to remove it.</p>
+    <div id="builderContainer"></div>
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="checkListening()">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        Check Answers — Part 1
+      </button>
+      <button class="btn btn-secondary" onclick="resetListening()">Reset Part 1</button>
+    </div>
+    <div class="result-box" id="listeningResult">
+      <div class="score-line" id="listeningScoreLine"></div>
+      <div class="feedback" id="listeningFeedback"></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ======================= READING PANEL ======================= -->
+<section id="panel-reading" class="panel">
+
+  <div class="step-card">
+    <h2><span class="step-num">1</span> Read</h2>
+    <p class="instructions">Click on a candidate to read their election speech. Then complete the activities below about what each one promised.</p>
+    <div class="candidate-grid" id="candidateGrid"></div>
+    <div class="candidate-detail" id="candidateDetail"></div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">2</span> Match the candidate</h2>
+    <p class="instructions">Click a candidate, then click the topic they talked about, to match them.</p>
+    <div class="match-columns">
+      <div>
+        <div class="match-col-title">Candidates</div>
+        <div id="matchCandidates"></div>
+      </div>
+      <div>
+        <div class="match-col-title">Topics</div>
+        <div id="matchTopics"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">3</span> First Conditional detective</h2>
+    <p class="instructions">For each sentence, choose the IF clause and the WILL clause.</p>
+    <div id="detectiveContainer"></div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">4</span> Meaning</h2>
+    <p class="instructions">Answer the questions about the candidates' promises.</p>
+    <div id="meaningContainer"></div>
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="checkReading()">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        Check Answers — Part 2
+      </button>
+      <button class="btn btn-secondary" onclick="resetReading()">Reset Part 2</button>
+    </div>
+    <div class="result-box" id="readingResult">
+      <div class="score-line" id="readingScoreLine"></div>
+      <div class="feedback" id="readingFeedback"></div>
+    </div>
+  </div>
+
+  <div class="step-card">
+    <h2><span class="step-num">5</span> Your promise</h2>
+    <p class="instructions">Choose one school problem and write your own promise using the First Conditional.</p>
+    <div class="promise-topics" id="promiseTopics"></div>
+    <textarea class="promise-box" id="promiseBox" placeholder="Write your sentence here. Example structure: If ..., I will ..."></textarea>
+    <div class="action-row">
+      <button class="btn btn-accent" onclick="showPromiseReminder()">Submit my promise</button>
+    </div>
+    <div class="reminder-box" id="promiseReminder">
+      Remember: <strong>If + present simple, will + base verb.</strong> There is no single correct answer here — check that your sentence follows this pattern.
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+const audioLabels = ["Conversation 1","Conversation 2","Conversation 3","Conversation 4"];
+
+const mcQuestions = [
+  {
+    q: "According to Conversation 1, what usually happens when it rains?",
+    options: ["More people eat outside","Delivery orders increase","The restaurant closes early"],
+    correct: 1
+  },
+  {
+    q: "According to Conversation 2, what happens when people exercise every morning?",
+    options: ["They feel tired all day","They have more energy","They skip breakfast"],
+    correct: 1
+  },
+  {
+    q: "According to Conversation 3, what happens if plants don't get water regularly?",
+    options: ["They grow faster","They become weak","They change color"],
+    correct: 1
+  },
+  {
+    q: "According to Conversation 4, what do people usually do when there is a lot of traffic?",
+    options: ["They walk everywhere","They take the metro","They wait at home"],
+    correct: 1
+  }
+];
+
+const gapItems = [
+  { before:"", after:"it rains, delivery orders usually increase.", correct:"If" },
+  { before:"", after:"people exercise every morning, they usually have more energy.", correct:"When" },
+  { before:"", after:"you don't water the plants, they get weak.", correct:"If" },
+  { before:"", after:"there is a lot of traffic, people take the metro.", correct:"When" }
+];
+
+const classifyItems = [
+  { sentence:"If you mix red and blue, you get purple.", correct:"A" },
+  { sentence:"If you finish your homework early, you will watch a movie tonight.", correct:"B" },
+  { sentence:"When I was a child, if it snowed, school closed.", correct:"C" },
+  { sentence:"When water reaches 100°C, it boils.", correct:"A" },
+  { sentence:"If she calls me tomorrow, I will tell her the news.", correct:"B" }
+];
+const classifyLabels = { A:"General fact / routine", B:"Future possibility", C:"Past event" };
+
+const builderItems = [
+  { words:["delivery","orders","increase","If","it","rains",","], target:"If it rains , delivery orders increase" },
+  { words:["they","feel","more","energetic","When","people","exercise",","], target:"When people exercise , they feel more energetic" },
+  { words:["they","get","weak","If","plants","don't","get","water",","], target:"If plants don't get water , they get weak" },
+  { words:["people","take","the","metro","When","there","is","traffic",","], target:"When there is traffic , people take the metro" }
+];
+
+const candidates = [
+  { name:"Bob", topic:"Better school parties", icon:"party" },
+  { name:"MJ", topic:"A longer vacation", icon:"sun" },
+  { name:"Ben", topic:"Cheaper transportation", icon:"bus" },
+  { name:"Susan", topic:"Better teachers and staff", icon:"book" },
+  { name:"Julio", topic:"Healthier cafeteria food", icon:"apple" },
+  { name:"Mary", topic:"More books in the library", icon:"library" }
+];
+
+const candidateSpeeches = {
+  Bob: "If you elect me as student body president, I will give you the best parties you have ever seen. Our school has already focused on education and on sports, but now it's time for parties that no one has seen before. Parties are important for student life, because if we don't have good parties, how can we enjoy our education and our studies? Elect me as student president, and I promise to fulfill your needs, students!",
+  MJ: "Dear fellow students, this is MJ. If you vote for me as the representative of this university, I will definitely give you more vacation. We have too many classes every week, and a short vacation in the summer. Right now we have sixty days of vacation in the summer, but I will increase it to eighty. Please vote for me as the representative of this school. Thank you.",
+  Ben: "Dear students, if you elect me as student body president, I will make sure we have a cheaper way to come to school, because right now transportation by bus is too expensive, and with the economic problems we have right now, I think we definitely need a cheaper mode of transportation. Our services aren't good either, and I think we should push for better services and a cheaper deal.",
+  Susan: "I hear from a lot of people that there aren't enough good teachers at this school, and the workers at the office aren't helpful at all. So if you choose me for student body president, I will meet with the president to explain these problems, so that the school starts hiring better staff, because I think education is the most important thing in the world. That's why you're all at school, right? So vote for me now?",
+  Julio: "Hello, ladies and gentlemen. Today I want to talk to you about the conditions in our cafeteria. It's outrageous that we have to pay twice as much for a plate of salad as for a plate of fried chicken. Universities should promote health, and our university isn't doing that. A lot of people visit our campus, and in the world today, more people die from obesity than from diseases related to cigarettes or alcohol. If I get elected president, I promise to change the conditions in our cafeteria and make healthy food available to everyone at reasonable prices.",
+  Mary: "My fellow students, we have a problem: there are no books in our library. The library is a very interesting place, and I'm sure you'll all use it regularly — when you want to go to sleep, or when it's very cold and you want a heated place. But this university is an academic institution, and every now and then, I'd like to be able to find a book in there. I walk into the library and look left, and there are empty shelves. I look right, and there are more empty shelves. I'd like to be president of this campus next year, and I will get some books for this library."
+};
+
+const matchTopicsList = [
+  "Better school parties",
+  "A longer vacation",
+  "Cheaper transportation",
+  "Better teachers and staff",
+  "Healthier cafeteria food",
+  "More books in the library"
+];
+
+const detectiveItems = [
+  { ifPart:"If you vote for me,", willPart:"I will organize more fun parties.", candidate:"Bob" },
+  { ifPart:"If I win the election,", willPart:"I will ask for a longer summer vacation.", candidate:"MJ" },
+  { ifPart:"If you choose me as president,", willPart:"I will make the bus fares cheaper.", candidate:"Ben" },
+  { ifPart:"If I become president,", willPart:"I will hire better teachers and staff.", candidate:"Susan" },
+  { ifPart:"If you elect me,", willPart:"I will improve the food in the cafeteria.", candidate:"Julio" },
+  { ifPart:"If I win,", willPart:"I will buy more books for the library.", candidate:"Mary" },
+  { ifPart:"If we have more parties,", willPart:"students will feel happier at school.", candidate:"Bob" }
+];
+
+const meaningQuestions = [
+  { q:"What will happen if students vote for Bob?", options:["He will organize more parties","He will lower vacation time","He will hire teachers"], correct:0 },
+  { q:"What does MJ promise to do if elected?", options:["Lower bus fares","Ask for a longer vacation","Buy more library books"], correct:1 },
+  { q:"What will Ben do if he becomes president?", options:["Improve cafeteria food","Add more parties","Make transportation cheaper"], correct:2 },
+  { q:"What is Susan's main promise?", options:["Better teachers and staff","Healthier food","More books"], correct:0 },
+  { q:"In Julio's speech, is he talking about a general fact or a possible future result?", options:["A general fact","A possible future result","A past event"], correct:1 },
+  { q:"What will Mary do if she wins?", options:["Buy more books for the library","Organize parties","Improve transportation"], correct:0 }
+];
+
+const promiseTopics = ["Transportation","Cafeteria food","Library books"];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+const state = {
+  mc: new Array(mcQuestions.length).fill(null),
+  gap: new Array(gapItems.length).fill(null),
+  classify: new Array(classifyItems.length).fill(null),
+  builder: builderItems.map(item => ({ bank: shuffle(item.words.slice()), answer: [] })),
+  matchSelectedCandidate: null,
+  matchPairs: {},               // candidateName -> topic
+  detective: detectiveItems.map(() => ({ ifSel:null, willSel:null })),
+  meaning: new Array(meaningQuestions.length).fill(null),
+  listeningChecked:false,
+  readingChecked:false,
+  listeningScore:0,
+  listeningTotal:0,
+  readingScore:0,
+  readingTotal:0
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+function showTab(name){
+  document.getElementById('panel-listening').classList.toggle('visible', name==='listening');
+  document.getElementById('panel-reading').classList.toggle('visible', name==='reading');
+  document.getElementById('tab-listening').classList.toggle('active', name==='listening');
+  document.getElementById('tab-reading').classList.toggle('active', name==='reading');
+}
+
+/* ============================================================
+   BUILD: AUDIO PLAYERS
+   ============================================================ */
+function renderAudio(){
+  const grid = document.getElementById('audioGrid');
+  grid.innerHTML = '';
+  audioLabels.forEach((label, i) => {
+    const card = document.createElement('div');
+    card.className = 'audio-card';
+    card.innerHTML = `
+      <div class="label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        ${label}
+      </div>
+      <audio controls preload="none">
+        <source src="audio/conversation${i+1}.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   BUILD: MULTIPLE CHOICE (Step 2 Listening)
+   ============================================================ */
+function renderMC(){
+  const c = document.getElementById('mcContainer');
+  c.innerHTML = '';
+  mcQuestions.forEach((item, qi) => {
+    const div = document.createElement('div');
+    div.className = 'mc-item';
+    const optsHtml = item.options.map((opt, oi) => `
+      <div class="mc-option" data-q="${qi}" data-o="${oi}" onclick="selectMC(${qi},${oi})">${opt}</div>
+    `).join('');
+    div.innerHTML = `<div class="mc-question">${qi+1}. ${item.q}</div><div class="mc-options">${optsHtml}</div>`;
+    c.appendChild(div);
+  });
+}
+function selectMC(qi, oi){
+  if(state.listeningChecked) return;
+  state.mc[qi] = oi;
+  document.querySelectorAll(`.mc-option[data-q="${qi}"]`).forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.o)===oi);
+  });
+}
+
+/* ============================================================
+   BUILD: IF / WHEN GAP FILL (Step 3 Listening)
+   ============================================================ */
+function renderGap(){
+  const c = document.getElementById('gapContainer');
+  c.innerHTML = '';
+  gapItems.forEach((item, gi) => {
+    const div = document.createElement('div');
+    div.className = 'gap-item';
+    div.innerHTML = `
+      <div class="sentence">____ ${item.after}</div>
+      <div class="gap-choice-group">
+        <button class="gap-choice" data-g="${gi}" data-v="If" onclick="selectGap(${gi},'If')">If</button>
+        <button class="gap-choice" data-g="${gi}" data-v="When" onclick="selectGap(${gi},'When')">When</button>
+      </div>
+    `;
+    c.appendChild(div);
+  });
+}
+function selectGap(gi, val){
+  if(state.listeningChecked) return;
+  state.gap[gi] = val;
+  document.querySelectorAll(`.gap-choice[data-g="${gi}"]`).forEach(el=>{
+    el.classList.toggle('selected', el.dataset.v===val);
+  });
+}
+
+/* ============================================================
+   BUILD: CLASSIFY (Step 4 Listening)
+   ============================================================ */
+function renderClassify(){
+  const c = document.getElementById('classifyContainer');
+  c.innerHTML = '';
+  classifyItems.forEach((item, ci) => {
+    const div = document.createElement('div');
+    div.className = 'classify-item';
+    const opts = Object.keys(classifyLabels).map(key => `
+      <button class="classify-btn" data-c="${ci}" data-v="${key}" onclick="selectClassify(${ci},'${key}')">${key}) ${classifyLabels[key]}</button>
+    `).join('');
+    div.innerHTML = `<div class="sentence">${ci+1}. "${item.sentence}"</div><div class="classify-options">${opts}</div>`;
+    c.appendChild(div);
+  });
+}
+function selectClassify(ci, val){
+  if(state.listeningChecked) return;
+  state.classify[ci] = val;
+  document.querySelectorAll(`.classify-btn[data-c="${ci}"]`).forEach(el=>{
+    el.classList.toggle('selected', el.dataset.v===val);
+  });
+}
+
+/* ============================================================
+   BUILD: SENTENCE BUILDER (Step 5 Listening)
+   ============================================================ */
+function renderBuilder(){
+  const c = document.getElementById('builderContainer');
+  c.innerHTML = '';
+  builderItems.forEach((item, bi) => {
+    const div = document.createElement('div');
+    div.className = 'builder-item';
+    div.id = `builder-${bi}`;
+    div.innerHTML = `
+      <div class="builder-answer" id="builder-answer-${bi}"></div>
+      <div class="builder-bank" id="builder-bank-${bi}"></div>
+      <div class="action-row" style="margin-top:8px;">
+        <button class="btn btn-secondary" style="padding:6px 14px;font-size:0.85rem;" onclick="clearBuilder(${bi})">Clear</button>
+      </div>
+    `;
+    c.appendChild(div);
+    renderBuilderChips(bi);
+  });
+}
+function renderBuilderChips(bi){
+  const bankEl = document.getElementById(`builder-bank-${bi}`);
+  const answerEl = document.getElementById(`builder-answer-${bi}`);
+  bankEl.innerHTML = '';
+  answerEl.innerHTML = '';
+  const s = state.builder[bi];
+  s.bank.forEach((word, idx) => {
+    const chip = document.createElement('span');
+    chip.className = 'word-chip bank-chip';
+    chip.textContent = word;
+    chip.onclick = () => moveToAnswer(bi, idx);
+    bankEl.appendChild(chip);
+  });
+  s.answer.forEach((word, idx) => {
+    const chip = document.createElement('span');
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.onclick = () => moveToBank(bi, idx);
+    answerEl.appendChild(chip);
+  });
+}
+function moveToAnswer(bi, bankIdx){
+  if(state.listeningChecked) return;
+  const s = state.builder[bi];
+  const [word] = s.bank.splice(bankIdx,1);
+  s.answer.push(word);
+  renderBuilderChips(bi);
+}
+function moveToBank(bi, answerIdx){
+  if(state.listeningChecked) return;
+  const s = state.builder[bi];
+  const [word] = s.answer.splice(answerIdx,1);
+  s.bank.push(word);
+  renderBuilderChips(bi);
+}
+function clearBuilder(bi){
+  if(state.listeningChecked) return;
+  const s = state.builder[bi];
+  s.bank = s.bank.concat(s.answer);
+  s.answer = [];
+  renderBuilderChips(bi);
+}
+
+/* ============================================================
+   CHECK / RESET — LISTENING (PART 1)
+   ============================================================ */
+function checkListening(){
+  let score = 0, total = 0;
+
+  // MC
+  mcQuestions.forEach((item, qi) => {
+    total++;
+    const chosen = state.mc[qi];
+    document.querySelectorAll(`.mc-option[data-q="${qi}"]`).forEach(el=>{
+      const oi = parseInt(el.dataset.o);
+      if(oi === item.correct) el.classList.add('correct');
+      else if(oi === chosen) el.classList.add('incorrect');
+    });
+    if(chosen === item.correct) score++;
+  });
+
+  // Gap
+  gapItems.forEach((item, gi) => {
+    total++;
+    const chosen = state.gap[gi];
+    document.querySelectorAll(`.gap-choice[data-g="${gi}"]`).forEach(el=>{
+      if(el.dataset.v === item.correct) el.classList.add('correct');
+      else if(el.dataset.v === chosen) el.classList.add('incorrect');
+    });
+    if(chosen === item.correct) score++;
+  });
+
+  // Classify
+  classifyItems.forEach((item, ci) => {
+    total++;
+    const chosen = state.classify[ci];
+    document.querySelectorAll(`.classify-btn[data-c="${ci}"]`).forEach(el=>{
+      if(el.dataset.v === item.correct) el.classList.add('correct');
+      else if(el.dataset.v === chosen) el.classList.add('incorrect');
+    });
+    if(chosen === item.correct) score++;
+  });
+
+  // Builder
+  builderItems.forEach((item, bi) => {
+    total++;
+    const s = state.builder[bi];
+    const userSentence = s.answer.join(' ');
+    const div = document.getElementById(`builder-${bi}`);
+    if(userSentence === item.target){
+      score++;
+      div.classList.add('correct');
+    } else {
+      div.classList.add('incorrect');
+    }
+  });
+
+  state.listeningChecked = true;
+  state.listeningScore = score;
+  state.listeningTotal = total;
+
+  const pct = Math.round((score/total)*100);
+  document.getElementById('listeningScoreLine').textContent = `Score: ${score} / ${total} (${pct}%)`;
+  document.getElementById('listeningFeedback').textContent = feedbackMessage(pct);
+  document.getElementById('listeningResult').classList.add('visible');
+}
+
+function resetListening(){
+  state.mc = new Array(mcQuestions.length).fill(null);
+  state.gap = new Array(gapItems.length).fill(null);
+  state.classify = new Array(classifyItems.length).fill(null);
+  state.builder = builderItems.map(item => ({ bank: shuffle(item.words.slice()), answer: [] }));
+  state.listeningChecked = false;
+  state.listeningScore = 0;
+  state.listeningTotal = 0;
+
+  document.getElementById('listeningResult').classList.remove('visible');
+  renderMC();
+  renderGap();
+  renderClassify();
+  renderBuilder();
+  document.querySelectorAll('#panel-listening .builder-item').forEach(el=>el.classList.remove('correct','incorrect'));
+}
+
+/* ============================================================
+   BUILD: CANDIDATES (Step 1 Reading)
+   ============================================================ */
+const candidateIcons = {
+  party: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5.8 11.3 2 22l10.7-3.8"/><path d="m4 3 3 3"/><path d="m10 3 -1 5"/><path d="m16 3 -1 5"/><path d="M20 3 12 11"/><path d="M12 11 8 15"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
+  bus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M3 11h18"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/></svg>`,
+  book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  apple: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6c1-2 3-3 5-2"/><path d="M12 6c-3-1-8 1-8 7 0 5 3 9 5.5 9 1.2 0 1.8-.5 2.5-.5s1.3.5 2.5.5C17 22 20 18 20 13c0-4-3-6-5-6-1 0-2 .5-3 1"/></svg>`,
+  library: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20V6l5-2v16"/><path d="M8 4l6 2v14"/><path d="M14 6l6-2v16l-6 2"/></svg>`
+};
+function renderCandidates(){
+  const grid = document.getElementById('candidateGrid');
+  grid.innerHTML = '';
+  candidates.forEach((cand, i) => {
+    const div = document.createElement('div');
+    div.className = 'candidate-card';
+    div.id = `cand-card-${i}`;
+    div.onclick = () => selectCandidate(i);
+    div.innerHTML = `${candidateIcons[cand.icon]}<div class="name">${cand.name}</div>`;
+    grid.appendChild(div);
+  });
+}
+function selectCandidate(i){
+  document.querySelectorAll('.candidate-card').forEach((el,idx)=>{
+    el.classList.toggle('active', idx===i);
+  });
+  const detail = document.getElementById('candidateDetail');
+  detail.classList.add('visible');
+  const name = candidates[i].name;
+  detail.innerHTML = `<strong>${name}'s speech:</strong><br><br>${candidateSpeeches[name]}`;
+}
+
+/* ============================================================
+   BUILD: MATCHING (Step 2 Reading)
+   ============================================================ */
+let shuffledTopics = [];
+function renderMatch(){
+  const candCol = document.getElementById('matchCandidates');
+  const topicCol = document.getElementById('matchTopics');
+  candCol.innerHTML = '';
+  topicCol.innerHTML = '';
+  shuffledTopics = shuffle(matchTopicsList);
+
+  candidates.forEach((cand) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-btn';
+    btn.dataset.name = cand.name;
+    btn.textContent = cand.name;
+    btn.onclick = () => onMatchCandidateClick(cand.name);
+    candCol.appendChild(btn);
+  });
+
+  shuffledTopics.forEach((topic) => {
+    const btn = document.createElement('button');
+    btn.className = 'match-btn';
+    btn.dataset.topic = topic;
+    btn.textContent = topic;
+    btn.onclick = () => onMatchTopicClick(topic);
+    topicCol.appendChild(btn);
+  });
+}
+function onMatchCandidateClick(name){
+  if(Object.prototype.hasOwnProperty.call(state.matchPairs, name)) return;
+  state.matchSelectedCandidate = name;
+  document.querySelectorAll('#matchCandidates .match-btn').forEach(el=>{
+    el.classList.toggle('selected', el.dataset.name===name);
+  });
+}
+function onMatchTopicClick(topic){
+  if(!state.matchSelectedCandidate) return;
+  const usedTopics = Object.values(state.matchPairs);
+  if(usedTopics.includes(topic)) return;
+  state.matchPairs[state.matchSelectedCandidate] = topic;
+  const candBtn = document.querySelector(`#matchCandidates .match-btn[data-name="${state.matchSelectedCandidate}"]`);
+  const topicBtn = document.querySelector(`#matchTopics .match-btn[data-topic="${topic}"]`);
+  candBtn.classList.remove('selected');
+  candBtn.classList.add('paired');
+  candBtn.textContent = `${state.matchSelectedCandidate}  →  ${topic}`;
+  topicBtn.classList.add('paired','disabled');
+  state.matchSelectedCandidate = null;
+}
+
+/* ============================================================
+   BUILD: DETECTIVE (Step 3 Reading)
+   ============================================================ */
+function renderDetective(){
+  const c = document.getElementById('detectiveContainer');
+  c.innerHTML = '';
+  detectiveItems.forEach((item, di) => {
+    const div = document.createElement('div');
+    div.className = 'detective-item';
+    const optionsHtml = `
+      <option value="">-- choose --</option>
+      <option value="if">${item.ifPart}</option>
+      <option value="will">${item.willPart}</option>
+    `;
+    div.innerHTML = `
+      <div class="detective-sentence">${di+1}. ${item.ifPart} ${item.willPart}</div>
+      <div class="detective-row">
+        <label>IF clause:</label>
+        <select class="det-select" id="det-if-${di}" onchange="onDetectiveChange(${di})">${optionsHtml}</select>
+      </div>
+      <div class="detective-row">
+        <label>WILL clause:</label>
+        <select class="det-select" id="det-will-${di}" onchange="onDetectiveChange(${di})">${optionsHtml}</select>
+      </div>
+    `;
+    c.appendChild(div);
+  });
+}
+function onDetectiveChange(di){
+  if(state.readingChecked) return;
+  state.detective[di].ifSel = document.getElementById(`det-if-${di}`).value;
+  state.detective[di].willSel = document.getElementById(`det-will-${di}`).value;
+}
+
+/* ============================================================
+   BUILD: MEANING MC (Step 4 Reading)
+   ============================================================ */
+function renderMeaning(){
+  const c = document.getElementById('meaningContainer');
+  c.innerHTML = '';
+  meaningQuestions.forEach((item, qi) => {
+    const div = document.createElement('div');
+    div.className = 'mc-item';
+    const optsHtml = item.options.map((opt, oi) => `
+      <div class="mc-option" data-mq="${qi}" data-mo="${oi}" onclick="selectMeaning(${qi},${oi})">${opt}</div>
+    `).join('');
+    div.innerHTML = `<div class="mc-question">${qi+1}. ${item.q}</div><div class="mc-options">${optsHtml}</div>`;
+    c.appendChild(div);
+  });
+}
+function selectMeaning(qi, oi){
+  if(state.readingChecked) return;
+  state.meaning[qi] = oi;
+  document.querySelectorAll(`.mc-option[data-mq="${qi}"]`).forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.mo)===oi);
+  });
+}
+
+/* ============================================================
+   BUILD: YOUR PROMISE (Step 5 Reading)
+   ============================================================ */
+function renderPromiseTopics(){
+  const c = document.getElementById('promiseTopics');
+  c.innerHTML = '';
+  promiseTopics.forEach((topic, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'topic-pill';
+    pill.textContent = topic;
+    pill.onclick = () => {
+      document.querySelectorAll('.topic-pill').forEach(el=>el.classList.remove('selected'));
+      pill.classList.add('selected');
+    };
+    c.appendChild(pill);
+  });
+}
+function showPromiseReminder(){
+  document.getElementById('promiseReminder').classList.add('visible');
+}
+
+/* ============================================================
+   CHECK / RESET — READING (PART 2)
+   ============================================================ */
+function checkReading(){
+  let score = 0, total = 0;
+
+  // Matching
+  candidates.forEach((cand) => {
+    total++;
+    const chosen = state.matchPairs[cand.name];
+    const candBtn = document.querySelector(`#matchCandidates .match-btn[data-name="${cand.name}"]`);
+    if(chosen === cand.topic){
+      score++;
+      candBtn.classList.remove('paired');
+      candBtn.classList.add('correct');
+    } else {
+      candBtn.classList.remove('paired');
+      candBtn.classList.add('incorrect');
+      candBtn.textContent = chosen ? `${cand.name}  →  ${chosen}` : `${cand.name}  →  (no answer)`;
+    }
+  });
+
+  // Detective
+  detectiveItems.forEach((item, di) => {
+    total++;
+    const s = state.detective[di];
+    const ifSelect = document.getElementById(`det-if-${di}`);
+    const willSelect = document.getElementById(`det-will-${di}`);
+    const ifCorrect = s.ifSel === 'if';
+    const willCorrect = s.willSel === 'will';
+    ifSelect.classList.add(ifCorrect ? 'correct' : 'incorrect');
+    willSelect.classList.add(willCorrect ? 'correct' : 'incorrect');
+    if(ifCorrect && willCorrect) score++;
+  });
+
+  // Meaning
+  meaningQuestions.forEach((item, qi) => {
+    total++;
+    const chosen = state.meaning[qi];
+    document.querySelectorAll(`.mc-option[data-mq="${qi}"]`).forEach(el=>{
+      const oi = parseInt(el.dataset.mo);
+      if(oi === item.correct) el.classList.add('correct');
+      else if(oi === chosen) el.classList.add('incorrect');
+    });
+    if(chosen === item.correct) score++;
+  });
+
+  state.readingChecked = true;
+  state.readingScore = score;
+  state.readingTotal = total;
+
+  const pct = Math.round((score/total)*100);
+  document.getElementById('readingScoreLine').textContent = `Score: ${score} / ${total} (${pct}%)`;
+  document.getElementById('readingFeedback').textContent = feedbackMessage(pct);
+  document.getElementById('readingResult').classList.add('visible');
+}
+
+function resetReading(){
+  state.matchSelectedCandidate = null;
+  state.matchPairs = {};
+  state.detective = detectiveItems.map(() => ({ ifSel:null, willSel:null }));
+  state.meaning = new Array(meaningQuestions.length).fill(null);
+  state.readingChecked = false;
+  state.readingScore = 0;
+  state.readingTotal = 0;
+
+  document.getElementById('readingResult').classList.remove('visible');
+  document.getElementById('candidateDetail').classList.remove('visible');
+  document.querySelectorAll('.candidate-card').forEach(el=>el.classList.remove('active'));
+  renderMatch();
+  renderDetective();
+  renderMeaning();
+
+  document.getElementById('promiseBox').value = '';
+  document.getElementById('promiseReminder').classList.remove('visible');
+  document.querySelectorAll('.topic-pill').forEach(el=>el.classList.remove('selected'));
+}
+
+/* ============================================================
+   FEEDBACK / FINAL
+   ============================================================ */
+function feedbackMessage(pct){
+  if(pct >= 90) return "Excellent! You have a strong understanding of this grammar point.";
+  if(pct >= 80) return "Great job! Just a few small details to review.";
+  if(pct >= 70) return "Good work! Keep practicing.";
+  return "Keep practicing the conditional forms. Review the examples and try again.";
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init(){
+  renderAudio();
+  renderMC();
+  renderGap();
+  renderClassify();
+  renderBuilder();
+  renderCandidates();
+  renderMatch();
+  renderDetective();
+  renderMeaning();
+  renderPromiseTopics();
+}
+init();
+</script>
+</body>
+</html>
