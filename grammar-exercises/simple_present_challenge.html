@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Present Challenge</title>
+<style>
+  :root{
+    --purple:#6C5CE7;
+    --purple-dark:#4834D4;
+    --pink:#FD79A8;
+    --teal:#00CEC9;
+    --yellow:#FDCB6E;
+    --green:#00B894;
+    --red:#FF6B6B;
+    --bg1:#EEF2FF;
+    --bg2:#FFF0F6;
+    --text:#2D3436;
+    --card-bg:#FFFFFF;
+    --shadow: 0 8px 24px rgba(108,92,231,0.15);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Verdana, Arial, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color:var(--text);
+    min-height:100vh;
+    padding:20px;
+  }
+  .wrap{max-width:800px;margin:0 auto;}
+  header{
+    text-align:center;
+    margin-bottom:24px;
+  }
+  h1{
+    font-size:clamp(1.6rem,5vw,2.4rem);
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin:0 0 6px 0;
+  }
+  .subtitle{color:#636E72;font-size:1rem;}
+
+  .name-card{
+    background:var(--card-bg);
+    border-radius:18px;
+    padding:20px 24px;
+    box-shadow:var(--shadow);
+    margin-bottom:22px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px;
+  }
+  .name-card label{
+    font-weight:700;
+    font-size:1.05rem;
+    color:var(--purple-dark);
+    flex:0 0 auto;
+  }
+  .name-card input{
+    flex:1 1 200px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:2px solid #DFE6E9;
+    font-size:1rem;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .name-card input:focus{border-color:var(--purple);}
+
+  .progress-wrap{
+    background:var(--card-bg);
+    border-radius:14px;
+    padding:14px 18px;
+    box-shadow:var(--shadow);
+    margin-bottom:20px;
+    position:sticky;
+    top:10px;
+    z-index:10;
+  }
+  .progress-text{
+    font-weight:700;
+    color:var(--purple-dark);
+    margin-bottom:8px;
+    font-size:0.95rem;
+    text-align:center;
+  }
+  .progress-bar-bg{
+    background:#EEE;
+    border-radius:20px;
+    height:12px;
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--teal), var(--purple));
+    border-radius:20px;
+    transition:width .3s ease;
+  }
+
+  .card{
+    background:var(--card-bg);
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
+    border:2px solid transparent;
+    transition:border-color .2s, transform .2s;
+    scroll-margin-top:100px;
+  }
+  .card.answered{border-color:#E0DFFF;}
+  .qnum{
+    display:inline-block;
+    background:var(--purple);
+    color:white;
+    font-weight:700;
+    font-size:0.8rem;
+    padding:4px 10px;
+    border-radius:20px;
+    margin-bottom:10px;
+  }
+  .qtext{
+    font-size:1.08rem;
+    margin-bottom:14px;
+    line-height:1.5;
+  }
+  .qtext .blank{
+    display:inline-block;
+    min-width:70px;
+    border-bottom:2px dashed var(--purple);
+  }
+
+  .options{display:flex;flex-wrap:wrap;gap:10px;}
+  .opt-btn{
+    background:#F5F3FF;
+    border:2px solid #E0DFFF;
+    color:var(--purple-dark);
+    padding:10px 16px;
+    border-radius:12px;
+    font-size:0.98rem;
+    cursor:pointer;
+    transition:all .15s;
+    font-weight:600;
+  }
+  .opt-btn:hover{background:#E9E5FF;}
+  .opt-btn.selected{
+    background:var(--purple);
+    color:white;
+    border-color:var(--purple-dark);
+    transform:scale(1.03);
+  }
+
+  .text-input{
+    width:100%;
+    max-width:320px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:2px solid #DFE6E9;
+    font-size:1rem;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .text-input:focus{border-color:var(--purple);}
+
+  .fb{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    font-size:0.95rem;
+    line-height:1.5;
+    display:none;
+    animation: fadeIn .35s ease;
+  }
+  .fb.correct{
+    display:block;
+    background:#E6FBF3;
+    color:#00734D;
+    border:1px solid #A9EFD1;
+  }
+  .fb.incorrect{
+    display:block;
+    background:#FFEDED;
+    color:#B32020;
+    border:1px solid #FFC2C2;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(-6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-6px);}
+    40%{transform:translateX(6px);}
+    60%{transform:translateX(-4px);}
+    80%{transform:translateX(4px);}
+  }
+  .shake{animation:shake .4s;}
+  @keyframes pop{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.05);}
+    100%{transform:scale(1);}
+  }
+  .pop{animation:pop .35s;}
+
+  .card.correct-card{border-color:var(--green);}
+  .card.incorrect-card{border-color:var(--red);}
+
+  .action-row{
+    text-align:center;
+    margin:30px 0;
+  }
+  .big-btn{
+    background:linear-gradient(90deg, var(--purple), var(--pink));
+    color:white;
+    border:none;
+    padding:16px 38px;
+    border-radius:30px;
+    font-size:1.15rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(108,92,231,0.35);
+    transition:transform .15s, box-shadow .15s;
+  }
+  .big-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px rgba(108,92,231,0.45);}
+  .big-btn:disabled{
+    background:#CFCFCF;
+    cursor:not-allowed;
+    box-shadow:none;
+  }
+  .hint{
+    text-align:center;
+    color:#B32020;
+    font-size:0.9rem;
+    margin-top:10px;
+    display:none;
+  }
+
+  .results{
+    display:none;
+    background:var(--card-bg);
+    border-radius:20px;
+    padding:30px 24px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    margin-bottom:24px;
+  }
+  .results h2{
+    font-size:1.6rem;
+    margin-bottom:6px;
+  }
+  .score-circle{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    margin:20px auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background:conic-gradient(var(--purple) 0deg, var(--purple) 0deg, #EEE 0deg);
+    position:relative;
+  }
+  .score-circle-inner{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+  }
+  .score-num{
+    font-size:1.8rem;
+    font-weight:800;
+    color:var(--purple-dark);
+  }
+  .score-pct{
+    font-size:1rem;
+    color:#636E72;
+  }
+  .feedback-msg{
+    font-size:1.1rem;
+    font-weight:700;
+    margin:12px 0;
+  }
+  .try-again{
+    background:linear-gradient(90deg, var(--teal), var(--green));
+    color:white;
+    border:none;
+    padding:14px 32px;
+    border-radius:30px;
+    font-size:1.05rem;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:10px;
+    box-shadow:0 6px 18px rgba(0,184,148,0.35);
+  }
+  .try-again:hover{transform:translateY(-2px);}
+
+  footer{
+    text-align:center;
+    color:#B2B2C6;
+    font-size:0.8rem;
+    margin-top:30px;
+  }
+
+  @media (max-width:480px){
+    .name-card{flex-direction:column;align-items:stretch;}
+    .options{flex-direction:column;}
+    .opt-btn{width:100%;text-align:left;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>✨ Simple Present Challenge ✨</h1>
+    <p class="subtitle">Practice affirmative, negative, and question forms!</p>
+  </header>
+
+  <div class="name-card">
+    <label for="studentName">Student Name:</label>
+    <input type="text" id="studentName" placeholder="Type your name here...">
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-text" id="progressText">Question 0 of 20 answered</div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+  </div>
+
+  <div id="quizArea"></div>
+
+  <div class="action-row">
+    <button class="big-btn" id="checkBtn" onclick="checkAnswers()">CHECK ANSWERS</button>
+    <p class="hint" id="hintMsg">Please answer all 20 questions before checking your results.</p>
+  </div>
+
+  <div class="results" id="resultsBox">
+    <h2 id="resultsTitle">Results</h2>
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-circle-inner">
+        <div class="score-num" id="scoreNum">0/20</div>
+        <div class="score-pct" id="scorePct">0%</div>
+      </div>
+    </div>
+    <div class="feedback-msg" id="feedbackMsg"></div>
+    <button class="try-again" onclick="tryAgain()">TRY AGAIN</button>
+  </div>
+
+  <footer>Simple Present Tense Practice</footer>
+</div>
+
+<script>
+// ---------- Question bank ----------
+// type: "mc" (multiple choice buttons) or "text" (typed input)
+const questions = [
+  {
+    type:"mc",
+    text:"She ___ in a big office downtown.",
+    options:["work","works","working"],
+    answer:"works",
+    explain:"Use the base verb + -s for he/she/it: work → works."
+  },
+  {
+    type:"text",
+    text:"I ___ (live) in a small apartment near the park.",
+    answer:"live",
+    accept:["live"],
+    explain:"With I/you/we/they, use the base verb: I live."
+  },
+  {
+    type:"mc",
+    text:"He ___ have any brothers or sisters.",
+    options:["don't","doesn't"],
+    answer:"doesn't",
+    explain:"He/she/it uses 'doesn't' in negatives: He doesn't have..."
+  },
+  {
+    type:"text",
+    text:"They ___ (not / work) on weekends. (negative)",
+    answer:"don't work",
+    accept:["don't work","do not work"],
+    explain:"They is plural, so use 'don't' + base verb: They don't work."
+  },
+  {
+    type:"mc",
+    text:"___ you have any cousins?",
+    options:["Do","Does"],
+    answer:"Do",
+    explain:"With you/I/we/they, questions start with 'Do': Do you have...?"
+  },
+  {
+    type:"mc",
+    text:"___ she live near the school?",
+    options:["Do","Does"],
+    answer:"Does",
+    explain:"With he/she/it, questions start with 'Does': Does she live...?"
+  },
+  {
+    type:"text",
+    text:"My brother ___ (study) English every evening.",
+    answer:"studies",
+    accept:["studies"],
+    explain:"Verbs ending in a consonant + y change to -ies: study → studies."
+  },
+  {
+    type:"mc",
+    text:"Does he work nearby? — Yes, he ___.",
+    options:["do","does"],
+    answer:"does",
+    explain:"Short answers with 'does' questions use 'does': Yes, he does."
+  },
+  {
+    type:"mc",
+    text:"Do they live in Lima? — No, they ___.",
+    options:["don't","doesn't"],
+    answer:"don't",
+    explain:"Short answers with 'do' questions use 'don't' for negatives: No, they don't."
+  },
+  {
+    type:"text",
+    text:"He ___ (watch) TV every night.",
+    answer:"watches",
+    accept:["watches"],
+    explain:"Verbs ending in -ch, -sh, -x, -s, -o usually add -es: watch → watches."
+  },
+  {
+    type:"mc",
+    text:"Choose the correct sentence:",
+    options:["She don't have a car.","She doesn't have a car."],
+    answer:"She doesn't have a car.",
+    explain:"He/she/it uses 'doesn't', not 'don't', in negatives."
+  },
+  {
+    type:"text",
+    text:"We ___ (have) two dogs at home.",
+    answer:"have",
+    accept:["have"],
+    explain:"With we/you/they/I, use the base verb: We have..."
+  },
+  {
+    type:"mc",
+    text:"He doesn't ___ in a hospital.",
+    options:["work","works","working"],
+    answer:"work",
+    explain:"After 'doesn't', the main verb stays in its base form: doesn't work, NOT doesn't works."
+  },
+  {
+    type:"mc",
+    text:"___ your parents live in this city?",
+    options:["Do","Does"],
+    answer:"Do",
+    explain:"'Your parents' = they, so use 'Do': Do your parents live...?"
+  },
+  {
+    type:"text",
+    text:"I ___ (not / have) any children. (negative)",
+    answer:"don't have",
+    accept:["don't have","do not have"],
+    explain:"With I, use 'don't' + base verb: I don't have..."
+  },
+  {
+    type:"mc",
+    text:"Does your sister have any pets? — Yes, she ___.",
+    options:["do","does"],
+    answer:"does",
+    explain:"Short answer with 'does' question: Yes, she does."
+  },
+  {
+    type:"text",
+    text:"My mother ___ (go) to work by bus.",
+    answer:"goes",
+    accept:["goes"],
+    explain:"Verbs ending in -o add -es: go → goes."
+  },
+  {
+    type:"mc",
+    text:"Choose the correct question:",
+    options:["Does they work nearby?","Do they work nearby?"],
+    answer:"Do they work nearby?",
+    explain:"'They' takes 'Do', not 'Does': Do they work nearby?"
+  },
+  {
+    type:"mc",
+    text:"He ___ three languages.",
+    options:["speak","speaks","speaking"],
+    answer:"speaks",
+    explain:"He/she/it takes the -s form: speak → speaks."
+  },
+  {
+    type:"text",
+    text:"Do you have any cousins? — No, I ___. (short answer)",
+    answer:"don't",
+    accept:["don't","do not"],
+    explain:"Short answer with 'Do' question uses 'don't': No, I don't."
+  }
+];
+
+const TOTAL = questions.length;
+let studentAnswers = new Array(TOTAL).fill(null);
+let checked = false;
+
+// ---------- Render ----------
+function renderQuiz(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = "";
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'card-' + i;
+
+    const num = document.createElement('div');
+    num.className = 'qnum';
+    num.textContent = 'Question ' + (i+1) + ' of ' + TOTAL;
+    card.appendChild(num);
+
+    const qtext = document.createElement('div');
+    qtext.className = 'qtext';
+    qtext.textContent = q.text;
+    card.appendChild(qtext);
+
+    if(q.type === 'mc'){
+      const optWrap = document.createElement('div');
+      optWrap.className = 'options';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'opt-btn';
+        btn.textContent = opt;
+        btn.onclick = () => selectOption(i, opt, btn, optWrap);
+        optWrap.appendChild(btn);
+      });
+      card.appendChild(optWrap);
+    } else {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'text-input';
+      input.placeholder = 'Type your answer...';
+      input.id = 'input-' + i;
+      input.addEventListener('input', () => {
+        studentAnswers[i] = input.value.trim();
+        updateProgress();
+      });
+      card.appendChild(input);
+    }
+
+    const fb = document.createElement('div');
+    fb.className = 'fb';
+    fb.id = 'fb-' + i;
+    card.appendChild(fb);
+
+    area.appendChild(card);
+  });
+  updateProgress();
+}
+
+function selectOption(i, opt, btn, wrap){
+  if(checked) return;
+  studentAnswers[i] = opt;
+  Array.from(wrap.children).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('card-'+i).classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress(){
+  const answeredCount = studentAnswers.filter(a => a !== null && a !== "").length;
+  document.getElementById('progressText').textContent =
+    'Question ' + answeredCount + ' of ' + TOTAL + ' answered';
+  const pct = Math.round((answeredCount / TOTAL) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function normalize(s){
+  return (s || "").toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!?]+$/,'');
+}
+
+function checkAnswers(){
+  const answeredCount = studentAnswers.filter(a => a !== null && a !== "").length;
+  if(answeredCount < TOTAL){
+    document.getElementById('hintMsg').style.display = 'block';
+    const firstUnanswered = studentAnswers.findIndex(a => a === null || a === "");
+    if(firstUnanswered !== -1){
+      document.getElementById('card-' + firstUnanswered).scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    return;
+  }
+  document.getElementById('hintMsg').style.display = 'none';
+  checked = true;
+  document.getElementById('checkBtn').disabled = true;
+
+  let score = 0;
+  questions.forEach((q, i) => {
+    const card = document.getElementById('card-' + i);
+    const fb = document.getElementById('fb-' + i);
+    let isCorrect = false;
+
+    if(q.type === 'mc'){
+      isCorrect = studentAnswers[i] === q.answer;
+      const wrap = card.querySelector('.options');
+      Array.from(wrap.children).forEach(b => {
+        b.disabled = true;
+        if(b.textContent === q.answer){
+          b.style.background = 'var(--green)';
+          b.style.color = 'white';
+          b.style.borderColor = 'var(--green)';
+        } else if(b.textContent === studentAnswers[i] && !isCorrect){
+          b.style.background = 'var(--red)';
+          b.style.color = 'white';
+          b.style.borderColor = 'var(--red)';
+        }
+      });
+    } else {
+      const acceptList = q.accept || [q.answer];
+      isCorrect = acceptList.some(a => normalize(a) === normalize(studentAnswers[i]));
+      const input = document.getElementById('input-' + i);
+      input.disabled = true;
+    }
+
+    if(isCorrect){
+      score++;
+      card.classList.add('correct-card', 'pop');
+      fb.classList.add('correct');
+      fb.textContent = '✅ Correct! ' + q.explain;
+    } else {
+      card.classList.add('incorrect-card', 'shake');
+      fb.classList.add('incorrect');
+      fb.textContent = '❌ Correct answer: "' + q.answer + '". ' + q.explain;
+    }
+  });
+
+  showResults(score);
+  document.getElementById('resultsBox').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function showResults(score){
+  const box = document.getElementById('resultsBox');
+  box.style.display = 'block';
+
+  const name = document.getElementById('studentName').value.trim();
+  const pct = Math.round((score / TOTAL) * 100);
+
+  let greeting;
+  if(pct >= 90) greeting = 'Excellent! 🎉';
+  else if(pct >= 80) greeting = 'Great job! 👏';
+  else if(pct >= 70) greeting = 'Good work! Keep practicing! 👍';
+  else greeting = "Keep practicing! Review do/does, don't/doesn't, and the third-person -s. 💪";
+
+  const title = name ? ('Great job, ' + name + '! 🎉') : 'Great job! 🎉';
+  document.getElementById('resultsTitle').textContent = title;
+  document.getElementById('scoreNum').textContent = score + '/' + TOTAL;
+  document.getElementById('scorePct').textContent = pct + '%';
+  document.getElementById('feedbackMsg').textContent = greeting + ' You scored ' + score + '/' + TOTAL + ' (' + pct + '%).';
+
+  let color = 'var(--red)';
+  if(pct >= 90) color = 'var(--green)';
+  else if(pct >= 70) color = 'var(--purple)';
+  else if(pct >= 50) color = 'var(--yellow)';
+
+  const deg = Math.round((pct/100) * 360);
+  document.getElementById('scoreCircle').style.background =
+    'conic-gradient(' + color + ' ' + deg + 'deg, #EEE ' + deg + 'deg)';
+}
+
+function tryAgain(){
+  const name = document.getElementById('studentName').value;
+  studentAnswers = new Array(TOTAL).fill(null);
+  checked = false;
+  document.getElementById('resultsBox').style.display = 'none';
+  document.getElementById('checkBtn').disabled = false;
+  document.getElementById('hintMsg').style.display = 'none';
+  renderQuiz();
+  document.getElementById('studentName').value = name;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
