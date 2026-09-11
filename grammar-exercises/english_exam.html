@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Exam</title>
+<style>
+  :root{
+    --primary:#2b6777;
+    --primary-dark:#1f4e59;
+    --accent:#52ab98;
+    --bg:#f4f7f8;
+    --card-bg:#ffffff;
+    --text:#243b3f;
+    --muted:#6b7d80;
+    --border:#e1e8e9;
+    --correct:#2f9e6f;
+    --wrong:#d9534f;
+    --shadow: 0 2px 10px rgba(31,78,89,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: Georgia, 'Times New Roman', serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header.top{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:#fff;
+    padding:28px 20px;
+    text-align:center;
+  }
+  header.top h1{
+    margin:0;
+    font-size:1.8rem;
+    letter-spacing:1px;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  header.top p{
+    margin:6px 0 0;
+    font-size:0.95rem;
+    opacity:0.9;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  .container{
+    max-width:760px;
+    margin:0 auto;
+    padding:20px;
+  }
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:24px;
+    margin-bottom:22px;
+    box-shadow:var(--shadow);
+  }
+  .card h2{
+    margin-top:0;
+    font-size:1.25rem;
+    color:var(--primary-dark);
+    border-bottom:2px solid var(--accent);
+    padding-bottom:8px;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  .field{
+    margin-bottom:16px;
+  }
+  label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:6px;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    font-size:0.95rem;
+  }
+  input[type="text"]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:1rem;
+    font-family: Georgia, serif;
+    background:#fbfdfd;
+  }
+  input[type="text"]:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(82,171,152,0.15);
+  }
+  button{
+    cursor:pointer;
+    border:none;
+    border-radius:6px;
+    padding:12px 26px;
+    font-size:1rem;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    font-weight:bold;
+    transition:transform 0.08s ease, background 0.2s ease;
+  }
+  button:active{transform:scale(0.98);}
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+  }
+  .btn-primary:hover{background:#469c8b;}
+  .btn-secondary{
+    background:var(--primary);
+    color:#fff;
+  }
+  .btn-secondary:hover{background:var(--primary-dark);}
+  .btn-row{
+    text-align:center;
+    margin-top:10px;
+  }
+  #progressWrap{
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    padding:10px 20px 6px;
+    z-index:10;
+  }
+  #progressBarOuter{
+    width:100%;
+    background:var(--border);
+    border-radius:20px;
+    height:12px;
+    overflow:hidden;
+    max-width:760px;
+    margin:0 auto;
+  }
+  #progressBarInner{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--primary));
+    transition:width 0.25s ease;
+  }
+  #progressLabel{
+    text-align:center;
+    font-size:0.8rem;
+    color:var(--muted);
+    max-width:760px;
+    margin:4px auto 0;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  .question{
+    margin-bottom:18px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .question:last-child{
+    border-bottom:none;
+    margin-bottom:0;
+    padding-bottom:0;
+  }
+  .qtext{
+    font-weight:bold;
+    margin-bottom:10px;
+  }
+  .qnum{
+    color:var(--accent);
+    margin-right:6px;
+  }
+  .options label{
+    font-weight:normal;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin-bottom:8px;
+    cursor:pointer;
+    background:#fbfdfd;
+  }
+  .options label:hover{
+    border-color:var(--accent);
+  }
+  .options input[type="radio"]{
+    accent-color:var(--accent);
+    width:16px;height:16px;
+  }
+  .reading-text{
+    background:#f0f6f5;
+    border-left:4px solid var(--accent);
+    padding:16px 18px;
+    border-radius:6px;
+    margin-bottom:20px;
+    font-style:italic;
+  }
+  .instructions{
+    background:#eef6f7;
+    border-radius:8px;
+    padding:14px 16px;
+    font-size:0.95rem;
+    color:var(--muted);
+    margin-bottom:20px;
+  }
+  #dateDisplay{
+    color:var(--muted);
+    font-size:0.9rem;
+  }
+  .hidden{display:none !important;}
+  .disabled-note{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.85rem;
+    margin-top:6px;
+  }
+  fieldset[disabled] .options label,
+  .locked input{
+    opacity:0.65;
+    pointer-events:none;
+  }
+  #resultsScreen{
+    text-align:center;
+  }
+  #resultsScreen h2{
+    border:none;
+    font-size:1.6rem;
+    color:var(--primary-dark);
+  }
+  .score-big{
+    font-size:2.4rem;
+    font-weight:bold;
+    color:var(--accent);
+    margin:10px 0;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  .percentage-big{
+    font-size:1.4rem;
+    color:var(--primary);
+    margin-bottom:10px;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+  .level-badge{
+    display:inline-block;
+    padding:8px 22px;
+    border-radius:30px;
+    font-weight:bold;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    color:#fff;
+    background:var(--primary);
+    margin-bottom:16px;
+  }
+  .error-msg{
+    color:var(--wrong);
+    font-size:0.9rem;
+    margin-top:8px;
+    text-align:center;
+    display:none;
+  }
+  .name-in-results{
+    font-size:1.3rem;
+    font-weight:bold;
+    font-family: 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>ENGLISH EXAM</h1>
+  <p>Elementary &ndash; Pre-Intermediate Level</p>
+</header>
+
+<div id="progressWrap" class="hidden">
+  <div id="progressBarOuter"><div id="progressBarInner"></div></div>
+  <div id="progressLabel">0 of 29 questions answered</div>
+</div>
+
+<div class="container">
+
+  <!-- START SCREEN -->
+  <div class="card" id="startScreen">
+    <h2>Before You Begin</h2>
+    <div class="field">
+      <label for="studentName">Name:</label>
+      <input type="text" id="studentName" placeholder="Type your full name here" required>
+    </div>
+    <div class="field">
+      <label>Date:</label>
+      <div id="dateDisplay"></div>
+    </div>
+    <p class="instructions">Read each question carefully and choose or write the best answer. When you finish, click <strong>Submit Exam</strong> to see your results.</p>
+    <div class="error-msg" id="nameError">Please enter your name before starting the exam.</div>
+    <div class="btn-row">
+      <button class="btn-primary" id="startBtn">Start Exam</button>
+    </div>
+  </div>
+
+  <!-- EXAM -->
+  <form id="examForm" class="hidden">
+
+    <div class="card">
+      <h2>Part 1 &ndash; Verb To Be</h2>
+      <div class="question" data-qid="q1">
+        <div class="qtext"><span class="qnum">1.</span>My sister ___ a doctor.</div>
+        <div class="options">
+          <label><input type="radio" name="q1" value="am"> am</label>
+          <label><input type="radio" name="q1" value="is"> is</label>
+          <label><input type="radio" name="q1" value="are"> are</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q2">
+        <div class="qtext"><span class="qnum">2.</span>We ___ from Canada.</div>
+        <div class="options">
+          <label><input type="radio" name="q2" value="am"> am</label>
+          <label><input type="radio" name="q2" value="is"> is</label>
+          <label><input type="radio" name="q2" value="are"> are</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q3">
+        <div class="qtext"><span class="qnum">3.</span>___ you ready for the test?</div>
+        <div class="options">
+          <label><input type="radio" name="q3" value="am"> Am</label>
+          <label><input type="radio" name="q3" value="is"> Is</label>
+          <label><input type="radio" name="q3" value="are"> Are</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q4">
+        <div class="qtext"><span class="qnum">4.</span>He ___ not at home right now.</div>
+        <div class="options">
+          <label><input type="radio" name="q4" value="am"> am</label>
+          <label><input type="radio" name="q4" value="is"> is</label>
+          <label><input type="radio" name="q4" value="are"> are</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q5">
+        <div class="qtext"><span class="qnum">5.</span>I ___ a student.</div>
+        <div class="options">
+          <label><input type="radio" name="q5" value="am"> am</label>
+          <label><input type="radio" name="q5" value="is"> is</label>
+          <label><input type="radio" name="q5" value="are"> are</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Part 2 &ndash; Present Simple</h2>
+      <div class="question" data-qid="q6">
+        <div class="qtext"><span class="qnum">6.</span>She ___ in a hospital. (work / works)</div>
+        <div class="options">
+          <label><input type="radio" name="q6" value="work"> work</label>
+          <label><input type="radio" name="q6" value="works"> works</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q7">
+        <div class="qtext"><span class="qnum">7.</span>They ___ (live) in Madrid.</div>
+        <input type="text" name="q7" placeholder="Write your answer">
+      </div>
+      <div class="question" data-qid="q8">
+        <div class="qtext"><span class="qnum">8.</span>___ you like coffee?</div>
+        <div class="options">
+          <label><input type="radio" name="q8" value="do"> Do</label>
+          <label><input type="radio" name="q8" value="does"> Does</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q9">
+        <div class="qtext"><span class="qnum">9.</span>He ___ (not / like) spicy food.</div>
+        <input type="text" name="q9" placeholder="Write your answer">
+      </div>
+      <div class="question" data-qid="q10">
+        <div class="qtext"><span class="qnum">10.</span>My parents ___ speak French. (don't / doesn't)</div>
+        <div class="options">
+          <label><input type="radio" name="q10" value="dont"> don't</label>
+          <label><input type="radio" name="q10" value="doesnt"> doesn't</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q11">
+        <div class="qtext"><span class="qnum">11.</span>My brother ___ (study) English every day.</div>
+        <input type="text" name="q11" placeholder="Write your answer">
+      </div>
+      <div class="question" data-qid="q12">
+        <div class="qtext"><span class="qnum">12.</span>What time ___ she get up in the morning?</div>
+        <div class="options">
+          <label><input type="radio" name="q12" value="do"> do</label>
+          <label><input type="radio" name="q12" value="does"> does</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Part 3 &ndash; Time, Routines &amp; Frequency</h2>
+      <div class="question" data-qid="q13">
+        <div class="qtext"><span class="qnum">13.</span>It's 7:30. We say it's &ldquo;half past ___&rdquo;.</div>
+        <div class="options">
+          <label><input type="radio" name="q13" value="six"> six</label>
+          <label><input type="radio" name="q13" value="seven"> seven</label>
+          <label><input type="radio" name="q13" value="eight"> eight</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q14">
+        <div class="qtext"><span class="qnum">14.</span>I usually go to bed ___ 11 pm.</div>
+        <div class="options">
+          <label><input type="radio" name="q14" value="at"> at</label>
+          <label><input type="radio" name="q14" value="in"> in</label>
+          <label><input type="radio" name="q14" value="on"> on</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q15">
+        <div class="qtext"><span class="qnum">15.</span>My birthday is ___ June.</div>
+        <div class="options">
+          <label><input type="radio" name="q15" value="at"> at</label>
+          <label><input type="radio" name="q15" value="in"> in</label>
+          <label><input type="radio" name="q15" value="on"> on</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q16">
+        <div class="qtext"><span class="qnum">16.</span>I go to the gym ___ Mondays.</div>
+        <div class="options">
+          <label><input type="radio" name="q16" value="at"> at</label>
+          <label><input type="radio" name="q16" value="in"> in</label>
+          <label><input type="radio" name="q16" value="on"> on</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q17">
+        <div class="qtext"><span class="qnum">17.</span>&ldquo;How often do you exercise?&rdquo; &ldquo;I exercise ___.&rdquo;</div>
+        <div class="options">
+          <label><input type="radio" name="q17" value="twice a week"> twice a week</label>
+          <label><input type="radio" name="q17" value="two week"> two week</label>
+          <label><input type="radio" name="q17" value="week two times"> week two times</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q18">
+        <div class="qtext"><span class="qnum">18.</span>Put the words in the correct order: <em>up / usually / I / at 7 am / get</em></div>
+        <input type="text" name="q18" placeholder="Write the full sentence">
+      </div>
+      <div class="question" data-qid="q19">
+        <div class="qtext"><span class="qnum">19.</span>Put the words in the correct order: <em>never / coffee / drinks / she</em></div>
+        <input type="text" name="q19" placeholder="Write the full sentence">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Part 4 &ndash; Present Simple vs. Present Continuous</h2>
+      <div class="question" data-qid="q20">
+        <div class="qtext"><span class="qnum">20.</span>Look! It ___ right now.</div>
+        <div class="options">
+          <label><input type="radio" name="q20" value="rains"> rains</label>
+          <label><input type="radio" name="q20" value="is raining"> is raining</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q21">
+        <div class="qtext"><span class="qnum">21.</span>I usually ___ tea in the morning.</div>
+        <div class="options">
+          <label><input type="radio" name="q21" value="drink"> drink</label>
+          <label><input type="radio" name="q21" value="am drinking"> am drinking</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q22">
+        <div class="qtext"><span class="qnum">22.</span>Right now, she ___ her homework.</div>
+        <div class="options">
+          <label><input type="radio" name="q22" value="does"> does</label>
+          <label><input type="radio" name="q22" value="is doing"> is doing</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q23">
+        <div class="qtext"><span class="qnum">23.</span>We ___ dinner every day at 7 pm.</div>
+        <div class="options">
+          <label><input type="radio" name="q23" value="have"> have</label>
+          <label><input type="radio" name="q23" value="are having"> are having</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q24">
+        <div class="qtext"><span class="qnum">24.</span>At the moment, they ___ a movie.</div>
+        <div class="options">
+          <label><input type="radio" name="q24" value="watch"> watch</label>
+          <label><input type="radio" name="q24" value="are watching"> are watching</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Part 5 &ndash; Short Reading</h2>
+      <div class="reading-text">
+        Laura is a nurse. She works in a big hospital in the city. Every day, she wakes up at 6 am and has breakfast at 6:30. She usually walks to work because the hospital is near her house. Laura works from 8 am to 4 pm, three times a week. On her free days, she goes to the gym or meets her friends. Today is different. Right now, Laura is not at home &mdash; she is working an extra shift at the hospital because a colleague is sick. She is helping a patient at the moment. After work, she is going to visit her mother. Laura loves her job very much.
+      </div>
+      <div class="question" data-qid="q25">
+        <div class="qtext"><span class="qnum">25.</span>What is Laura's job?</div>
+        <div class="options">
+          <label><input type="radio" name="q25" value="teacher"> Teacher</label>
+          <label><input type="radio" name="q25" value="nurse"> Nurse</label>
+          <label><input type="radio" name="q25" value="doctor"> Doctor</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q26">
+        <div class="qtext"><span class="qnum">26.</span>What time does Laura usually wake up?</div>
+        <div class="options">
+          <label><input type="radio" name="q26" value="6am"> 6 am</label>
+          <label><input type="radio" name="q26" value="630am"> 6:30 am</label>
+          <label><input type="radio" name="q26" value="8am"> 8 am</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q27">
+        <div class="qtext"><span class="qnum">27.</span>How does Laura usually get to work?</div>
+        <div class="options">
+          <label><input type="radio" name="q27" value="bus"> By bus</label>
+          <label><input type="radio" name="q27" value="walks"> She walks</label>
+          <label><input type="radio" name="q27" value="drives"> She drives</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q28">
+        <div class="qtext"><span class="qnum">28.</span>Why is today different for Laura?</div>
+        <div class="options">
+          <label><input type="radio" name="q28" value="holiday"> She is on holiday</label>
+          <label><input type="radio" name="q28" value="extra shift"> She is working an extra shift because a colleague is sick</label>
+          <label><input type="radio" name="q28" value="sick"> She is sick today</label>
+        </div>
+      </div>
+      <div class="question" data-qid="q29">
+        <div class="qtext"><span class="qnum">29.</span>What is Laura doing right now?</div>
+        <div class="options">
+          <label><input type="radio" name="q29" value="sleeping"> Sleeping</label>
+          <label><input type="radio" name="q29" value="visiting her mother"> Visiting her mother</label>
+          <label><input type="radio" name="q29" value="helping a patient"> Helping a patient</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="submit" class="btn-primary" id="submitBtn">Submit Exam</button>
+    </div>
+    <p class="disabled-note">Once submitted, your answers cannot be changed.</p>
+  </form>
+
+  <!-- RESULTS -->
+  <div class="card hidden" id="resultsScreen">
+    <h2 id="congratsText">Congratulations!</h2>
+    <div class="name-in-results" id="resultName"></div>
+    <div class="score-big" id="resultScore"></div>
+    <div class="percentage-big" id="resultPercentage"></div>
+    <div class="level-badge" id="resultLevel"></div>
+    <p>Thank you for completing the exam!</p>
+    <div class="btn-row">
+      <button class="btn-secondary" id="retakeBtn">Retake Exam</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Display today's date
+  var dateEl = document.getElementById('dateDisplay');
+  var today = new Date();
+  var options = { year: 'numeric', month: 'long', day: 'numeric' };
+  dateEl.textContent = today.toLocaleDateString('en-US', options);
+
+  // Question definitions: type 'mc' (radio, exact value match) or 'text' (normalized string match)
+  var questions = [
+    {id:'q1', type:'mc', answers:['is']},
+    {id:'q2', type:'mc', answers:['are']},
+    {id:'q3', type:'mc', answers:['are']},
+    {id:'q4', type:'mc', answers:['is']},
+    {id:'q5', type:'mc', answers:['am']},
+
+    {id:'q6', type:'mc', answers:['works']},
+    {id:'q7', type:'text', answers:['live']},
+    {id:'q8', type:'mc', answers:['do']},
+    {id:'q9', type:'text', answers:['doesnt like','does not like',"doesn't like"]},
+    {id:'q10', type:'mc', answers:['dont']},
+    {id:'q11', type:'text', answers:['studies']},
+    {id:'q12', type:'mc', answers:['does']},
+
+    {id:'q13', type:'mc', answers:['seven']},
+    {id:'q14', type:'mc', answers:['at']},
+    {id:'q15', type:'mc', answers:['in']},
+    {id:'q16', type:'mc', answers:['on']},
+    {id:'q17', type:'mc', answers:['twice a week']},
+    {id:'q18', type:'text', answers:['i usually get up at 7 am','i usually get up at seven am','i usually get up at 7am']},
+    {id:'q19', type:'text', answers:['she never drinks coffee']},
+
+    {id:'q20', type:'mc', answers:['is raining']},
+    {id:'q21', type:'mc', answers:['drink']},
+    {id:'q22', type:'mc', answers:['is doing']},
+    {id:'q23', type:'mc', answers:['have']},
+    {id:'q24', type:'mc', answers:['are watching']},
+
+    {id:'q25', type:'mc', answers:['nurse']},
+    {id:'q26', type:'mc', answers:['6am']},
+    {id:'q27', type:'mc', answers:['walks']},
+    {id:'q28', type:'mc', answers:['extra shift']},
+    {id:'q29', type:'mc', answers:['helping a patient']}
+  ];
+
+  var TOTAL_QUESTIONS = questions.length; // should be 29
+
+  function normalize(str){
+    return String(str || '')
+      .toLowerCase()
+      .replace(/['’]/g, '')
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  var startScreen = document.getElementById('startScreen');
+  var examForm = document.getElementById('examForm');
+  var resultsScreen = document.getElementById('resultsScreen');
+  var studentNameInput = document.getElementById('studentName');
+  var nameError = document.getElementById('nameError');
+  var startBtn = document.getElementById('startBtn');
+  var retakeBtn = document.getElementById('retakeBtn');
+  var progressWrap = document.getElementById('progressWrap');
+  var progressBarInner = document.getElementById('progressBarInner');
+  var progressLabel = document.getElementById('progressLabel');
+
+  var submittedOnce = false;
+  var finalStudentName = '';
+
+  function updateProgress(){
+    var answered = 0;
+    questions.forEach(function(q){
+      if(q.type === 'mc'){
+        var checked = examForm.querySelector('input[name="'+q.id+'"]:checked');
+        if(checked) answered++;
+      } else {
+        var field = examForm.querySelector('input[name="'+q.id+'"]');
+        if(field && normalize(field.value).length > 0) answered++;
+      }
+    });
+    var pct = Math.round((answered / TOTAL_QUESTIONS) * 100);
+    progressBarInner.style.width = pct + '%';
+    progressLabel.textContent = answered + ' of ' + TOTAL_QUESTIONS + ' questions answered';
+  }
+
+  examForm.addEventListener('change', updateProgress);
+  examForm.addEventListener('keyup', updateProgress);
+
+  startBtn.addEventListener('click', function(){
+    var name = studentNameInput.value.trim();
+    if(name.length === 0){
+      nameError.style.display = 'block';
+      studentNameInput.focus();
+      return;
+    }
+    nameError.style.display = 'none';
+    finalStudentName = name;
+    startScreen.classList.add('hidden');
+    examForm.classList.remove('hidden');
+    progressWrap.classList.remove('hidden');
+    updateProgress();
+    window.scrollTo(0,0);
+  });
+
+  function calculateScore(){
+    var score = 0;
+    questions.forEach(function(q){
+      var userValue = '';
+      if(q.type === 'mc'){
+        var checked = examForm.querySelector('input[name="'+q.id+'"]:checked');
+        userValue = checked ? normalize(checked.value) : '';
+      } else {
+        var field = examForm.querySelector('input[name="'+q.id+'"]');
+        userValue = field ? normalize(field.value) : '';
+      }
+      var isCorrect = q.answers.some(function(a){ return normalize(a) === userValue; });
+      if(isCorrect) score++;
+    });
+    return score;
+  }
+
+  function getLevel(score){
+    if(score >= 26) return 'Excellent';
+    if(score >= 22) return 'Very Good';
+    if(score >= 18) return 'Good';
+    if(score >= 14) return 'Needs Practice';
+    return 'Keep Practicing';
+  }
+
+  function lockExam(){
+    var inputs = examForm.querySelectorAll('input');
+    inputs.forEach(function(inp){ inp.disabled = true; });
+    examForm.classList.add('locked');
+    document.getElementById('submitBtn').disabled = true;
+  }
+
+  examForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(submittedOnce) return; // prevent multiple conflicting results
+    submittedOnce = true;
+
+    var score = calculateScore();
+    var percentage = Math.round((score / TOTAL_QUESTIONS) * 100);
+    var level = getLevel(score);
+
+    lockExam();
+
+    document.getElementById('resultName').textContent = finalStudentName;
+    document.getElementById('congratsText').textContent = 'Congratulations, ' + finalStudentName + '!';
+    document.getElementById('resultScore').textContent = 'Your score: ' + score + ' / ' + TOTAL_QUESTIONS;
+    document.getElementById('resultPercentage').textContent = 'Percentage: ' + percentage + '%';
+    document.getElementById('resultLevel').textContent = 'Level: ' + level;
+
+    examForm.classList.add('hidden');
+    progressWrap.classList.add('hidden');
+    resultsScreen.classList.remove('hidden');
+    window.scrollTo(0,0);
+  });
+
+  retakeBtn.addEventListener('click', function(){
+    // Reset everything
+    submittedOnce = false;
+    finalStudentName = '';
+    studentNameInput.value = '';
+
+    var radios = examForm.querySelectorAll('input[type="radio"]');
+    radios.forEach(function(r){ r.checked = false; r.disabled = false; });
+    var texts = examForm.querySelectorAll('input[type="text"]');
+    texts.forEach(function(t){ t.value = ''; t.disabled = false; });
+    document.getElementById('submitBtn').disabled = false;
+    examForm.classList.remove('locked');
+
+    resultsScreen.classList.add('hidden');
+    examForm.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+    window.scrollTo(0,0);
+  });
+
+})();
+</script>
+
+</body>
+</html>
