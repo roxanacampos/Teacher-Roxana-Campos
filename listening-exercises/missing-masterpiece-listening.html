@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Mystery of the Missing Masterpiece | Ready2Speak</title>
+<style>
+:root{--navy:#12294a;--navy2:#1c3d6b;--teal:#0f8a8a;--tealbg:#e3f3f2;--gold:#c9973b;--goldbg:#fbf3e1;--bg:#f4f6f9;--card:#fff;--ink:#1b2433;--mute:#586277;--line:#d5dbe5;--ok:#16794c;--okbg:#e4f5ec;--bad:#b3261e;--badbg:#fdeceb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--navy:#0b1830;--navy2:#1c3d6b;--tealbg:#123a3d;--goldbg:#3a2f18;--bg:#0e1522;--card:#17202f;--ink:#e8edf5;--mute:#a4afc2;--line:#2c3a52;--okbg:#12362a;--badbg:#3b1917;--ok:#5fd39b;--bad:#ff9a92}}
+:root[data-theme="dark"]{--navy:#0b1830;--navy2:#1c3d6b;--tealbg:#123a3d;--goldbg:#3a2f18;--bg:#0e1522;--card:#17202f;--ink:#e8edf5;--mute:#a4afc2;--line:#2c3a52;--okbg:#12362a;--badbg:#3b1917;--ok:#5fd39b;--bad:#ff9a92}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+h1,h2,h3,button,legend,label,.ui{font-family:"Segoe UI",Helvetica,Arial,sans-serif}
+header{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;padding:22px 20px;border-bottom:5px solid var(--gold)}
+.wrap{max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:12px;font:700 1.15rem "Segoe UI",Arial,sans-serif}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-weight:800}
+.brand small{display:block;font-weight:400;opacity:.85;font-size:.8rem}
+header h1{margin:14px 0 0;font-size:clamp(1.5rem,4vw,2.3rem);line-height:1.2}
+main.wrap{padding:24px 16px 48px;display:grid;gap:24px}
+@media(min-width:980px){main.wrap{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}.video-col{position:sticky;top:12px}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.video-box{position:relative;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-col p{margin:12px 0 0}
+.btn{display:inline-block;font:600 1rem "Segoe UI",Arial,sans-serif;border:0;border-radius:10px;padding:12px 22px;cursor:pointer;text-decoration:none;min-height:44px}
+.btn.primary{background:var(--teal);color:#fff}.btn.gold{background:var(--gold);color:#12294a}.btn.ghost{background:transparent;color:var(--teal);border:2px solid var(--teal)}
+.btn:hover{filter:brightness(1.08)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.instr{background:var(--goldbg);border-left:5px solid var(--gold);padding:12px 16px;border-radius:8px;margin:0 0 16px;font-family:"Segoe UI",Arial,sans-serif}
+.name-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.name-row div{flex:1 1 220px}
+label.lbl{display:block;font-weight:600;margin-bottom:4px}
+input[type=text]{width:100%;font:1rem "Segoe UI",Arial,sans-serif;padding:11px 12px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.err{color:var(--bad);font:600 .95rem "Segoe UI",Arial,sans-serif;margin:8px 0 0}
+#quiz{display:none}
+fieldset.q{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:18px 18px 12px;margin:0 0 18px;min-width:0}
+fieldset.q.missing{border:2px solid var(--bad);background:var(--badbg)}
+fieldset.q.right{border-left:6px solid var(--ok)}fieldset.q.wrong{border-left:6px solid var(--bad)}
+legend{font-weight:700;padding:0 8px;font-size:1.05rem;line-height:1.4}
+.qn{display:inline-block;background:var(--navy);color:#fff;border-radius:8px;padding:1px 9px;margin-right:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;margin:8px 0;border:2px solid var(--line);border-radius:10px;cursor:pointer;font-family:"Segoe UI",Arial,sans-serif}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-top:5px;width:18px;height:18px;accent-color:var(--teal);flex:none}
+.opt:has(input:checked){border-color:var(--teal);background:var(--tealbg)}
+.locked .opt{cursor:default}
+.opt.correct{border-color:var(--ok);background:var(--okbg)}
+.opt.incorrect{border-color:var(--bad);background:var(--badbg)}
+.tag{margin-left:auto;font-weight:700;font-size:.85rem;white-space:nowrap}
+.fb{margin:10px 0 4px;padding:10px 14px;border-radius:8px;font-family:"Segoe UI",Arial,sans-serif;font-size:.97rem}
+.fb.ok{background:var(--okbg)}.fb.no{background:var(--badbg)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+#result{display:none;text-align:center;border:3px solid var(--gold);background:var(--card);border-radius:16px;padding:26px 20px;margin-bottom:20px;font-family:"Segoe UI",Arial,sans-serif}
+#result .who{color:var(--mute);margin:0}
+#result h2{margin:2px 0 8px;font-size:1.6rem;color:var(--navy)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #result h2{color:var(--gold)}}
+:root[data-theme="dark"] #result h2{color:var(--gold)}
+#result .score{font-size:3rem;font-weight:800;color:var(--teal);line-height:1.1}
+#result .pct{font-size:1.3rem;font-weight:600}
+#result .msg{max-width:46ch;margin:10px auto 0}
+.sr{position:absolute;left:-9999px}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><span class="logo" aria-hidden="true">R2</span><span>Ready2Speak<small>Listening practice · B2</small></span></div>
+  <h1>The Mystery of the Missing Masterpiece</h1>
+</div></header>
+
+<main class="wrap">
+  <section class="video-col panel" aria-label="News report">
+    <div class="video-box">
+      <iframe src="https://abcnews.go.com/video/embed?id=68368716" title="ABC News report: a stolen Klimt painting is found" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <p class="ui">If the video does not play, <a class="btn ghost" href="https://abcnews.com/video/68368716/" target="_blank" rel="noopener">Open video</a></p>
+  </section>
+
+  <section aria-label="Listening quiz">
+    <div class="panel" id="start">
+      <p class="instr"><strong>Watch the news report and choose the best answer for each question. You may watch the video twice.</strong></p>
+      <div class="name-row">
+        <div><label class="lbl" for="nm">Your name</label><input type="text" id="nm" autocomplete="name" maxlength="60"></div>
+        <button class="btn primary" id="go" type="button">Start quiz</button>
+      </div>
+      <p class="err" id="nmErr" role="alert" hidden>Please enter your name to start.</p>
+    </div>
+
+    <div id="quiz">
+      <div id="result" role="region" aria-labelledby="rTitle" tabindex="-1"></div>
+      <p class="instr" id="hello"></p>
+      <form id="form" novalidate>
+        <div id="qs"></div>
+        <p class="err" id="formErr" role="alert" hidden></p>
+        <div class="actions">
+          <button class="btn gold" type="submit" id="submit">Submit answers</button>
+          <button class="btn ghost" type="button" id="retry" hidden>Try Again</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script>
+const Q=[
+{q:"What is the main point of the report?",o:["A famous painting stolen long ago has been found, but its recovery has raised new questions.","A gallery has improved its security after a series of thefts.","Experts cannot agree whether a well-known painting is genuine.","A gardener has been accused of stealing a valuable artwork."],a:0,e:"The report presents the recovery of the Klimt painting as remarkable, while stressing that the discovery leaves many questions unanswered."},
+{q:"According to the report, how was the painting discovered?",o:["Police searched the gallery's storage rooms after receiving a tip.","A gardener clearing plants from an outside wall noticed a small hidden panel.","An X-ray scan of the building revealed a hidden space.","The thief returned the painting to the gallery."],a:1,e:"The report says a gardener removing ivy from the gallery's external wall found a small panel, and the painting was behind it."},
+{q:"How did experts confirm that the painting was authentic?",o:["They cut a small sample from the canvas for analysis.","They compared it with old photographs in the gallery's archive.","They ran extensive tests that did not damage it, including advanced X-rays.","They relied on a statement from the police."],a:2,e:"Experts used extensive non-invasive tests, including high-tech X-rays, so the canvas was not damaged."},
+{q:"According to the report, what is still unknown even though the painting has been recovered and authenticated?",o:["Whether the painting is a genuine Klimt","Who took the painting and why it stayed hidden for so long","Which gallery the painting was stolen from","Whether the police are involved in the case"],a:1,e:"The report says investigators still have to find out who stole the painting and why it was left in place for so long."},
+{q:"The report says the painting \"may have never left the museum.\" How should this statement be understood?",o:["It is a proven fact that the painting never left the gallery.","It shows that gallery staff were responsible for the theft.","It means the thief brought the painting back last December.","It is a possibility suggested by where the painting was found, not an established fact."],a:3,e:"The word \"may\" signals a possibility. The report does not confirm that the painting stayed in the gallery all along."},
+{q:"An expert says the painting is \"the real deal.\" What does this expression mean here?",o:["The painting is genuine.","The painting is very expensive.","The painting was sold legally.","The painting is in perfect condition."],a:0,e:"\"The real deal\" means the painting is genuine, not a copy. This matches the experts' confirmation of its authenticity."},
+{q:"The report says Warhol's soup can prints were \"lifted\" from a museum in Missouri. What does \"lifted\" mean in this context?",o:["Moved to a safer location","Raised for display","Stolen","Borrowed for an exhibition"],a:2,e:"\"Lifted\" is informal for stolen. The report uses it to describe another theft that, at the time, had not been solved."},
+{q:"Police are examining traces on the canvas to \"piece together whodunit.\" What are they trying to do?",o:["Restore the painting to its original condition","Prove that the painting is not a copy","Estimate the painting's value","Use clues to work out who committed the crime"],a:3,e:"\"Whodunit\" refers to the question of who committed the crime. Police hope the traces will give them clues."},
+{q:"Why does the reporter compare the discovery with an art-heist movie?",o:["To stress how dramatic and surprising the discovery is","To suggest the theft was planned like a film plot","To imply that the painting may not be real","To criticize the way the police handled the case"],a:0,e:"The comparison shows how unusual and cinematic the story seems, with a painting hidden in a wall of the gallery it was taken from."},
+{q:"Why does the report mention the Gardner Museum and Springfield Art Museum thefts?",o:["To argue that museum security has not improved","To show that stolen artworks are not always recovered, unlike the Klimt painting","To suggest that the same thieves were involved in all three cases","To explain how the Klimt painting was finally found"],a:1,e:"According to the report, the works stolen from those museums had not been recovered, which contrasts with the happy ending of the Klimt case."}
+];
+const L="ABCD";let locked=false,name="";
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function build(){
+  $("qs").innerHTML=Q.map((x,i)=>`<fieldset class="q" id="f${i}"><legend><span class="qn">${i+1}</span>${esc(x.q)}</legend>`+
+   x.o.map((t,j)=>`<label class="opt" id="o${i}_${j}"><input type="radio" name="q${i}" value="${j}"><span><strong>${L[j]}.</strong> ${esc(t)}</span></label>`).join("")+
+   `<div class="fb-slot" aria-live="polite"></div></fieldset>`).join("");
+  document.querySelectorAll("input[type=radio]").forEach(r=>r.addEventListener("change",()=>{
+    const f=r.closest("fieldset");f.classList.remove("missing");
+    if(!document.querySelector("fieldset.missing"))$("formErr").hidden=true;
+  }));
+}
+function answered(i){const c=document.querySelector(`input[name=q${i}]:checked`);return c?+c.value:-1}
+$("go").onclick=()=>{
+  const v=$("nm").value.trim();
+  if(!v){$("nmErr").hidden=false;$("nm").focus();return}
+  $("nmErr").hidden=true;name=v;
+  $("start").style.display="none";$("quiz").style.display="block";
+  $("hello").innerHTML=`<strong>${esc(name)}</strong>, watch the news report and choose the best answer for each question. You may watch the video twice.`;
+  $("form").querySelector("input").focus();
+};
+$("nm").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("go").click()}});
+$("form").addEventListener("submit",e=>{
+  e.preventDefault();if(locked)return;
+  const miss=[];Q.forEach((_,i)=>{const f=$("f"+i);const m=answered(i)<0;f.classList.toggle("missing",m);if(m)miss.push(i+1)});
+  const fe=$("formErr");
+  if(miss.length){
+    fe.textContent=`Please answer ${miss.length===1?"question":"questions"} ${miss.join(", ")} before you submit.`;fe.hidden=false;
+    $("f"+(miss[0]-1)).querySelector("input").focus();return;
+  }
+  fe.hidden=true;let score=0;
+  Q.forEach((x,i)=>{
+    const s=answered(i),ok=s===x.a;if(ok)score++;
+    const f=$("f"+i);f.classList.add(ok?"right":"wrong","locked");
+    f.querySelectorAll("input").forEach(r=>r.disabled=true);
+    x.o.forEach((_,j)=>{
+      const lab=$(`o${i}_${j}`);
+      if(j===x.a){lab.classList.add("correct");lab.insertAdjacentHTML("beforeend",'<span class="tag" style="color:var(--ok)">✓ Correct answer</span>')}
+      else if(j===s){lab.classList.add("incorrect");lab.insertAdjacentHTML("beforeend",'<span class="tag" style="color:var(--bad)">✗ Your answer</span>')}
+    });
+    f.querySelector(".fb-slot").innerHTML=`<div class="fb ${ok?"ok":"no"}"><strong>${ok?"Correct.":"Not quite."}</strong> ${esc(x.e)}</div>`;
+  });
+  locked=true;const pct=Math.round(score/Q.length*100);
+  const msg=score>=9?"Excellent listening! You understood the report very well.":score>=7?"Well done! You followed the main ideas and most of the details.":score>=5?"Good effort! Watch the report again and focus on the details you missed.":"Keep practising! Watch the video again and read the explanations below.";
+  const r=$("result");
+  r.innerHTML=`<p class="who">Results for</p><h2 id="rTitle">${esc(name)}</h2><div class="score">${score} / ${Q.length}</div><div class="pct">${pct}%</div><p class="msg">${msg}</p><p class="who">Ready2Speak · The Mystery of the Missing Masterpiece</p>`;
+  r.style.display="block";$("submit").hidden=true;$("retry").hidden=false;
+  r.scrollIntoView({behavior:"smooth",block:"start"});r.focus();
+});
+$("retry").onclick=()=>{
+  locked=false;build();$("result").style.display="none";$("result").innerHTML="";
+  $("formErr").hidden=true;$("submit").hidden=false;$("retry").hidden=true;
+  window.scrollTo({top:0});$("form").querySelector("input").focus();
+};
+build();
+</script>
+</body>
+</html>
