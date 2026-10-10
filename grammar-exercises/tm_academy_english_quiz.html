@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TM Academy - A1 English Knowledge Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            900: '#0B1D35',
+                            800: '#102B4E',
+                            700: '#163B6B',
+                        },
+                        royal: '#1675D1',
+                        bright: '#299BFF',
+                        ice: '#E8F1FA'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Glowing & Glassmorphism Effects */
+        body {
+            background-color: #0B1D35;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(22, 117, 209, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(41, 155, 255, 0.18) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(16, 43, 78, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(41, 155, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-card-glow {
+            box-shadow: 0 0 35px rgba(41, 155, 255, 0.25);
+        }
+
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(41, 155, 255, 0.25);
+            background: rgba(11, 29, 53, 0.6);
+        }
+
+        .option-card:hover {
+            border-color: #299BFF;
+            background: rgba(22, 117, 209, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: #299BFF;
+            background: linear-gradient(135deg, rgba(22, 117, 209, 0.8) 0%, rgba(41, 155, 255, 0.6) 100%);
+            box-shadow: 0 0 20px rgba(41, 155, 255, 0.4);
+        }
+
+        .glow-button {
+            background: linear-gradient(135deg, #1675D1 0%, #299BFF 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(41, 155, 255, 0.4);
+        }
+
+        .glow-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(41, 155, 255, 0.6);
+        }
+
+        .glow-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Print Styling */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .glass-card {
+                background: #ffffff !important;
+                border: 1px solid #cccccc !important;
+                box-shadow: none !important;
+                color: #000000 !important;
+            }
+            .text-white, .text-ice, .text-bright {
+                color: #000000 !important;
+            }
+            .print-border {
+                border: 1px solid #ddd !important;
+                padding: 12px !important;
+                margin-bottom: 12px !important;
+                border-radius: 6px !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between p-4 md:p-8">
+
+    <!-- Helper template for TM Academy Logo SVG -->
+    <template id="tm-logo-svg">
+        <svg class="w-full h-full" viewBox="0 0 300 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="houseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#299BFF" />
+                    <stop offset="100%" stop-color="#1675D1" />
+                </linearGradient>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="4" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+            </defs>
+            <!-- Outer House Icon -->
+            <path d="M 150 20 L 260 110 L 260 135 L 240 135 L 240 120 L 150 45 L 60 120 L 60 210 L 125 210 L 125 235 L 35 235 L 35 110 Z" fill="url(#houseGrad)" filter="url(#glow)"/>
+            <path d="M 260 235 L 175 235 L 175 210 L 235 210 L 235 110 L 260 130 Z" fill="url(#houseGrad)"/>
+            <!-- Wifi Arcs -->
+            <path d="M 85 145 A 80 80 0 0 1 215 145" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" fill="none"/>
+            <path d="M 110 172 A 50 50 0 0 1 190 172" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" fill="none"/>
+            <circle cx="150" cy="205" r="11" fill="#FFFFFF"/>
+            <!-- Text Branding -->
+            <text x="150" y="270" text-anchor="middle" fill="#FFFFFF" font-family="'Inter', sans-serif" font-weight="900" font-size="28" letter-spacing="1">TM ACADEMY</text>
+        </svg>
+    </template>
+
+    <div class="max-w-3xl mx-auto w-full flex-grow flex flex-col justify-center my-4">
+
+        <!-- 1. WELCOME SCREEN -->
+        <div id="welcome-screen" class="glass-card glass-card-glow rounded-3xl p-6 md:p-10 text-center flex flex-col items-center">
+            <div class="w-36 h-36 md:w-44 md:h-44 mb-6" id="logo-container-welcome"></div>
+            
+            <span class="px-4 py-1.5 rounded-full bg-royal/20 text-bright text-xs md:text-sm font-semibold tracking-wider uppercase mb-3 border border-bright/30">
+                Official Knowledge Assessment
+            </span>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2 tracking-tight">TM ACADEMY</h1>
+            <h2 class="text-xl md:text-2xl font-bold text-bright mb-1">ENGLISH KNOWLEDGE CHALLENGE</h2>
+            <p class="text-ice text-sm md:text-base italic mb-8">Let's see what you've learned!</p>
+
+            <form id="start-form" onsubmit="startQuiz(event)" class="w-full max-w-md flex flex-col gap-4">
+                <div class="text-left">
+                    <label for="student-name" class="block text-xs font-semibold text-ice uppercase tracking-wider mb-2">Full Name <span class="text-bright">*</span></label>
+                    <input type="text" id="student-name" required placeholder="e.g. Maria Silva" 
+                        class="w-full px-5 py-4 rounded-xl bg-navy-900/90 border border-bright/40 text-white placeholder-gray-400 focus:outline-none focus:border-bright focus:ring-2 focus:ring-bright/50 text-base md:text-lg transition-all">
+                    <p id="name-error" class="text-red-400 text-xs mt-1.5 hidden font-medium">Please enter your full name to begin the quiz.</p>
+                </div>
+                
+                <button type="submit" class="glow-button w-full py-4 rounded-xl text-white font-bold text-lg tracking-wide uppercase mt-2">
+                    Start Quiz
+                </button>
+            </form>
+        </div>
+
+        <!-- 2. QUIZ INTERFACE -->
+        <div id="quiz-screen" class="glass-card rounded-3xl p-6 md:p-8 hidden">
+            <!-- Quiz Header -->
+            <div class="flex items-center justify-between pb-6 border-b border-bright/20 mb-6 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 flex-shrink-0" id="logo-container-header"></div>
+                    <div>
+                        <h3 class="text-xs text-bright font-bold uppercase tracking-wider">Student</h3>
+                        <p id="display-student-name" class="text-base font-semibold text-white truncate max-w-[150px] sm:max-w-[220px]"></p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span id="question-counter" class="text-xs md:text-sm font-bold text-bright bg-navy-900/80 px-3 py-1.5 rounded-lg border border-bright/30">
+                        Question 1 of 15
+                    </span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-navy-900/80 rounded-full h-3 mb-8 p-0.5 border border-bright/20">
+                <div id="progress-bar" class="bg-gradient-to-r from-royal to-bright h-full rounded-full transition-all duration-300" style="width: 6.66%;"></div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="mb-8">
+                <p id="question-topic" class="text-xs font-semibold text-bright uppercase tracking-widest mb-2"></p>
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-white leading-relaxed"></h3>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 gap-3.5 mb-8">
+                <!-- Options will be injected dynamically -->
+            </div>
+
+            <!-- Action Area -->
+            <div class="flex justify-end pt-4 border-t border-bright/20">
+                <button id="next-btn" onclick="nextQuestion()" disabled class="glow-button px-8 py-3.5 rounded-xl text-white font-bold text-base tracking-wide uppercase">
+                    Next Question
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. PERSONALIZED RESULTS SCREEN -->
+        <div id="results-screen" class="glass-card glass-card-glow rounded-3xl p-6 md:p-10 hidden">
+            <div class="text-center mb-8">
+                <div class="w-28 h-28 mx-auto mb-4" id="logo-container-results"></div>
+                <span class="px-4 py-1.5 rounded-full bg-royal/20 text-bright text-xs md:text-sm font-semibold tracking-wider uppercase border border-bright/30">
+                    Official Assessment Result
+                </span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-3">QUIZ COMPLETED!</h2>
+                <p id="result-greeting" class="text-xl text-bright font-semibold mt-1"></p>
+            </div>
+
+            <!-- Score Summary Card -->
+            <div class="bg-navy-900/80 rounded-2xl p-6 border border-bright/30 mb-8 text-center print-border">
+                <div class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-ice to-bright mb-2" id="score-percentage">
+                    0%
+                </div>
+                <p id="performance-message" class="text-lg md:text-xl font-bold text-bright mb-6"></p>
+                
+                <div class="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-bright/20 text-center">
+                    <div class="bg-navy-800/60 p-3 rounded-xl border border-bright/10">
+                        <span class="block text-xs text-ice font-medium uppercase">Score</span>
+                        <span id="score-raw" class="text-lg md:text-xl font-bold text-white">0 / 15</span>
+                    </div>
+                    <div class="bg-emerald-950/40 p-3 rounded-xl border border-emerald-500/30">
+                        <span class="block text-xs text-emerald-300 font-medium uppercase">Correct</span>
+                        <span id="score-correct" class="text-lg md:text-xl font-bold text-emerald-400">0</span>
+                    </div>
+                    <div class="bg-rose-950/40 p-3 rounded-xl border border-rose-500/30">
+                        <span class="block text-xs text-rose-300 font-medium uppercase">Incorrect</span>
+                        <span id="score-incorrect" class="text-lg md:text-xl font-bold text-rose-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Section -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-white mb-4 pb-2 border-b border-bright/20 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-bright" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    REVIEW YOUR MISTAKES
+                </h3>
+                <div id="mistakes-container" class="space-y-4">
+                    <!-- Mistakes or perfect score message injected here -->
+                </div>
+            </div>
+
+            <!-- Print Controls -->
+            <div class="no-print pt-4 border-t border-bright/20 flex justify-center">
+                <button onclick="window.print()" class="glow-button px-8 py-4 rounded-xl text-white font-bold text-base tracking-wide uppercase flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 000-4h-6a2 2 0 000 4zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Print My Results
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-ice/60 py-4 no-print">
+        © TM Academy • A1 Beginner English Knowledge Challenge
+    </footer>
+
+    <script>
+        // 15 A1 Level Questions with specified topics & explanations
+        const quizQuestions = [
+            {
+                id: 1,
+                topic: "There Is / There Are",
+                question: "There ___ a supermarket near my house.",
+                options: ["A) is", "B) are", "C) be", "D) am"],
+                correct: 0,
+                explanation: "We use 'is' with singular nouns like 'a supermarket'."
+            },
+            {
+                id: 2,
+                topic: "Prepositions of Place",
+                question: "The bank is ___ the school and the park.",
+                options: ["A) under", "B) between", "C) on", "D) inside"],
+                correct: 1,
+                explanation: "'Between' is used when something is in the space separating two places."
+            },
+            {
+                id: 3,
+                topic: "Shopping & Prices",
+                question: "How much ___ this T-shirt?",
+                options: ["A) is", "B) are", "C) do", "D) does"],
+                correct: 0,
+                explanation: "We use 'is' for singular items like 'this T-shirt'."
+            },
+            {
+                id: 4,
+                topic: "Shopping & Prices",
+                question: "These shoes are $20. How much are ___?",
+                options: ["A) this", "B) that", "C) those", "D) it"],
+                correct: 2,
+                explanation: "'Those' is used for plural items (shoes) located at a distance or referenced as plural."
+            },
+            {
+                id: 5,
+                topic: "Food & Restaurants",
+                question: "Can I ___ a hamburger, please?",
+                options: ["A) have", "B) having", "C) to have", "D) has"],
+                correct: 0,
+                explanation: "In polite restaurant requests, 'Can I have...' uses the base form of the verb."
+            },
+            {
+                id: 6,
+                topic: "Food & Restaurants",
+                question: "What do you say when you want to pay at a restaurant?",
+                options: [
+                    "A) Where is the menu?",
+                    "B) Can I have the check, please?",
+                    "C) What is your name?",
+                    "D) I like coffee."
+                ],
+                correct: 1,
+                explanation: "'Can I have the check, please?' is the standard polite way to ask to pay."
+            },
+            {
+                id: 7,
+                topic: "Clothes & Descriptions",
+                question: "She is ___ a blue dress today.",
+                options: ["A) wear", "B) wearing", "C) wears", "D) wore"],
+                correct: 1,
+                explanation: "Present continuous uses Subject + am/is/are + verb-ing ('wearing')."
+            },
+            {
+                id: 8,
+                topic: "Clothes & Descriptions",
+                question: "What do you wear on your feet?",
+                options: ["A) A hat", "B) Gloves", "C) Shoes", "D) A jacket"],
+                correct: 2,
+                explanation: "Shoes are the correct clothing item worn on your feet."
+            },
+            {
+                id: 9,
+                topic: "BE GOING TO (Affirmative - I)",
+                question: "I am going to ___ English tonight.",
+                options: ["A) study", "B) studying", "C) studied", "D) studies"],
+                correct: 0,
+                explanation: "After 'going to', we always use the base form of the verb ('study')."
+            },
+            {
+                id: 10,
+                topic: "BE GOING TO (Affirmative - She)",
+                question: "She ___ going to visit her grandmother tomorrow.",
+                options: ["A) am", "B) is", "C) are", "D) be"],
+                correct: 1,
+                explanation: "We use 'is' with the singular subject pronoun 'She'."
+            },
+            {
+                id: 11,
+                topic: "BE GOING TO (Negative - He)",
+                question: "He ___ going to buy a new car this weekend.",
+                options: ["A) isn't", "B) aren't", "C) am not", "D) don't"],
+                correct: 0,
+                explanation: "The correct negative form for 'He' is 'isn't' (is not)."
+            },
+            {
+                id: 12,
+                topic: "BE GOING TO (Negative - They)",
+                question: "They ___ going to watch a movie tonight because they are tired.",
+                options: ["A) isn't", "B) aren't", "C) am not", "D) doesn't"],
+                correct: 1,
+                explanation: "The correct negative form for 'They' is 'aren't' (are not)."
+            },
+            {
+                id: 13,
+                topic: "BE GOING TO (Yes/No Question)",
+                question: "___ you going to travel next month?",
+                options: ["A) Is", "B) Are", "C) Do", "D) Am"],
+                correct: 1,
+                explanation: "For questions with 'you' in 'be going to', start with 'Are'."
+            },
+            {
+                id: 14,
+                topic: "BE GOING TO (WH- Question)",
+                question: "What are you going to ___ at the mall?",
+                options: ["A) buy", "B) buying", "C) bought", "D) buys"],
+                correct: 0,
+                explanation: "In WH- questions with 'going to', use the base verb ('buy')."
+            },
+            {
+                id: 15,
+                topic: "BE GOING TO (Future Plans)",
+                question: "We are going to ___ lunch at a nice restaurant on Saturday.",
+                options: ["A) eats", "B) eating", "C) have", "D) ate"],
+                correct: 2,
+                explanation: "Use the base form of the verb 'have' after 'going to'."
+            }
+        ];
+
+        let state = {
+            studentName: '',
+            currentQuestion: 0,
+            answers: new Array(15).fill(null),
+            isSubmitted: false
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderLogos();
+            checkExistingSession();
+        });
+
+        function renderLogos() {
+            const svgTemplate = document.getElementById('tm-logo-svg').content;
+            document.getElementById('logo-container-welcome').appendChild(svgTemplate.cloneNode(true));
+            document.getElementById('logo-container-header').appendChild(svgTemplate.cloneNode(true));
+            document.getElementById('logo-container-results').appendChild(svgTemplate.cloneNode(true));
+        }
+
+        function checkExistingSession() {
+            const savedState = sessionStorage.getItem('tm_academy_quiz_state');
+            if (savedState) {
+                try {
+                    state = JSON.parse(savedState);
+                    if (state.isSubmitted) {
+                        showResultsScreen();
+                    } else if (state.studentName) {
+                        showQuizScreen();
+                    }
+                } catch (e) {
+                    console.error("Error reading session state", e);
+                }
+            }
+        }
+
+        function saveState() {
+            sessionStorage.setItem('tm_academy_quiz_state', JSON.stringify(state));
+        }
+
+        function startQuiz(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('student-name');
+            const name = nameInput.value.trim();
+            const errorElement = document.getElementById('name-error');
+
+            if (!name) {
+                errorElement.classList.remove('hidden');
+                return;
+            }
+            errorElement.classList.add('hidden');
+
+            state.studentName = name;
+            state.currentQuestion = 0;
+            state.answers = new Array(15).fill(null);
+            state.isSubmitted = false;
+            saveState();
+
+            showQuizScreen();
+        }
+
+        function showQuizScreen() {
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            document.getElementById('display-student-name').textContent = state.studentName;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qIndex = state.currentQuestion;
+            const q = quizQuestions[qIndex];
+
+            document.getElementById('question-counter').textContent = `Question ${qIndex + 1} of 15`;
+            
+            // Progress percentage
+            const progressPct = ((qIndex + 1) / 15) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+
+            document.getElementById('question-topic').textContent = q.topic;
+            document.getElementById('question-text').textContent = q.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const selectedAnswer = state.answers[qIndex];
+
+            q.options.forEach((optText, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `option-card w-full text-left p-4 md:p-5 rounded-xl font-medium text-base md:text-lg flex items-center justify-between text-white ${selectedAnswer === index ? 'selected' : ''}`;
+                
+                button.innerHTML = `
+                    <span>${escapeHtml(optText)}</span>
+                    <span class="w-6 h-6 rounded-full border-2 border-bright/40 flex items-center justify-center flex-shrink-0 ml-3">
+                        ${selectedAnswer === index ? '<span class="w-3 h-3 rounded-full bg-bright"></span>' : ''}
+                    </span>
+                `;
+
+                button.onclick = () => selectOption(index);
+                optionsContainer.appendChild(button);
+            });
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = selectedAnswer === null;
+            if (qIndex === 14) {
+                nextBtn.textContent = 'Submit Quiz';
+            } else {
+                nextBtn.textContent = 'Next Question';
+            }
+        }
+
+        function selectOption(index) {
+            state.answers[state.currentQuestion] = index;
+            saveState();
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (state.answers[state.currentQuestion] === null) return;
+
+            if (state.currentQuestion < 14) {
+                state.currentQuestion++;
+                saveState();
+                renderQuestion();
+            } else {
+                // Submit Quiz
+                state.isSubmitted = true;
+                saveState();
+                showResultsScreen();
+            }
+        }
+
+        function showResultsScreen() {
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            document.getElementById('result-greeting').textContent = `Great job, ${state.studentName}!`;
+
+            // Calculate Scores
+            let correctCount = 0;
+            quizQuestions.forEach((q, idx) => {
+                if (state.answers[idx] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const incorrectCount = 15 - correctCount;
+            const percentage = Math.round((correctCount / 15) * 100);
+
+            document.getElementById('score-percentage').textContent = `${percentage}%`;
+            document.getElementById('score-raw').textContent = `${correctCount} / 15`;
+            document.getElementById('score-correct').textContent = correctCount;
+            document.getElementById('score-incorrect').textContent = incorrectCount;
+
+            // Performance message criteria
+            let perfMessage = "";
+            if (percentage >= 90) {
+                perfMessage = "Excellent work!";
+            } else if (percentage >= 80) {
+                perfMessage = "Great job!";
+            } else if (percentage >= 70) {
+                perfMessage = "Good effort!";
+            } else if (percentage >= 60) {
+                perfMessage = "Keep practicing!";
+            } else {
+                perfMessage = "Don't give up! You can improve!";
+            }
+            document.getElementById('performance-message').textContent = perfMessage;
+
+            // Render Mistake Explanations
+            renderMistakesReview(incorrectCount);
+        }
+
+        function renderMistakesReview(incorrectCount) {
+            const container = document.getElementById('mistakes-container');
+            container.innerHTML = '';
+
+            if (incorrectCount === 0) {
+                container.innerHTML = `
+                    <div class="bg-emerald-950/40 border border-emerald-500/40 p-6 rounded-2xl text-center print-border">
+                        <p class="text-emerald-300 font-bold text-lg">Amazing! You answered every question correctly!</p>
+                        <p class="text-xs text-emerald-200/80 mt-1">Perfect score on your A1 English Knowledge Challenge.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            quizQuestions.forEach((q, idx) => {
+                const studentAns = state.answers[idx];
+                if (studentAns !== q.correct) {
+                    const studentChoiceText = studentAns !== null ? q.options[studentAns] : 'No answer selected';
+                    const correctChoiceText = q.options[q.correct];
+
+                    const item = document.createElement('div');
+                    item.className = 'bg-navy-900/90 border border-bright/20 rounded-2xl p-5 print-border';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-bold text-bright uppercase px-2.5 py-0.5 rounded bg-royal/20 border border-bright/20">
+                                Question ${idx + 1} • ${escapeHtml(q.topic)}
+                            </span>
+                        </div>
+                        <h4 class="text-base font-semibold text-white mb-3">${escapeHtml(q.question)}</h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 text-sm">
+                            <div class="bg-rose-950/30 border border-rose-500/30 p-3 rounded-xl">
+                                <span class="block text-xs font-semibold text-rose-300 uppercase">Your Answer</span>
+                                <span class="text-rose-200 font-medium">${escapeHtml(studentChoiceText)}</span>
+                            </div>
+                            <div class="bg-emerald-950/30 border border-emerald-500/30 p-3 rounded-xl">
+                                <span class="block text-xs font-semibold text-emerald-300 uppercase">Correct Answer</span>
+                                <span class="text-emerald-200 font-medium">${escapeHtml(correctChoiceText)}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-navy-800/80 p-3 rounded-xl border border-bright/10 text-xs md:text-sm text-ice">
+                            <strong class="text-bright font-semibold">Explanation:</strong> ${escapeHtml(q.explanation)}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                }
+            });
+        }
+
+        // Helper function to prevent HTML injection
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
