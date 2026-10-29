@@ -1,0 +1,452 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Forbidden Word</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Layout: one centered game column over a night sky (stars, moon, bats, ghosts).
+   Student view and teacher view are separate full views; only one is visible at a time. */
+:root {
+  --bg: #0d0716;
+  --bg-glow: #2a1050;
+  --panel: #1d1032;
+  --panel-2: #27164a;
+  --line: #43296f;
+  --orange: #ff7a1a;
+  --orange-soft: #ffa24d;
+  --ink: #f7eefe;
+  --muted: #b9a6d8;
+  --violet: #9b5cff;
+  --danger: #ff6b86;
+  --ok: #8be28b;
+  --display: 'Creepster', 'Chiller', fantasy;
+  --body: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--bg-glow), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, #3a1304, transparent 70%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 18px;
+  line-height: 1.45;
+  padding-block: 24px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: hidden;
+}
+
+/* ---------- atmosphere ---------- */
+.sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.stars { position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 28% 42%, #ffe9c9, transparent),
+    radial-gradient(1.5px 1.5px at 47% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 63% 33%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 78% 14%, #ffe9c9, transparent),
+    radial-gradient(1px 1px at 90% 48%, #fff, transparent),
+    radial-gradient(1px 1px at 6% 62%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 35% 78%, #ffe9c9, transparent),
+    radial-gradient(1px 1px at 72% 70%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 55% 55%, #fff, transparent),
+    radial-gradient(1px 1px at 18% 88%, #fff, transparent),
+    radial-gradient(1px 1px at 94% 86%, #ffe9c9, transparent);
+  animation: twinkle 4s ease-in-out infinite alternate; }
+.moon { position: absolute; top: 28px; right: 6%; width: clamp(64px, 12vw, 120px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff4d6, #ffd98a 60%, #e6a94a);
+  box-shadow: 0 0 60px 18px rgba(255, 190, 90, .28), 0 0 160px 60px rgba(255, 122, 26, .12); }
+.moon::after { content: ""; position: absolute; width: 22%; aspect-ratio: 1; border-radius: 50%; left: 22%; top: 52%; background: rgba(190, 130, 40, .25); box-shadow: 40px -30px 0 -2px rgba(190,130,40,.22); }
+.bat { position: absolute; left: -90px; width: 56px; fill: #05020a; opacity: .9; animation: fly linear infinite; }
+.bat svg { width: 100%; height: auto; display: block; animation: flap .35s ease-in-out infinite alternate; transform-origin: 50% 40%; }
+.bat.b1 { top: 12%; animation-duration: 22s; animation-delay: 0s; }
+.bat.b2 { top: 26%; width: 40px; animation-duration: 30s; animation-delay: 7s; }
+.bat.b3 { top: 8%;  width: 34px; animation-duration: 26s; animation-delay: 14s; }
+.ghost { position: absolute; font-size: clamp(34px, 6vw, 58px); opacity: .5; filter: drop-shadow(0 0 14px rgba(200, 170, 255, .6)); animation: bob 5s ease-in-out infinite alternate; }
+.ghost.g1 { left: 4%; top: 38%; }
+.ghost.g2 { right: 5%; top: 58%; animation-delay: -2s; font-size: clamp(28px, 5vw, 46px); }
+.ground { position: absolute; left: 0; right: 0; bottom: 0; height: 130px;
+  background: linear-gradient(to top, #07030d 0%, rgba(7,3,13,.85) 40%, transparent 100%); }
+.pumpkins { position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: space-between; padding-inline: 12px; font-size: clamp(30px, 6vw, 52px); filter: drop-shadow(0 0 18px rgba(255,122,26,.55)); }
+.pumpkins span:nth-child(even) { font-size: .75em; align-self: flex-end; }
+@keyframes twinkle { from { opacity: .55; } to { opacity: 1; } }
+@keyframes fly { 0% { transform: translate(0, 0); } 25% { transform: translate(28vw, 40px); } 50% { transform: translate(58vw, -20px); } 75% { transform: translate(85vw, 36px); } 100% { transform: translate(115vw, 0); } }
+@keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(.55); } }
+@keyframes bob { from { transform: translateY(-10px) rotate(-4deg); } to { transform: translateY(12px) rotate(5deg); } }
+
+/* ---------- shell ---------- */
+.app { position: relative; z-index: 1; width: 100%; max-width: 680px; margin-inline: auto; }
+.view[hidden] { display: none !important; }
+.title { font-family: var(--display); font-weight: 400; color: var(--orange); font-size: clamp(3rem, 14vw, 5.6rem); line-height: .95; letter-spacing: .03em; text-align: center; margin: 12px 0 8px;
+  text-shadow: 0 0 22px rgba(255, 122, 26, .55), 0 4px 0 #5a1f00; text-wrap: balance; }
+.tag { text-align: center; color: var(--muted); font-size: 1.15rem; font-weight: 700; margin: 0 0 28px; text-wrap: balance; }
+.tag em { color: var(--orange-soft); font-style: normal; }
+
+.panel { background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 2px solid var(--line); border-radius: 22px; padding: clamp(18px, 4vw, 28px); box-shadow: 0 18px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06); }
+label.lbl { display: block; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
+input[type="text"], input[type="password"] { width: 100%; font: inherit; font-size: 1.25rem; font-weight: 700; color: var(--ink); background: #120a21; border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; outline: none; transition: border-color .15s, box-shadow .15s; }
+input::placeholder { color: #7d6a9f; }
+input:focus-visible { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(255, 122, 26, .25); }
+.err { min-height: 1.5em; margin: 8px 2px 0; color: var(--danger); font-weight: 800; font-size: .98rem; }
+.shake { animation: shake .4s; }
+@keyframes shake { 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+
+.btn { appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; border-radius: 16px; padding: 16px 22px; min-height: 56px; color: #1b0a00;
+  background: linear-gradient(180deg, var(--orange-soft), var(--orange)); box-shadow: 0 6px 0 #a64300, 0 12px 28px rgba(255, 122, 26, .35); transition: transform .08s, box-shadow .08s, filter .15s; }
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(5px); box-shadow: 0 1px 0 #a64300, 0 4px 12px rgba(255, 122, 26, .3); }
+.btn:focus-visible, .link:focus-visible, .tbtn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.btn.big { width: 100%; font-size: 1.5rem; padding: 20px; min-height: 72px; margin-top: 8px; }
+.btn.ghosty { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+.btn.ghosty:active { transform: none; }
+.btn.ghosty:hover { box-shadow: inset 0 0 0 2px var(--violet); }
+.btn.danger { background: linear-gradient(180deg, #ff8aa0, var(--danger)); box-shadow: 0 6px 0 #9b2742, 0 12px 28px rgba(255, 107, 134, .3); }
+.btn[disabled] { opacity: .4; cursor: not-allowed; filter: none; }
+.btn.small { font-size: .9rem; min-height: 46px; padding: 10px 16px; border-radius: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; }
+.row > * { flex: 1 1 200px; min-width: 0; }
+
+/* ---------- word card ---------- */
+.card { text-align: center; position: relative; padding: clamp(22px, 5vw, 36px); border-radius: 26px; border: 3px solid var(--orange);
+  background: radial-gradient(ellipse at 50% 0%, #4a2284, #1d1032 70%); box-shadow: 0 0 0 6px rgba(255,122,26,.12), 0 0 60px rgba(255,122,26,.3), 0 24px 60px rgba(0,0,0,.6); animation: pop .55s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes pop { from { transform: scale(.6) rotate(-4deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+.card .for { color: var(--muted); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: .85rem; overflow-wrap: anywhere; }
+.card .for b { color: var(--orange-soft); }
+.card .kick { font-family: var(--display); color: var(--violet); font-size: 1.6rem; letter-spacing: .06em; margin: 14px 0 0; }
+.card .word { font-weight: 900; color: #fff; font-size: clamp(2.2rem, 11vw, 4.4rem); line-height: 1.05; margin: 8px 0 22px; overflow-wrap: anywhere; text-wrap: balance; text-shadow: 0 0 24px rgba(255, 162, 77, .6); }
+.rule { background: #120a21; border: 2px dashed var(--orange); border-radius: 14px; padding: 14px 16px; font-weight: 800; font-size: 1.12rem; color: var(--orange-soft); margin: 0 0 22px; text-wrap: balance; }
+.card .row { justify-content: center; }
+.card.flash { animation: pop .45s cubic-bezier(.2, 1.4, .4, 1); }
+
+/* ---------- teacher access ---------- */
+.tbtn { position: fixed; z-index: 5; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); font: inherit; font-size: .72rem; font-weight: 800; letter-spacing: .12em; color: #8e7ab3; background: rgba(13, 7, 22, .7); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; cursor: pointer; opacity: .6; transition: opacity .15s, color .15s; }
+.tbtn:hover, .tbtn:focus-visible { opacity: 1; color: var(--ink); }
+.link { appearance: none; background: none; border: 0; font: inherit; font-weight: 800; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 10px 6px; }
+.center { text-align: center; }
+
+/* ---------- login ---------- */
+.lock { font-size: 3rem; text-align: center; margin-bottom: 4px; }
+.h2 { font-family: var(--display); font-weight: 400; color: var(--orange); font-size: 2.4rem; letter-spacing: .04em; margin: 0 0 4px; text-align: center; }
+.sub { color: var(--muted); text-align: center; margin: 0 0 20px; }
+
+/* ---------- dashboard ---------- */
+.dash { max-width: 860px; }
+body.is-dash .app { max-width: 860px; }
+.dash-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.dash-head h2 { font-family: var(--display); font-weight: 400; color: var(--orange); font-size: 2.3rem; letter-spacing: .04em; margin: 0; }
+.note { background: #1a0f2c; border: 1px solid var(--line); border-left: 4px solid var(--violet); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: .95rem; margin-bottom: 14px; }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.tools input { flex: 2 1 220px; min-width: 0; font-size: 1.05rem; padding: 12px 14px; }
+.tools .btn { flex: 1 1 130px; }
+.stats { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-weight: 800; margin: 0 2px 10px; font-size: .95rem; }
+.stats b { color: var(--orange-soft); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; border-radius: 16px; border: 2px solid var(--line); background: #140a24; }
+table { width: 100%; border-collapse: collapse; min-width: 520px; }
+th { text-align: left; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 12px 14px; background: #1d1032; position: sticky; top: 0; }
+td { padding: 12px 14px; border-top: 1px solid #2a1948; vertical-align: middle; }
+td.n { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 800; width: 56px; }
+td.who { font-weight: 800; overflow-wrap: anywhere; }
+td.what { font-weight: 900; font-size: 1.2rem; color: #fff; overflow-wrap: anywhere; }
+td.when { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pill { display: inline-block; font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
+.pill.cur { background: rgba(139, 226, 139, .15); color: var(--ok); }
+.pill.old { background: rgba(185, 166, 216, .12); color: var(--muted); }
+tr.old td.what { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; font-weight: 700; }
+tr.old td.who { color: var(--muted); }
+.empty { text-align: center; padding: 38px 16px; color: var(--muted); font-weight: 700; }
+
+/* ---------- modal ---------- */
+.veil { position: fixed; inset: 0; z-index: 20; background: rgba(5, 2, 10, .8); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.veil[hidden] { display: none !important; }
+.modal { width: 100%; max-width: 440px; text-align: center; }
+.modal h3 { font-family: var(--display); font-weight: 400; font-size: 2rem; letter-spacing: .04em; color: var(--danger); margin: 0 0 6px; }
+.modal p { color: var(--muted); margin: 0 0 18px; }
+
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  .bat.b2, .ghost.g1 { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="sky" aria-hidden="true">
+  <div class="stars"></div>
+  <div class="moon"></div>
+  <div class="bat b1"><svg viewBox="0 0 60 28"><path d="M30 10C26 4 16 2 2 6c6 2 8 6 7 12 4-4 8-4 11 1 3-4 7-3 10 3 3-6 7-7 10-3 3-5 7-5 11-1-1-6 1-10 7-12C44 2 34 4 30 10zM26 7l1-6 3 5 3-5 1 6z"/></svg></div>
+  <div class="bat b2"><svg viewBox="0 0 60 28"><path d="M30 10C26 4 16 2 2 6c6 2 8 6 7 12 4-4 8-4 11 1 3-4 7-3 10 3 3-6 7-7 10-3 3-5 7-5 11-1-1-6 1-10 7-12C44 2 34 4 30 10zM26 7l1-6 3 5 3-5 1 6z"/></svg></div>
+  <div class="bat b3"><svg viewBox="0 0 60 28"><path d="M30 10C26 4 16 2 2 6c6 2 8 6 7 12 4-4 8-4 11 1 3-4 7-3 10 3 3-6 7-7 10-3 3-5 7-5 11-1-1-6 1-10 7-12C44 2 34 4 30 10zM26 7l1-6 3 5 3-5 1 6z"/></svg></div>
+  <div class="ghost g1">👻</div>
+  <div class="ghost g2">👻</div>
+  <div class="ground"></div>
+  <div class="pumpkins"><span>🎃</span><span>🕸️</span><span>🎃</span><span>🦇</span><span>🎃</span><span>🕯️</span><span>🎃</span></div>
+</div>
+
+<main class="app">
+
+  <!-- STUDENT VIEW -->
+  <section id="studentView" class="view">
+    <h1 class="title">Forbidden Word</h1>
+    <p class="tag">Can you describe it <em>without saying it?</em></p>
+
+    <div id="entry" class="panel">
+      <label class="lbl" for="nameInput">Your name</label>
+      <input id="nameInput" type="text" placeholder="Enter your name" maxlength="40" autocomplete="off" autocapitalize="words">
+      <div id="nameErr" class="err" role="alert"></div>
+      <button id="getBtn" class="btn big" type="button">Get my word</button>
+    </div>
+
+    <div id="result" hidden>
+      <div class="card" id="wordCard">
+        <div class="for">Word for <b id="forName"></b></div>
+        <p class="kick">Your forbidden word is</p>
+        <div class="word" id="wordText"></div>
+        <p class="rule">Describe your word without saying, spelling, or writing it!</p>
+        <div class="row">
+          <button id="newBtn" class="btn" type="button">New word</button>
+          <button id="changeBtn" class="btn ghosty" type="button">Change name</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHER LOGIN -->
+  <section id="loginView" class="view" hidden>
+    <div class="lock" aria-hidden="true">🔐</div>
+    <h2 class="h2">Teacher access</h2>
+    <p class="sub">Enter the teacher password to see the private list.</p>
+    <form id="loginForm" class="panel" autocomplete="off">
+      <label class="lbl" for="pwInput">Password</label>
+      <input id="pwInput" type="password" placeholder="Password" autocomplete="off">
+      <div id="pwErr" class="err" role="alert"></div>
+      <div class="row">
+        <button class="btn" type="submit">Unlock</button>
+        <button id="loginBack" class="btn ghosty" type="button">Back to game</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- TEACHER DASHBOARD -->
+  <section id="dashView" class="view dash" hidden>
+    <div class="dash-head">
+      <h2>Teacher panel</h2>
+      <button id="dashBack" class="btn ghosty small" type="button">Lock and go back</button>
+    </div>
+    <div class="note">Assignments are saved only in this browser on this device. Students on other devices will not appear here.</div>
+    <div class="tools">
+      <input id="searchInput" type="text" placeholder="Search by student or word" autocomplete="off">
+      <button id="refreshBtn" class="btn small" type="button">Refresh list</button>
+      <button id="clearBtn" class="btn small danger" type="button">Clear all</button>
+    </div>
+    <div class="stats"><span><b id="statStudents">0</b> students</span><span><b id="statAssign">0</b> assignments</span></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Student</th><th>Forbidden word</th><th>Time</th><th>Status</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="emptyMsg" class="empty" hidden></div>
+    </div>
+  </section>
+</main>
+
+<button id="teacherBtn" class="tbtn" type="button">TEACHER ACCESS</button>
+
+<div id="clearVeil" class="veil" hidden>
+  <div class="panel modal" role="dialog" aria-modal="true" aria-labelledby="clearTitle">
+    <h3 id="clearTitle">Delete everything?</h3>
+    <p>This removes every student assignment saved in this browser. You cannot undo it.</p>
+    <div class="row">
+      <button id="clearNo" class="btn ghosty" type="button">Cancel</button>
+      <button id="clearYes" class="btn danger" type="button">Yes, delete all</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var WORDS = [
+    'Pumpkin','Witch','Ghost','Haunted house','Vampire','Spider web','Skeleton','Broomstick','Candy corn','Cauldron',
+    'Werewolf','Graveyard','Full moon','Scarecrow','Mummy','Bat','Cobweb','Costume','Trick-or-treating','Frankenstein',
+    'Nightmare','Spell','Potion','Tombstone','Monster','Zombie','Black cat',"Witch's hat",'Candy bucket','Mask',
+    'Owl','Fog','Moonlight','Coffin','Magic wand','Spider','Eyeball','Haunted forest','Crystal ball','Zombie apocalypse',
+    'Blood moon','Creepy doll','Cursed mirror','Ghost town','Howling wolf','Haunted mansion',"Jack-o'-lantern",'Monster costume','Haunted castle',"Witch's potion",
+    'Candle','Lantern','Goblin','Skull','Ghoul','Dracula','Raven','Fangs','Vampire cape','Shadow',
+    'Midnight','Scream','Bonfire','Hayride','Apple cider','Lollipop','Chocolate bar','Pitchfork','Bones','Ghost story',
+    'Haunted hotel','Secret passage','Candy apple','Flying broom','Spooky night','Trick or treat'
+  ];
+  var KEY_A = 'forbiddenword_assignments_v1';
+  var KEY_D = 'forbiddenword_deck_v1';
+  var PASSWORD = 'HALLOWEEN2026';
+
+  var mem = {};
+  function load(k, def) {
+    try { var v = localStorage.getItem(k); if (v) return JSON.parse(v); } catch (e) {}
+    return (k in mem) ? JSON.parse(mem[k]) : def;
+  }
+  function save(k, v) {
+    mem[k] = JSON.stringify(v);
+    try { localStorage.setItem(k, mem[k]); } catch (e) {}
+  }
+
+  function $(id) { return document.getElementById(id); }
+  var views = { student: $('studentView'), login: $('loginView'), dash: $('dashView') };
+  function show(name) {
+    for (var k in views) views[k].hidden = (k !== name);
+    document.body.classList.toggle('is-dash', name === 'dash');
+    $('teacherBtn').hidden = (name !== 'student');
+    window.scrollTo(0, 0);
+  }
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  // Deck: every word is used once before any word repeats.
+  function draw(avoid) {
+    var deck = load(KEY_D, []).filter(function (w) { return WORDS.indexOf(w) !== -1; });
+    if (!deck.length) deck = shuffle(WORDS.slice());
+    if (avoid && deck[deck.length - 1] === avoid) {
+      if (deck.length > 1) { var t = deck[0]; deck[0] = deck[deck.length - 1]; deck[deck.length - 1] = t; }
+      else deck = [avoid].concat(shuffle(WORDS.filter(function (w) { return w !== avoid; })));
+    }
+    var w = deck.pop();
+    save(KEY_D, deck);
+    return w;
+  }
+
+  /* ---------- student ---------- */
+  var nameInput = $('nameInput'), nameErr = $('nameErr');
+  var current = null;
+
+  function giveWord(isNew) {
+    var name = nameInput.value.trim();
+    if (!name) {
+      nameErr.textContent = 'Please enter your name first.';
+      $('entry').classList.remove('shake'); void $('entry').offsetWidth; $('entry').classList.add('shake');
+      $('entry').hidden = false; $('result').hidden = true;
+      nameInput.focus();
+      return;
+    }
+    nameErr.textContent = '';
+    var word = draw(isNew && current ? current.word : null);
+    var list = load(KEY_A, []);
+    var n = list.reduce(function (m, a) { return Math.max(m, a.n); }, 0) + 1;
+    var key = name.toLowerCase();
+    list.forEach(function (a) { if (a.name.toLowerCase() === key) a.current = false; });
+    list.push({ n: n, name: name, word: word, time: Date.now(), current: true });
+    save(KEY_A, list);
+    current = { name: name, word: word };
+    $('forName').textContent = name;
+    $('wordText').textContent = word;
+    var card = $('wordCard');
+    card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+    $('entry').hidden = true;
+    $('result').hidden = false;
+  }
+
+  $('getBtn').addEventListener('click', function () { giveWord(false); });
+  $('newBtn').addEventListener('click', function () { giveWord(true); });
+  nameInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') giveWord(false); });
+  nameInput.addEventListener('input', function () { nameErr.textContent = ''; });
+  $('changeBtn').addEventListener('click', function () {
+    current = null;
+    nameInput.value = '';
+    $('result').hidden = true;
+    $('entry').hidden = false;
+    nameInput.focus();
+  });
+
+  /* ---------- teacher ---------- */
+  var unlocked = false;
+  $('teacherBtn').addEventListener('click', function () {
+    if (unlocked) { show('dash'); render(); return; }
+    $('pwInput').value = ''; $('pwErr').textContent = '';
+    show('login');
+    $('pwInput').focus();
+  });
+  $('loginBack').addEventListener('click', function () { show('student'); });
+  $('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if ($('pwInput').value.trim() === PASSWORD) {
+      unlocked = true;
+      $('pwInput').value = '';
+      show('dash');
+      $('searchInput').value = '';
+      render();
+    } else {
+      $('pwErr').textContent = 'Wrong password. Try again.';
+      var f = $('loginForm'); f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake');
+      $('pwInput').select();
+    }
+  });
+  $('dashBack').addEventListener('click', function () { unlocked = false; show('student'); });
+
+  function fmtTime(ts) {
+    try { return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+  }
+  function cell(tag, cls, text) { var c = document.createElement(tag); if (cls) c.className = cls; c.textContent = text; return c; }
+
+  function render() {
+    var all = load(KEY_A, []);
+    var q = $('searchInput').value.trim().toLowerCase();
+    var rows = all.filter(function (a) {
+      return !q || a.name.toLowerCase().indexOf(q) !== -1 || a.word.toLowerCase().indexOf(q) !== -1;
+    }).sort(function (a, b) { return b.n - a.n; });
+
+    var names = {};
+    all.forEach(function (a) { names[a.name.toLowerCase()] = 1; });
+    $('statStudents').textContent = Object.keys(names).length;
+    $('statAssign').textContent = all.length;
+    $('clearBtn').disabled = all.length === 0;
+
+    var tb = $('rows');
+    tb.textContent = '';
+    rows.forEach(function (a) {
+      var tr = document.createElement('tr');
+      if (!a.current) tr.className = 'old';
+      tr.appendChild(cell('td', 'n', a.n));
+      tr.appendChild(cell('td', 'who', a.name));
+      tr.appendChild(cell('td', 'what', a.word));
+      tr.appendChild(cell('td', 'when', fmtTime(a.time)));
+      var st = document.createElement('td');
+      st.appendChild(cell('span', 'pill ' + (a.current ? 'cur' : 'old'), a.current ? 'Current' : 'Replaced'));
+      tr.appendChild(st);
+      tb.appendChild(tr);
+    });
+    var em = $('emptyMsg');
+    if (!rows.length) {
+      em.hidden = false;
+      em.textContent = all.length
+        ? 'No student or word matches your search.'
+        : 'No words assigned yet. When a student taps GET MY WORD in this browser, it will appear here.';
+    } else em.hidden = true;
+  }
+
+  $('searchInput').addEventListener('input', render);
+  $('refreshBtn').addEventListener('click', render);
+  window.addEventListener('storage', function () { if (!views.dash.hidden) render(); });
+
+  var veil = $('clearVeil');
+  $('clearBtn').addEventListener('click', function () { veil.hidden = false; $('clearNo').focus(); });
+  $('clearNo').addEventListener('click', function () { veil.hidden = true; });
+  veil.addEventListener('click', function (e) { if (e.target === veil) veil.hidden = true; });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') veil.hidden = true; });
+  $('clearYes').addEventListener('click', function () {
+    save(KEY_A, []);
+    save(KEY_D, []);
+    veil.hidden = true;
+    render();
+  });
+
+  show('student');
+})();
+</script>
+
+</body></html>
